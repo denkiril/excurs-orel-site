@@ -1,0 +1,169 @@
+<!-- Starts 8 okt 2018 -->
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="include/bootstrap-grid.min.css" />
+    <link rel="stylesheet" type="text/css" href="include/slick.css"/>
+    <link rel="stylesheet" type="text/css" href="include/slick-theme.css"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:300,400&amp;subset=cyrillic" />
+    <link rel="stylesheet" href="css/main.css" />
+    <title>Экскурсии по Орлу</title>
+</head>
+
+<body>
+    <!-- header & nav -->
+    <div class="container">
+        <header>
+            <div class="row">
+                <div class="col header-container flex-container">
+                    <h1 class="logo-wrapper"><a href="#">Экскурсии по Орлу</a></h1> 
+                    <!-- <h1><span class="logo-wrapper"><a href="#">Экскурсии по Орлу</a></span></h1>  -->
+                    <img src="img/Logo_200.png" height="90px" alt="Экскурсии по Орлу" />
+                </div>
+            </div>
+        </header>
+
+        <!-- <input type="checkbox" id="menu-checkbox" /> -->
+        <nav role="navigation">
+            <div class="row">
+                <!-- <label for="menu-checkbox" class="toggle-button" data-open="MENU" data-close="CLOSE" onclick></label> -->
+                <div class="col nav-container flex-container">
+                    <div class="icon-container">
+                        <div class="menu-icon">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                    <div class="nav-title">ЭКСКУРСИИ</div>
+                    <ul class="nav-menu">
+                        <li class="act-item"><span class="nav-item-text">ЭКСКУРСИИ</span></li>
+                        <li class="nav-item"><a href="#"><span class="nav-item-text">КВЕСТЫ</span></a></li>
+                        <li class="nav-item"><a href="#"><span class="nav-item-text">СУВЕНИРЫ</span></a></li>
+                        <li class="nav-item"><a href="#"><span class="nav-item-text">ПУТЕВОДИТЕЛЬ</span></a></li>
+                        <li class="nav-item"><a href="#"><span class="nav-item-text">ЗАКАЗАТЬ<br>ЭКСКУРСИЮ</span></a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+    </div> <!-- / header & nav -->
+
+    <main>
+    <div class="container main-container">
+        <!-- welcome section -->
+        <section role="welcome">
+            <div class="row section-container main-section">
+                <div class="col-md-12 col-lg-6">
+                        <p>Добро пожаловать на сайт краеведческого движения «Экскурсии по Орлу»!</p>
+                        <p>Мы знаем историю Орла и готовы делиться своими знаниями со всеми желающими. С 2015 года мы регулярно проводим бесплатные экскурсии по Орлу, лекции, а также сборные экскурсии для небольших групп. Следите за <a href="#announcement" class="ref-text">нашими анонсами</a>, чтобы не пропустить время и место очередной встречи.</p>
+                        <p>Вы всегда можете заказать экскурсию по Орлу на удобное вам время и по интересующей вас теме.</p>
+                        <p>Жмите: <a href="#" class="target-action">Заказать экскурсию!</a></p>
+                </div>
+                <div class="offset-md-1 col-md-10 offset-lg-0 col-lg-6">
+                    <div class="main-carousel">
+                        <div>
+                            <picture>
+                                <source srcset="img/excurs-photos/ex-orel-1_1920.webp" media="(min-width: 769px)" type="image/webp" />
+                                <source srcset="img/excurs-photos/ex-orel-1_1920.jpg" media="(min-width: 769px)" />
+                                <source srcset="img/excurs-photos/ex-orel-1_768.webp" type="image/webp" />
+                                <img src="img/excurs-photos/ex-orel-1_768.jpg" alt="Экскурсия по Орлу" />
+                            </picture>
+                        </div>
+                        <div><img src="img/excurs-photos/ex-orel-2.jpg" alt="Экскурсия по Орлу" /></div>
+                        <div><img src="img/excurs-photos/ex-orel-3.jpg" alt="Экскурсия по Орлу" /></div>
+                        <div><img src="img/excurs-photos/ex-orel-4.jpg" alt="Экскурсия по Орлу" /></div>
+                        <div><img src="img/excurs-photos/ex-orel-5.jpg" alt="Экскурсия по Орлу" /></div>
+                    </div>
+                </div>
+            </div>
+        </section> <!-- / welcome section -->
+
+        <!-- announcement section -->
+        <a name="announcement"></a>
+        <section role="announcement">
+            <div class="row section-container">
+                <div class="col">
+                    <h2>АКТУАЛЬНОЕ</h2>
+                    <div class="row">
+                        <div class="news-card-container col-md-6 col-lg-4">
+                            <div class="news-card">
+                                <a href="#"><img src="img/excurs-photos/eo-news-1.jpg" border="0" alt="Экскурсия по Орлу" /></a> 
+                                <p>Квест-экскурсия по местам жизни Ивана Тургенева. <a href="#" class="ref-text">Подробнее</a></p>
+                            </div>
+                        </div>
+                        <div class="news-card-container col-md-6 col-lg-4">
+                            <div class="news-card">
+                                <a href="#"><img src="img/excurs-photos/eo-news-2.jpg" border="0" alt="Экскурсия по Орлу" /></a>
+                                <p>Учебные курсы по истории города Орла и экскурсионной деятельности «Узнай свой город». 
+                                    <a href="#" class="ref-text">Подробнее</a></p>
+                            </div>
+                        </div>
+                        <div class="news-card-container col-md-6 col-lg-4">
+                            <div class="news-card">
+                                <a href="#"><img src="img/excurs-photos/eo-news-3.jpg" border="0" alt="Экскурсия по Орлу" /></a>
+                                <p>Главная площадка сообщества и самая актуальная информация – в группе 
+                                    <a href="https://vk.com/excurs_orel" class="ref-text">vk.com/excurs_orel</a></p> 
+                            </div>
+                        </div>
+                        <div class="news-card-container col-md-6 col-lg-4">
+                            <div class="news-card">
+                                <picture>
+                                    <source srcset="img/excurs-photos/ex-orel-1_1920.webp" media="(min-width: 769px)" type="image/webp">
+                                    <source srcset="img/excurs-photos/ex-orel-1_1920.jpg" media="(min-width: 769px)">
+                                    <source srcset="img/excurs-photos/ex-orel-1_768.webp" type="image/webp">
+                                    <img src="img/excurs-photos/ex-orel-1_768.jpg" alt="Экскурсия по Орлу">
+                                </picture>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section> <!-- / announcement section -->
+
+    </div>
+    </main>
+
+    <!-- footer -->
+    <div class="container footer-container">
+        <footer>
+            <div class="row">
+                <div class="col-12 col-sm-7 col-lg-9 footer-links">
+                    <a href="#">О проекте</a><br />
+                    <a href="#">Путеводитель по Орлу</a><br />
+                    <a href="#">Орловские сувениры</a><br />
+                    <a href="#">Квесты в Орле</a><br />
+                    <a href="#">Заказать экскурсию в Орле</a><br />
+                    <a href="#">Контакты</a><br />
+                </div>
+                <div class="offset-6 col-6 offset-sm-0 col-sm-5 offset-lg-0 col-lg-3 soclogo-cont">
+                    <a href="https://vk.com/excurs_orel" target="_blank" class="soc-logo">
+                        <img class="logo-1" src="img/vk-1.svg" border="0" alt="Экскурсии по Орлу ВКонтакте" />
+                        <img class="logo-2" src="img/vk-2.svg" border="0" alt="Экскурсии по Орлу ВКонтакте" />
+                    </a>
+                    <a href="#" target="_blank" class="soc-logo">
+                        <img class="logo-1" src="img/facebook-1.svg" border="0" alt="Экскурсии по Орлу в фейсбуке" />
+                        <img class="logo-2" src="img/facebook-2.svg" border="0" alt="Экскурсии по Орлу в фейсбуке" />
+                    </a>
+                    <a href="#" target="_blank" class="soc-logo">
+                        <img class="logo-1" src="img/instagram-1.svg" border="0" alt="Экскурсии по Орлу в инстаграме" />
+                        <img class="logo-2" src="img/instagram-2.svg" border="0" alt="Экскурсии по Орлу в инстаграме" />
+                    </a>
+                </div>
+            </div>
+
+            <p>© 2015-2019 «Экскурсии по Орлу»</p>
+        </footer>
+    </div>
+
+    <script src="include/jquery-3.3.1.min.js"></script>
+    <script src="include/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="include/slick.min.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
