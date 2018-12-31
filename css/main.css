@@ -163,6 +163,7 @@ body{
     text-decoration: none;
     color: inherit;
     background-color: #ffd649;
+    padding: 0 4px;
     /* width: 100%; */
 }
 .target-action:hover{
