@@ -39,7 +39,12 @@ body{
 } */
 .nav-container{
     background-color: #e0f3fc;
+    position: relative;
+    /* padding: 10px 15px; */
 }
+/* .menu-container{
+    position: relative;
+} */
 .nav-menu{
     display: flex;
     display: -ms-flexbox;
@@ -51,6 +56,7 @@ body{
     margin: 0;
     height: 3em;
     width: 100%;
+    background-color: inherit;
 }
 .nav-menu li{
     list-style: none;
@@ -63,9 +69,14 @@ body{
     -ms-flex-align: center !important;
     /* background: #ffd649; */
 }
-.nav-item a{
+.nav-menu a{
     text-decoration: none;
     color: #015a8d;
+}
+.act-item a{
+    color: #000 !important;
+}
+.nav-item a{
     height: 100%;
     display: flex;
     display: -ms-flexbox;
@@ -78,25 +89,24 @@ body{
 .nav-item:hover{
     background: #ffd649;
 }
-.nav-item-text{
+/* .nav-item-text{ */
+.nav-item span{
     text-align: center;
     padding: 0 8px;
-    /* font-size: 1em; */
-    /* display: block; */
 }
-.nav-title{
+.nav-adaptive{
+    padding: 10px 15px;
     display: none;
 }
-.icon-container{
-    height: 100%;
-}
+/* .nav-title */
+
 .menu-icon {
-    display: none;
+    /* display: none; */
     width: 42px;
     height: 30px;
     position: relative;
     cursor: pointer;
-    margin: 10px 0;
+    /* margin: 10px 0; */
 }
 .menu-icon span {
     display: block;
@@ -119,28 +129,29 @@ body{
 .menu-icon span:nth-child(4) {
     top: 24px;
 }
-.nav-container.menu_state_open .menu-icon span:nth-child(1) {
+/* .nav-container.menu_state_open .menu-icon span:nth-child(1) { */
+.menu-icon.menu_state_open span:nth-child(1) {
     top: 18px;
     width: 0%;
     left: 50%;
 }
-.nav-container.menu_state_open .menu-icon span:nth-child(2) {
+.menu-icon.menu_state_open span:nth-child(2) {
     transform: rotate(45deg);
 }
-.nav-container.menu_state_open .menu-icon span:nth-child(3) {
+.menu-icon.menu_state_open span:nth-child(3) {
     transform: rotate(-45deg);
 }
-.nav-container.menu_state_open .menu-icon span:nth-child(4) {
+.menu-icon.menu_state_open span:nth-child(4) {
     top: 18px;
     width: 0%;
     left: 50%;
 }
-.nav-container.menu_state_open .nav-menu {
+/* .nav-container.menu_state_open .nav-menu {
     display: block;  
 }
 .nav-container.menu_state_open .nav-title {
     display: none;
-}
+} */
 
 .main-container{
     margin-top: 20px;
@@ -150,12 +161,12 @@ body{
 .section-container{
     margin-bottom: 20px;
 }
-.ref-text{
+/* .ref-text{ */
+.section-container a{
     text-decoration: none;
-    /* text-decoration-style: dotted; */
     color: #005281;
 }
-.ref-text:hover{
+.section-container a:hover{
     text-decoration: underline;
     color: inherit;
 }
@@ -231,18 +242,23 @@ h2{
 .footer-links{
     margin-bottom: 20px;
 }
-.soclogo-cont{
+.soc-container{
     padding: 0;
     margin-bottom: 20px;
 }
-/* .soclogo-cont a{ */
-.soc-logo{
+.soc-container a{
+    /* width: 30%;
+    padding: 0 5px; */
     text-decoration: none;
 }
+/* .soc-logo{
+    
+} */
 .soc-logo img{
-    width: 25%;
-    margin-right: 5%;
-    border: 0;
+    width: 27%;
+    margin: 0 2%;
+    /* border: 0; */
+    text-decoration: none;
 }
 .soc-logo img.logo-2{
     display: none;
@@ -254,12 +270,20 @@ h2{
     display: none;
 }
 
-/* .text-center{
-    text-align: center;
+/* #nav-block{
+    width: initial;    
 } */
+.fixed{
+    position: fixed;
+    z-index: 10;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+}
 
 @media screen and (max-width: 992px) {
-    .nav-item-text{
+    /* .nav-item-text{ */
+    .nav-item span{
         font-size: 18px;
     }
     .main-section{
@@ -277,25 +301,33 @@ h2{
     .header-container h1{
         font-size: 1.5em;
     }
+    /* .menu-icon, .nav-title */
+    .nav-adaptive {
+        display: flex;
+    }
     .nav-menu{
         display: none;
         height: auto;
-        width: auto;
+        /* width: auto; */
+        position: absolute;
+        z-index: 10;
+        margin-top: -2px;
     }
     .nav-menu li{
         height: auto;
-        position: inherit;
+        /* position: inherit; */
+        /* position: static; */
         display: block;
+        margin: 15px;
     }
     .act-item{
         display: none !important;
     }    
     .nav-item{
-        margin: 10px 0;
-        /* padding-right: 20px; */
         text-align: right;
     }
-    .nav-item-text{
+    /* .nav-item-text{ */
+    .nav-item span{
         padding: 0;
         text-align: right;
     }
@@ -311,12 +343,7 @@ h2{
     .nav-item:hover{
         background: transparent;
     }
-    .menu-icon{
-        display: block; 
-    }
-    .nav-title{
-        display: block;
-    }
+
     /*.toggle-button{
         float: right;
         cursor: pointer;
