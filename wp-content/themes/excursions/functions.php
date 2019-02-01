@@ -41,6 +41,8 @@ if ( ! function_exists( 'excursions_setup' ) ) :
 		 * @link https://developer.wordpress.org/themes/functionality/featured-images-post-thumbnails/
 		 */
 		add_theme_support( 'post-thumbnails' );
+		// set_post_thumbnail_size( 150, 150 );
+
 		add_image_size( 'anno-thumb', 600, 400, true );
 
 		// This theme uses wp_nav_menu() in one location.

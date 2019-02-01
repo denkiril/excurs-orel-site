@@ -19,23 +19,54 @@ get_header();
 		<div class="container main-container">
 		<main id="main">
 
-		<?php if ( have_posts() ) while ( have_posts() ) :
-			the_post();
-			the_content();
+		<section role="announcement">
+            <div class="row section-container">
+			<div class="col">
 
-			// get_template_part( 'template-parts/content', 'page' );
+		<?php  
+		the_post();
+		the_content(); ?>
 
-			if ( comments_open() || get_comments_number() ) :
-				comments_template();
-			endif;
+		<h2>ПРЕДСТОЯЩИЕ МЕРОПРИЯТИЯ</h2>
+		
+		<?php 
+		$myposts = get_posts();
+		foreach( $myposts as $post ){
+			setup_postdata( $post ); ?>
 
-		endwhile; 
+			<div class="row anno-card">
+                <div class="col-12 col-md-4">
+					<a href="<?php the_permalink() ?>" title="Ссылка на: <?php the_title_attribute(); ?>">
+						<?php the_post_thumbnail('medium'); ?>
+					</a>
+				</div>
+				<div class="col-12 col-md-8">
+					<?php the_title('<h3>', '</h3>'); ?>
+					<?php // echo get_the_excerpt() . '<a href="' . get_permalink() .'"> [ Подробнее... ]</a>'; ?>
+					<p>
+						<?php echo get_the_excerpt() . '  ' ?> 
+						<a href="<?php the_permalink() ?>">Подробнее...</a>
+					</p>
+				</div>
+			</div>
+
+			<?php 
+			}
+			wp_reset_postdata(); ?>
+
+		<?php 
+		// $myposts = get_posts('post_type=attachment');
+		// foreach( $myposts as $post ){
+		// 	setup_postdata( $post ); 
+		// 	echo wp_get_attachment_image( $post->ID, 'medium' );
+		// 	}
+		// 	wp_reset_postdata(); 
 		?>
-		Ивенты!
 
-		<!-- <?php the_post(); ?> -->
-		<!-- <?php the_content(); ?> -->
-
+			</div>
+			</div>
+		</section> <!-- / announcement section -->
+		
 		</main><!-- #main -->
 		</div> <!-- .main-container -->
 	</div><!-- #primary -->

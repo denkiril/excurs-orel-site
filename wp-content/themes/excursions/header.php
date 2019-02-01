@@ -37,18 +37,33 @@
 		<div class="container">
 			<div class="row">
                 <div class="col header-container flex-container">
-                    <h1><?php echo get_post_meta( $post->ID, 'header-h1', true ); ?></h1> 
+					<?php 
+						$headertitle = get_bloginfo();
+						$postmeta = get_post_meta( $post->ID, 'header-h1', true ); 
+						if($postmeta) $headertitle = $postmeta;
+						if ( is_page() ) :
+							$headertitle_html = '<h1 class="header-title">'.$headertitle.'</h1>';
+							$navtitle = get_the_title();
+						else :
+							$headertitle_html = '<h2 class="header-title">'.$headertitle.'</h2>';
+							$navtitle = $post->ID;
+						endif;
+						echo $headertitle_html;
+					?>
 					<!-- <h1 class="logo-wrapper"><a href="/">Экскурсии по Орлу</a></h1>  -->
 					<a href="<?php echo home_url(); ?>">
 						<img src="<?php echo get_template_directory_uri() ?> . /assets/img/Logo_200.png" alt="Экскурсии по Орлу" />
 					</a>
                 </div>
             </div>
+		</div>
 
+		<div class="container nav-container">
 			<nav id="nav-block" role="navigation">
 				<div class="row">
 					<div class="col">
-						<div class="nav-container">
+						<!-- <div class="nav-container"> -->
+						<div>
 							<div id="nav-adaptive" class="flex-container">
 								<button id="menu">
 									<span></span>
@@ -56,7 +71,7 @@
 									<span></span>
 									<span></span>
 								</button>
-								<div class="nav-title"><?php the_title(); ?></div>
+								<div class="nav-title"><?php echo $navtitle; ?></div>
 							</div>
 						</div>
 						<!--<div class="nav-container">
@@ -69,7 +84,8 @@
 								<li class="nav-item"><a href="#"><span>ЗАКАЗАТЬ<br>ЭКСКУРСИЮ</span></a></li>
 							</ul>
 						</div>-->
-						<div class="nav-container">
+						<!-- <div class="nav-container"> -->
+						<div>
 							<?php wp_nav_menu( array(
 								'theme_location'  => 'Primary',
 								'menu'            => 'menu-1',
