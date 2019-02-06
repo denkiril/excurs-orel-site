@@ -189,3 +189,70 @@ if ( defined( 'JETPACK__VERSION' ) ) {
 // remove_filter( 'the_content', 'wpautop' );
 // remove_filter( 'the_excerpt', 'wpautop' );
 // remove_filter( 'comment_text', 'wpautop' );
+
+add_action( 'anno-cards', 'anno_func', 10, 3);
+
+function anno_func( $cat_name, $section_title, $read_more='Подробнее...' ) {
+	global $post;
+	$args = array( 'post_type' => 'post', 'category_name' => $cat_name );
+	$myposts = get_posts( $args );
+	if ( $myposts ): 
+		echo '<section role="' . $cat_name . '"><div class="row section-container"><div class="col">';
+		echo '<h2>' . $section_title . '</h2>';
+		foreach( $myposts as $post ):
+			setup_postdata( $post );
+			$permalink = get_the_permalink(); 
+			$title = esc_html( get_the_title() );
+			$echo = '<div class="row anno-card"><div class="col-12 col-md-4"><a href="' . $permalink . '" tabindex="-1">'; 
+			$echo .= get_the_post_thumbnail(null, 'medium');
+			$echo .= '</a></div><div class="col-12 col-md-8"><h3><a href="' . $permalink . '" title="Ссылка на: '; 
+			$echo .= $title . '">' . $title . '</a></h3><p>' . get_the_excerpt() . '  ';
+			$echo .= '<a href="' . $permalink . '" tabindex="-1">' . $read_more . '</a></p></div></div>';
+			echo $echo; 
+			wp_reset_postdata();
+		endforeach;
+		echo '</div></div></section>';
+	endif;
+}
+
+add_shortcode( 'annocards', 'annocards_func' );
+
+// использование: [annocards post_type = "post" cat_name="event" section_title="Приходите"] 
+
+function annocards_func( $atts ){
+	// белый список параметров и значения по умолчанию
+	$atts = shortcode_atts( array(
+		'post_type' => 'post',
+		'cat_name' => '',
+		'section_title' => '',
+		'read_more' => 'Подробнее...'
+	), $atts );
+
+	$post_type = $atts['post_type'];
+	$cat_name = $atts['cat_name'];
+	$section_title = $atts['section_title'];
+	$read_more = $atts['read_more'];
+	$echo = '';
+
+	global $post;
+	$args = array( 'post_type' => $post_type, 'category_name' => $cat_name );
+	$myposts = get_posts( $args );
+	if ( $myposts ): 
+		$echo .= '<section role="' . $cat_name . '"><div class="row section-container"><div class="col">';
+		$echo .= '<h2>' . $section_title . '</h2>';
+		foreach( $myposts as $post ):
+			setup_postdata( $post );
+			$permalink = get_the_permalink(); 
+			$title = esc_html( get_the_title() );
+			$echo .= '<div class="row anno-card"><div class="col-12 col-md-4"><a href="' . $permalink . '" tabindex="-1">'; 
+			$echo .= get_the_post_thumbnail(null, 'medium');
+			$echo .= '</a></div><div class="col-12 col-md-8"><h3><a href="' . $permalink . '" title="Ссылка на: '; 
+			$echo .= $title . '">' . $title . '</a></h3><p>' . get_the_excerpt() . '  ';
+			$echo .= '<a href="' . $permalink . '" tabindex="-1">' . $read_more . '</a></p></div></div>';
+			wp_reset_postdata();
+		endforeach;
+		$echo .= '</div></div></section>';
+	endif;
+
+	return $echo;
+}

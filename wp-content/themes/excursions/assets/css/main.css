@@ -164,6 +164,7 @@ body{
 main h2{
     font-size: 1em;
     text-align: center;
+    text-transform: uppercase;
     margin-bottom: 1em;
 }
 main h3{
@@ -344,6 +345,10 @@ img[data-src]{
 }
 .anno-card p{
     margin-top: 0.8em;
+}
+.anno-card a:focus img{
+    outline: thin dotted;
+    /* outline-width: medium; */
 }
 
 

@@ -15,8 +15,8 @@
 get_header();
 ?>
 
-	<div id="primary" class="content-area">
-		<div class="container main-container">
+	<!-- <div id="primary" class="content-area"> -->
+	<div class="container main-container">
 		<main id="main">
 
 		<?php
@@ -36,8 +36,8 @@ get_header();
 		<?php the_content(); ?>
 
 		</main><!-- #main -->
-		</div> <!-- .main-container -->
-	</div><!-- #primary -->
+	</div> <!-- .main-container -->
+	<!-- </div>#primary -->
 
 <?php
 // get_sidebar();
