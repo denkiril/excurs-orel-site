@@ -161,6 +161,26 @@ body{
     display: none;
 } */
 
+.breadcrumbs{
+    margin-top: 15px;
+    font-size: 0.8em;
+}
+
+.main-container{
+    margin-top: 20px;
+    font-weight: 300;
+    color: #000;
+}
+.main-container a,
+.breadcrumbs a{
+    text-decoration: none;
+    color: #005281;
+}
+.main-container a:hover,
+.breadcrumbs a:hover{
+    /* text-decoration: underline; */
+    color: inherit;
+}
 main h2{
     font-size: 1em;
     text-align: center;
@@ -170,19 +190,6 @@ main h2{
 main h3{
     font-size: 1em;
     /* font-weight: 500; */
-}
-.main-container{
-    margin-top: 20px;
-    font-weight: 300;
-    color: #000;
-}
-.main-container a{
-    text-decoration: none;
-    color: #005281;
-}
-.main-container a:hover{
-    /* text-decoration: underline; */
-    color: inherit;
 }
 .section-container{
     margin-bottom: 20px;
@@ -349,6 +356,38 @@ img[data-src]{
 .anno-card a:focus img{
     outline: thin dotted;
     /* outline-width: medium; */
+}
+
+.events-image{
+    float: left;
+    max-width: 768px;
+    width: 40%;
+    height: auto;
+    margin: 0 15px 10px 0;
+}
+
+@media (max-width: 1200px) {
+    .events-image {
+        width: 50%;
+    }
+}
+@media (max-width: 992px) {
+    .events-image {
+        float: none;
+        display: block;
+        width: 80%;
+        margin: 0 auto 10px auto;
+    }
+}
+@media (max-width: 768px) {
+    .events-image {
+        width: 90%;
+    }
+}
+@media (max-width: 576px) {
+    .events-image {
+        width: 100%;
+    }
 }
 
 

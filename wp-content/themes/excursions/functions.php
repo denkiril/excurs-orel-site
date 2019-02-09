@@ -43,7 +43,7 @@ if ( ! function_exists( 'excursions_setup' ) ) :
 		add_theme_support( 'post-thumbnails' );
 		// set_post_thumbnail_size( 150, 150 );
 
-		add_image_size( 'anno-thumb', 600, 400, true );
+		// add_image_size( 'anno-thumb', 600, 400, true );
 
 		// This theme uses wp_nav_menu() in one location.
 		register_nav_menus( array(
@@ -217,7 +217,7 @@ function anno_func( $cat_name, $section_title, $read_more='Подробнее...
 
 add_shortcode( 'annocards', 'annocards_func' );
 
-// использование: [annocards post_type = "post" cat_name="event" section_title="Приходите"] 
+// использование: [annocards post_type="post" cat_name="event" section_title="Приходите"] 
 
 function annocards_func( $atts ){
 	// белый список параметров и значения по умолчанию
@@ -255,4 +255,47 @@ function annocards_func( $atts ){
 	endif;
 
 	return $echo;
+}
+
+add_action( 'init', 'register_post_types' );
+
+function register_post_types(){
+	register_post_type('events', array(
+		'label'  => null,
+		'labels' => array(
+			'name'               => 'События', // основное название для типа записи
+			'singular_name'      => 'Событие', // название для одной записи этого типа
+			'add_new'            => 'Добавить событие', // для добавления новой записи
+			'add_new_item'       => 'Добавление события', // заголовка у вновь создаваемой записи в админ-панели.
+			'edit_item'          => 'Редактировать событие', // для редактирования типа записи
+			'new_item'           => 'Новое событие', // текст новой записи
+			'view_item'          => 'Смотреть событие', // для просмотра записи этого типа.
+			'search_items'       => 'Искать события', // для поиска по этим типам записи
+			'not_found'          => 'Не найдено', // если в результате поиска ничего не было найдено
+			'not_found_in_trash' => 'Не найдено в корзине', // если не было найдено в корзине
+			'parent_item_colon'  => '', // для родителей (у древовидных типов)
+			'menu_name'          => 'События', // название меню
+		),
+		'description'         => 'События – это наши экскурсии, лекции и прочие мероприятия с датой.',
+		'public'              => true,
+		'publicly_queryable'  => true, // зависит от public
+		'exclude_from_search' => true, // зависит от public
+		'show_ui'             => true, // зависит от public
+		'show_in_menu'        => true, // показывать ли в меню адмнки
+		'show_in_admin_bar'   => true, // по умолчанию значение show_in_menu
+		'show_in_nav_menus'   => true, // зависит от public
+		'show_in_rest'        => true, // добавить в REST API. C WP 4.7
+		'rest_base'           => null, // $post_type. C WP 4.7
+		'menu_position'       => 4,
+		'menu_icon'           => 'dashicons-calendar-alt', 
+		//'capability_type'   => 'post',
+		//'capabilities'      => 'post', // массив дополнительных прав для этого типа записи
+		//'map_meta_cap'      => null, // Ставим true чтобы включить дефолтный обработчик специальных прав
+		'hierarchical'        => false,
+		'supports'            => array('title','editor','author','thumbnail','excerpt'), // 'title','editor','author','thumbnail','excerpt','trackbacks','custom-fields','comments','revisions','page-attributes','post-formats'
+		'taxonomies'          => array(),
+		'has_archive'         => false,
+		'rewrite'             => true,
+		'query_var'           => true,
+	) );
 }

@@ -10,8 +10,14 @@
 get_header();
 ?>
 
-	<div id="primary" class="content-area">
-		<div class="container main-container">
+	<?php if(function_exists('bcn_display') /*&& !is_page(PAGE_ID1) && !is_page(PAGE_ID2)*/ ): ?>
+		<div class="breadcrumbs container" typeof="BreadcrumbList" vocab="https://schema.org/">
+			<?php bcn_display(); ?>
+		</div>
+	<?php endif; ?>
+
+	<!-- <div id="primary" class="content-area"> -->
+	<div class="container main-container">
 		<main id="main" class="site-main">
 
 		<?php
@@ -20,7 +26,7 @@ get_header();
 
 			get_template_part( 'template-parts/content', get_post_type() );
 
-			echo get_post_type();
+			echo 'single.php, post_type = ' . get_post_type();
 
 			// the_post_navigation();
 
@@ -28,8 +34,8 @@ get_header();
 		?>
 
 		</main><!-- #main -->
-		</div> <!-- .main-container -->
-	</div><!-- #primary -->
+	</div> <!-- .main-container -->
+	<!-- </div> #primary -->
 
 <?php
 // get_sidebar();

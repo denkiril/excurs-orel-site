@@ -20,20 +20,18 @@ get_header();
 		<main id="main">
 
 		<?php
-		// while ( have_posts() ) :
-		// 	the_post();
+		while ( have_posts() ) :
 
-		// 	get_template_part( 'template-parts/content', 'page' );
+			the_post();
+			the_content();
 
-		// 	if ( comments_open() || get_comments_number() ) :
-		// 		comments_template();
-		// 	endif;
+			// get_template_part( 'template-parts/content', 'page' );
+			// if ( comments_open() || get_comments_number() ) :
+			// 	comments_template();
+			// endif;
 
-		// endwhile; 
+		endwhile; 
 		?>
-
-		<?php the_post(); ?>
-		<?php the_content(); ?>
 
 		</main><!-- #main -->
 	</div> <!-- .main-container -->
