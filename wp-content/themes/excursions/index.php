@@ -15,39 +15,46 @@
 get_header();
 ?>
 
-	<div id="primary" class="content-area">
+	<?php if(function_exists('bcn_display') /*&& !is_page(PAGE_ID1) && !is_page(PAGE_ID2)*/ ): ?>
+		<div class="breadcrumbs container" typeof="BreadcrumbList" vocab="https://schema.org/">
+			<?php bcn_display(); ?>
+		</div>
+	<?php endif; ?>
+
+	<div class="container main-container index.php">
 		<main id="main" class="site-main">
 
 		<?php
-		if ( have_posts() ) :
+		$headertitle = single_post_title(null, false);
+		$postmeta = get_post_meta( get_queried_object()->ID, 'header-h1', true ); 
+		if($postmeta) $headertitle = $postmeta;
 
+		if ( have_posts() ) :
 			if ( is_home() && ! is_front_page() ) :
 				?>
 				<header>
-					<h1 class="page-title screen-reader-text"><?php single_post_title(); ?></h1>
+					<!-- <h1 class="page-title screen-reader-text"><?php single_post_title(); ?></h1> -->
+					<h1 class="page-title"><?= $headertitle ?></h1>
 				</header>
 				<?php
-			endif;
+			endif; ?>
+
+			<?php echo do_shortcode('[annocards post_type="post"]');
 
 			/* Start the Loop */
-			while ( have_posts() ) :
-				the_post();
-
+			// while ( have_posts() ) :
+			// 	the_post();
+				// the_content();
 				/*
 				 * Include the Post-Type-specific template for the content.
 				 * If you want to override this in a child theme, then include a file
 				 * called content-___.php (where ___ is the Post Type name) and that will be used instead.
 				 */
-				get_template_part( 'template-parts/content', get_post_type() );
-
-			endwhile;
-
-			the_posts_navigation();
-
+				// get_template_part( 'template-parts/content', get_post_type() );
+			// endwhile;
+			// the_posts_navigation();
 		else :
-
 			get_template_part( 'template-parts/content', 'none' );
-
 		endif;
 		?>
 
@@ -55,5 +62,5 @@ get_header();
 	</div><!-- #primary -->
 
 <?php
-get_sidebar();
+// get_sidebar();
 get_footer();

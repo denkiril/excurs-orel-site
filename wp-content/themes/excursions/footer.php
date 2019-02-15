@@ -20,9 +20,15 @@
 					<a href="#">О проекте</a><br />
 					<a href="#">Путеводитель по Орлу</a><br />
 					<a href="#">Орловские сувениры</a><br />
-					<a href="#">Квесты в Орле</a><br />
+					<!-- <a href="#">Квесты в Орле</a><br /> -->
 					<a href="#">Заказать экскурсию в Орле</a><br />
 					<a href="#">Контакты</a><br />
+					<?php wp_nav_menu( array(
+						'theme_location'  => 'footer_menu',
+						// 'menu'            => 'menu-1',
+						'container'       => false,
+						'menu_class'      => 'footer-menu'
+					) ); ?>
 				</div>
 				<div class="col-12 col-sm-6 col-lg-6 mb-container">
 					<div class="soc-container">

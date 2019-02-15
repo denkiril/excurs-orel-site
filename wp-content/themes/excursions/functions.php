@@ -47,7 +47,8 @@ if ( ! function_exists( 'excursions_setup' ) ) :
 
 		// This theme uses wp_nav_menu() in one location.
 		register_nav_menus( array(
-			'menu-1' => esc_html__( 'Primary', 'excursions' ),
+			'header_menu' => 'Меню в шапке',
+			'footer_menu' => 'Меню в подвале'
 		) );
 
 		/*
@@ -136,15 +137,18 @@ function excursions_scripts() {
 	wp_enqueue_style( 'bootstrap-grid', get_template_directory_uri() . '/assets/include/bootstrap-grid.min.css' );
     wp_enqueue_style( 'slick', get_template_directory_uri() . '/assets/include/slick.css' );
     wp_enqueue_style( 'slick-theme', get_template_directory_uri() . '/assets/include/slick-theme.css' );
-    // wp_enqueue_style( 'main', href="https://fonts.googleapis.com/css?family=Ubuntu:300,400&amp;subset=cyrillic" );
+    wp_enqueue_style( 'main-font?family=Ubuntu:300,400&amp;subset=cyrillic', '//fonts.googleapis.com/css' );
 	wp_enqueue_style( 'main', get_template_directory_uri() . '/assets/css/main.css' );
 
 	wp_deregister_script( 'jquery' );
 	// wp_register_script( 'jquery', get_template_directory_uri() . '/assets/include/jquery-3.3.1.min.js' );
 	wp_enqueue_script( 'jquery', get_template_directory_uri() . '/assets/include/jquery-3.3.1.min.js', array(), false, 'in_footer' );
-	wp_enqueue_script( 'bootstrap', get_template_directory_uri() . '/assets/include/bootstrap.bundle.min.js', array('jquery'),false,'in_footer' );
-	wp_enqueue_script( 'slick', get_template_directory_uri() . '/assets/include/slick.min.js', array('jquery'),false,'in_footer' );
-	wp_enqueue_script( 'script', get_template_directory_uri() . '/assets/js/script.js', array('jquery'),false,'in_footer' );
+	wp_enqueue_script( 'bootstrap', get_template_directory_uri() . '/assets/include/bootstrap.bundle.min.js', array('jquery'), false, 'in_footer' );
+	wp_enqueue_script( 'slick', get_template_directory_uri() . '/assets/include/slick.min.js', array('jquery'), false, 'in_footer' );
+	wp_enqueue_script( 'script', get_template_directory_uri() . '/assets/js/script.js', array('jquery'), false, 'in_footer' );
+	// wp_enqueue_script( 'googlemap-api?key=YOUR_API_KEY', '//maps.googleapis.com/maps/api/js', array(), false, 'in_footer' );
+	wp_enqueue_script( 'ymap-api?apikey=6ebdbbc2-3779-4216-9d88-129e006559bd&lang=ru_RU', '//api-maps.yandex.ru/2.1/', array(), false, 'in_footer' );
+	wp_enqueue_script( 'acf-map-script', get_template_directory_uri() . '/assets/js/acf-map-yandex.js', array('jquery'), false, 'in_footer' );
 }
 add_action( 'wp_enqueue_scripts', 'excursions_scripts' );
 
@@ -217,29 +221,31 @@ function anno_func( $cat_name, $section_title, $read_more='Подробнее...
 
 add_shortcode( 'annocards', 'annocards_func' );
 
-// использование: [annocards post_type="post" cat_name="event" section_title="Приходите"] 
+// использование: [annocards post_type="post" cat_name="blog" tag_name="promo" section_title="Приходите" read_more="Подробнее..."] 
 
 function annocards_func( $atts ){
 	// белый список параметров и значения по умолчанию
 	$atts = shortcode_atts( array(
 		'post_type' => 'post',
 		'cat_name' => '',
-		'section_title' => '',
-		'read_more' => 'Подробнее...'
+		'tag_name' => '',
+		'section_title' => null,
+		'read_more' => null
 	), $atts );
 
 	$post_type = $atts['post_type'];
 	$cat_name = $atts['cat_name'];
+	$tag_name = $atts['tag_name'];
 	$section_title = $atts['section_title'];
 	$read_more = $atts['read_more'];
 	$echo = '';
 
 	global $post;
-	$args = array( 'post_type' => $post_type, 'category_name' => $cat_name );
+	$args = array( 'post_type' => $post_type, 'category_name' => $cat_name, 'tag' => $tag_name );
 	$myposts = get_posts( $args );
 	if ( $myposts ): 
 		$echo .= '<section role="' . $cat_name . '"><div class="row section-container"><div class="col">';
-		$echo .= '<h2>' . $section_title . '</h2>';
+		if( $section_title ) $echo .= '<h2>' . $section_title . '</h2>';
 		foreach( $myposts as $post ):
 			setup_postdata( $post );
 			$permalink = get_the_permalink(); 
@@ -247,8 +253,9 @@ function annocards_func( $atts ){
 			$echo .= '<div class="row anno-card"><div class="col-12 col-md-4"><a href="' . $permalink . '" tabindex="-1">'; 
 			$echo .= get_the_post_thumbnail(null, 'medium');
 			$echo .= '</a></div><div class="col-12 col-md-8"><h3><a href="' . $permalink . '" title="Ссылка на: '; 
-			$echo .= $title . '">' . $title . '</a></h3><p>' . get_the_excerpt() . '  ';
-			$echo .= '<a href="' . $permalink . '" tabindex="-1">' . $read_more . '</a></p></div></div>';
+			$echo .= $title . '">' . $title . '</a></h3><p>' . get_the_excerpt();
+			if( $read_more ) $echo .= ' <a href="' . $permalink . '" tabindex="-1">' . $read_more . '</a>';
+			$echo .= '</p></div></div>';
 			wp_reset_postdata();
 		endforeach;
 		$echo .= '</div></div></section>';
@@ -292,10 +299,28 @@ function register_post_types(){
 		//'capabilities'      => 'post', // массив дополнительных прав для этого типа записи
 		//'map_meta_cap'      => null, // Ставим true чтобы включить дефолтный обработчик специальных прав
 		'hierarchical'        => false,
-		'supports'            => array('title','editor','author','thumbnail','excerpt'), // 'title','editor','author','thumbnail','excerpt','trackbacks','custom-fields','comments','revisions','page-attributes','post-formats'
+		'supports'            => array('title','author','thumbnail','excerpt'), // 'title','editor','author','thumbnail','excerpt','trackbacks','custom-fields','comments','revisions','page-attributes','post-formats'
 		'taxonomies'          => array(),
 		'has_archive'         => false,
 		'rewrite'             => true,
 		'query_var'           => true,
 	) );
 }
+
+//отключение всех архивов start
+// function wph_disable_all_archives($false) {
+//     if (is_archive()) {
+//         global $wp_query;
+//         $wp_query->set_404();
+//         status_header(404);
+//         nocache_headers();
+//         return true;
+//     }
+//     return $false;
+// }
+//удаление ссылки на архив автора
+// function wph_remove_author_link($content) {return home_url();}
+
+// add_action('pre_handle_404', 'wph_disable_all_archives');
+// add_filter('author_link', 'wph_remove_author_link');
+//отключение всех архивов end

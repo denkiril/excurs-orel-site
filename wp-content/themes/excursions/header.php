@@ -19,12 +19,12 @@
 
 	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
 	<meta name="description" content="Если вы искали Экскурсии по Орлу, то вы нашли! ;)" />
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:300,400&amp;subset=cyrillic" />
+	<!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:300,400&amp;subset=cyrillic" /> -->
     <!-- <link rel="stylesheet" href="include/bootstrap-grid.min.css" />
     <link rel="stylesheet" type="text/css" href="include/slick.css"/>
     <link rel="stylesheet" type="text/css" href="include/slick-theme.css"/>
     <link rel="stylesheet" href="css/main.css" /> -->
-	<title>Экскурсии по Орлу</title>
+	<title><?=get_the_title()?></title>
 
 	<?php wp_head(); ?>
 </head>
@@ -87,8 +87,8 @@
 						<!-- <div class="nav-container"> -->
 						<div>
 							<?php wp_nav_menu( array(
-								'theme_location'  => 'Primary',
-								'menu'            => 'menu-1',
+								'theme_location'  => 'header_menu',
+								// 'menu'            => 'menu-1',
 								'container'       => false,
 								'menu_class'      => 'nav-menu'
 							 ) ); ?>

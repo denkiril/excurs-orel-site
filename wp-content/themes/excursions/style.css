@@ -792,7 +792,7 @@ a:hover, a:active {
 /*--------------------------------------------------------------
 # Clearings
 --------------------------------------------------------------*/
-.clear:before,
+/* .clear:before,
 .clear:after,
 .entry-content:before,
 .entry-content:after,
@@ -807,16 +807,16 @@ a:hover, a:active {
 	content: "";
 	display: table;
 	table-layout: fixed;
-}
+} */
 
-.clear:after,
+/* .clear:after,
 .entry-content:after,
 .comment-content:after,
 .site-header:after,
 .site-content:after,
 .site-footer:after {
 	clear: both;
-}
+} */
 
 /*--------------------------------------------------------------
 # Widgets
