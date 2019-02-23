@@ -18,13 +18,9 @@
 	<link rel="profile" href="https://gmpg.org/xfn/11">
 
 	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
-	<meta name="description" content="Если вы искали Экскурсии по Орлу, то вы нашли! ;)" />
-	<!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:300,400&amp;subset=cyrillic" /> -->
-    <!-- <link rel="stylesheet" href="include/bootstrap-grid.min.css" />
-    <link rel="stylesheet" type="text/css" href="include/slick.css"/>
-    <link rel="stylesheet" type="text/css" href="include/slick-theme.css"/>
-    <link rel="stylesheet" href="css/main.css" /> -->
-	<title><?=get_the_title()?></title>
+	<meta name="description" content="Официальный сайт краеведческого движения «Экскурсии по Орлу»." />
+	<!-- <link rel="shortcut icon" href="favicon.ico" /> -->
+	<!-- <title><?=get_the_title()?></title> -->
 
 	<?php wp_head(); ?>
 </head>
@@ -38,21 +34,36 @@
 			<div class="row">
                 <div class="col header-container flex-container">
 					<?php 
-						$headertitle = get_bloginfo();
-						$postmeta = get_post_meta( $post->ID, 'header-h1', true ); 
-						if($postmeta) $headertitle = $postmeta;
-						if ( is_page() ) :
+						$alt_headertitle = get_post_meta( $post->ID, 'header-title', true ); 
+						$headertitle = $alt_headertitle ? $alt_headertitle : get_bloginfo();
+						$is_front_page = is_front_page();
+						if ( $is_front_page || $alt_headertitle ) :
 							$headertitle_html = '<h1 class="header-title">'.$headertitle.'</h1>';
-							$navtitle = get_the_title();
+							$h1_is = true;
 						else :
 							$headertitle_html = '<h2 class="header-title">'.$headertitle.'</h2>';
-							$navtitle = $post->ID;
+							$h1_is = false;
 						endif;
 						echo $headertitle_html;
+
+						$nav_title = (is_page() || is_home()) ? single_post_title(null, false) : '';
+						if( !$nav_title && is_archive() ) $nav_title = get_the_archive_title();
+						if( !$nav_title && is_single() ){
+							// $ancestors = get_post_ancestors($post->ID);
+							if( is_singular('post') ){
+								$blog_id = get_option('page_for_posts');
+								$nav_title = get_the_title( $blog_id );
+								$nav_title_ref = get_permalink( $blog_id );
+							} 
+							if( is_singular('events') ){
+								$nav_title = 'События';
+								$nav_title_ref = get_post_type_archive_link('events');
+							} 
+						}
 					?>
 					<!-- <h1 class="logo-wrapper"><a href="/">Экскурсии по Орлу</a></h1>  -->
 					<a href="<?php echo home_url(); ?>">
-						<img src="<?php echo get_template_directory_uri() ?> . /assets/img/Logo_200.png" alt="Экскурсии по Орлу" />
+						<img src="<?php echo get_template_directory_uri() ?>/assets/img/Logo_200.png" alt="Экскурсии по Орлу" />
 					</a>
                 </div>
             </div>
@@ -71,7 +82,13 @@
 									<span></span>
 									<span></span>
 								</button>
-								<div class="nav-title"><?php echo $navtitle; ?></div>
+								<div class="nav-title">
+									<?php 
+									if( $nav_title_ref ) echo '<a href="'.$nav_title_ref.'" title="Ссылка на '.$nav_title.'">';
+									echo $nav_title;
+									if( $nav_title_ref ) echo '</a>'; 
+									?>
+								</div>
 							</div>
 						</div>
 						<!--<div class="nav-container">
@@ -99,4 +116,18 @@
 		</div>
 	</header><!-- #masthead -->
 
+	<?php if(function_exists('bcn_display') && !$is_front_page ): ?>
+		<div class="breadcrumbs container" typeof="BreadcrumbList" vocab="https://schema.org/">
+			<?php bcn_display(); ?>
+		</div>
+	<?php endif; ?>
+
 	<div id="content" class="site-content">
+		<div class="container main-container">								
+		<?php if( !$h1_is && $nav_title && !is_single() ): 
+			if( is_post_type_archive('events') ) $alt_contenttitle = 'Наши мероприятия';
+			else $alt_contenttitle = get_post_meta( get_queried_object()->ID, 'content-title', true );
+			if( $alt_contenttitle ) $nav_title = $alt_contenttitle;
+			?>
+			<h1 class="content-title"><?=$nav_title?></h1>
+		<?php endif; ?>

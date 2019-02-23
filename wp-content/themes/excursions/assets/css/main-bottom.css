@@ -1,0 +1,93 @@
+/*
+  For bottom part of page
+*/
+footer{
+    /* Чтобы footer не уменьшался */
+    flex-shrink: 0;
+}
+.footer-container{
+    background-color: #3f3f3f;
+    font-weight: 300;
+    font-size: 0.9em;
+    color: #fff;
+    padding: 30px 30px 20px 30px;
+}
+@media screen and (max-width: 768px) {
+    .footer-container{
+        padding: 20px 15px;
+    }
+}
+.footer-container p{
+    margin: 0;
+}
+
+.footer-menu{
+    padding: 0;
+    margin: 0;
+}
+.footer-menu li{
+    list-style: none;
+}
+@media screen and (max-width: 768px) {
+    .footer-menu li{
+        margin-bottom: 10px;
+    }
+}
+.footer-links a{
+    text-decoration: none;
+    color: #fff;
+    line-height: 1.3;
+    /* display: block; */
+}
+.footer-links a:hover,
+.footer-links a:focus{
+    text-decoration: underline;
+    outline: none;
+}
+.copyr-container{
+    text-align: center;
+    margin-top: 20px;
+}
+.copyr-container a:hover,
+.copyr-container a:focus{
+    text-decoration: none;
+    color: #ee9b02;
+    outline: none;
+}
+.soc-container{
+    /* display: inline-block; */
+    text-align: right;
+    /* margin-bottom: 20px; */
+}
+.soc-container a{
+    text-decoration: none;
+    padding: 0 5px;
+}
+.soc-container a:focus{
+    outline: none;
+}
+.soc-container a:hover .vk-logo,
+.soc-container a:focus .vk-logo{
+    fill: #4d76a1;
+    fill-opacity: 1;
+}
+.soc-container a:hover .fb-logo,
+.soc-container a:focus .fb-logo{
+    fill: #3b5998;
+    fill-opacity: 1;
+}
+.soc-container a:hover .ig-logo,
+.soc-container a:focus .ig-logo{
+    fill: #d93175;
+    fill-opacity: 1;
+}
+.svg-logo{
+    fill: #fff;
+    fill-opacity: 0.7;
+    width: 50px;
+    height: 50px;
+}
+
+a img{
+    border: none; /*for IE*/
+}

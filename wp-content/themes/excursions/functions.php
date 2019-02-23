@@ -45,7 +45,7 @@ if ( ! function_exists( 'excursions_setup' ) ) :
 
 		// add_image_size( 'anno-thumb', 600, 400, true );
 
-		// This theme uses wp_nav_menu() in one location.
+		// This theme uses wp_nav_menu() in locations:
 		register_nav_menus( array(
 			'header_menu' => 'Меню в шапке',
 			'footer_menu' => 'Меню в подвале'
@@ -135,23 +135,36 @@ function excursions_scripts() {
 	}
 
 	wp_enqueue_style( 'bootstrap-grid', get_template_directory_uri() . '/assets/include/bootstrap-grid.min.css' );
-    wp_enqueue_style( 'slick', get_template_directory_uri() . '/assets/include/slick.css' );
-    wp_enqueue_style( 'slick-theme', get_template_directory_uri() . '/assets/include/slick-theme.css' );
-    wp_enqueue_style( 'main-font?family=Ubuntu:300,400&amp;subset=cyrillic', '//fonts.googleapis.com/css' );
-	wp_enqueue_style( 'main', get_template_directory_uri() . '/assets/css/main.css' );
+	wp_enqueue_style( 'events-css', get_template_directory_uri() . '/assets/css/events.css' );
+	// wp_enqueue_style( 'main-top-css', get_template_directory_uri() . '/assets/css/main-top.css' );
 
 	wp_deregister_script( 'jquery' );
 	// wp_register_script( 'jquery', get_template_directory_uri() . '/assets/include/jquery-3.3.1.min.js' );
 	wp_enqueue_script( 'jquery', get_template_directory_uri() . '/assets/include/jquery-3.3.1.min.js', array(), false, 'in_footer' );
-	wp_enqueue_script( 'bootstrap', get_template_directory_uri() . '/assets/include/bootstrap.bundle.min.js', array('jquery'), false, 'in_footer' );
-	wp_enqueue_script( 'slick', get_template_directory_uri() . '/assets/include/slick.min.js', array('jquery'), false, 'in_footer' );
+	wp_enqueue_script( 'bootstrap-js', get_template_directory_uri() . '/assets/include/bootstrap.min.js', array('jquery'), false, 'in_footer' );
+	wp_enqueue_script( 'slick-js', get_template_directory_uri() . '/assets/include/slick.min.js', array('jquery'), false, 'in_footer' );
 	wp_enqueue_script( 'script', get_template_directory_uri() . '/assets/js/script.js', array('jquery'), false, 'in_footer' );
-	// wp_enqueue_script( 'googlemap-api?key=YOUR_API_KEY', '//maps.googleapis.com/maps/api/js', array(), false, 'in_footer' );
-	wp_enqueue_script( 'ymap-api?apikey=6ebdbbc2-3779-4216-9d88-129e006559bd&lang=ru_RU', '//api-maps.yandex.ru/2.1/', array(), false, 'in_footer' );
-	wp_enqueue_script( 'acf-map-script', get_template_directory_uri() . '/assets/js/acf-map-yandex.js', array('jquery'), false, 'in_footer' );
+	// wp_register_script( 'googlemap-api?key=YOUR_API_KEY', '//maps.googleapis.com/maps/api/js', array(), false, 'in_footer' );
+	// wp_register_script( 'ymap-api?apikey=6ebdbbc2-3779-4216-9d88-129e006559bd&lang=ru_RU', '//api-maps.yandex.ru/2.1/', array(), false, 'in_footer' );
+	wp_register_script( 'acf-map-js', get_template_directory_uri() . '/assets/js/acf-map-yandex.js', array('jquery'), false, 'in_footer' );
+	wp_enqueue_script( 'fancybox-js', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js', array('jquery'), false, 'in_footer' );
 }
 add_action( 'wp_enqueue_scripts', 'excursions_scripts' );
 
+function styles_to_footer() {
+	wp_enqueue_style( 'main-bottom-css', get_template_directory_uri() . '/assets/css/main-bottom.css' );
+	wp_enqueue_style( 'slick-css', get_template_directory_uri() . '/assets/include/slick.css' );
+    wp_enqueue_style( 'slick-theme', get_template_directory_uri() . '/assets/include/slick-theme.css' );
+    wp_enqueue_style( 'main-font?family=Ubuntu:300,400&amp;subset=cyrillic', '//fonts.googleapis.com/css' );
+	wp_enqueue_style( 'fancybox-css', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css' );
+}
+add_action( 'wp_footer', 'styles_to_footer' );
+
+add_action( 'add_map_scripts', 'add_map_scripts_func', 10, 0);
+function add_map_scripts_func() {
+	wp_enqueue_script( 'ymap-api?apikey=6ebdbbc2-3779-4216-9d88-129e006559bd&lang=ru_RU', '//api-maps.yandex.ru/2.1/', array(), false, 'in_footer' );
+	wp_enqueue_script('acf-map-js');
+}
 
 // function test_styleadd() {
 // 	wp_enqueue_style( 'excursions-style', get_stylesheet_uri() );
@@ -221,7 +234,7 @@ function anno_func( $cat_name, $section_title, $read_more='Подробнее...
 
 add_shortcode( 'annocards', 'annocards_func' );
 
-// использование: [annocards post_type="post" cat_name="blog" tag_name="promo" section_title="Приходите" read_more="Подробнее..."] 
+// использование: [annocards post_type="post" cat_name="blog" tag_name="promo" section_title="Приходите" read_more="Подробнее..." date="future"] 
 
 function annocards_func( $atts ){
 	// белый список параметров и значения по умолчанию
@@ -230,7 +243,8 @@ function annocards_func( $atts ){
 		'cat_name' => '',
 		'tag_name' => '',
 		'section_title' => null,
-		'read_more' => null
+		'read_more' => null,
+		'date' => ''
 	), $atts );
 
 	$post_type = $atts['post_type'];
@@ -238,26 +252,44 @@ function annocards_func( $atts ){
 	$tag_name = $atts['tag_name'];
 	$section_title = $atts['section_title'];
 	$read_more = $atts['read_more'];
+	$date = $atts['date'];
 	$echo = '';
 
 	global $post;
 	$args = array( 'post_type' => $post_type, 'category_name' => $cat_name, 'tag' => $tag_name );
+
+	if( $post_type == 'events'):
+		$today = date('Ymd');
+		if($date == 'past') $past_events = true;
+		$compare = $past_events ? '<' : '>=';
+		$args += array( 'meta_query' => array( array('key' => 'event_info_event_date', 'compare' => $compare, 'value' => $today) ) );
+	endif;
+
 	$myposts = get_posts( $args );
 	if ( $myposts ): 
-		$echo .= '<section role="' . $cat_name . '"><div class="row section-container"><div class="col">';
+		$echo .= '<section><div class="row section-container"><div class="col">';
 		if( $section_title ) $echo .= '<h2>' . $section_title . '</h2>';
 		foreach( $myposts as $post ):
 			setup_postdata( $post );
+			if( $post_type == 'events')
+				$event_date = get_field('event_info_event_date');
+				// $event_date = get_field('event_info_event_date', false, false);
 			$permalink = get_the_permalink(); 
 			$title = esc_html( get_the_title() );
-			$echo .= '<div class="row anno-card"><div class="col-12 col-md-4"><a href="' . $permalink . '" tabindex="-1">'; 
+
+			$echo .= '<div class="row anno-card"><div class="col-12 col-md-4"><a href="' . $permalink . '" title="Ссылка на: ' . $title . '" tabindex="-1">'; 
 			$echo .= get_the_post_thumbnail(null, 'medium');
 			$echo .= '</a></div><div class="col-12 col-md-8"><h3><a href="' . $permalink . '" title="Ссылка на: '; 
-			$echo .= $title . '">' . $title . '</a></h3><p>' . get_the_excerpt();
+			$echo .= $title . '">' . $title . '</a></h3><p>';
+			if( $event_date ) $echo .= $event_date . ' ';
+			$echo .= get_the_excerpt();
 			if( $read_more ) $echo .= ' <a href="' . $permalink . '" tabindex="-1">' . $read_more . '</a>';
 			$echo .= '</p></div></div>';
 			wp_reset_postdata();
 		endforeach;
+		if( $past_events && !is_archive() )
+			$echo .= '<p class="anno-ref"><a href="' . get_post_type_archive_link('events') . '" title="Ссылка на все события">Все события ></a></p>';
+
 		$echo .= '</div></div></section>';
 	endif;
 
@@ -301,7 +333,7 @@ function register_post_types(){
 		'hierarchical'        => false,
 		'supports'            => array('title','author','thumbnail','excerpt'), // 'title','editor','author','thumbnail','excerpt','trackbacks','custom-fields','comments','revisions','page-attributes','post-formats'
 		'taxonomies'          => array(),
-		'has_archive'         => false,
+		'has_archive'         => true,
 		'rewrite'             => true,
 		'query_var'           => true,
 	) );
@@ -324,3 +356,46 @@ function register_post_types(){
 // add_action('pre_handle_404', 'wph_disable_all_archives');
 // add_filter('author_link', 'wph_remove_author_link');
 //отключение всех архивов end
+
+
+
+add_filter( 'shortcode_atts_wpcf7', 'custom_shortcode_atts_wpcf7', 10, 3 );
+function custom_shortcode_atts_wpcf7( $out, $pairs, $atts ) {
+	if( isset($atts['event-title']) )
+		$out['event-title'] = $atts['event-title'];
+
+	return $out;
+}
+
+// "Sender email address does not belong to the site domain." avoid
+// add_filter( 'wpcf7_validate_configuration', '__return_false' );
+
+remove_action('wp_head', 'print_emoji_detection_script', 7);
+remove_action('wp_print_styles', 'print_emoji_styles');
+
+## Удаляет "Рубрика: ", "Метка: " и т.д. из заголовка архива
+add_filter( 'get_the_archive_title', function( $title ){
+	return preg_replace('~^[^:]+: ~', '', $title );
+});
+
+add_shortcode( 'socwidgets', 'socwidgets_func' );
+// использование: [socwidgets section_title="Мы в соцсетях"] 
+
+function socwidgets_func( $atts ){
+	// белый список параметров и значения по умолчанию
+	$atts = shortcode_atts( array(
+		'section_title' => null
+	), $atts );
+
+	$section_title = $atts['section_title'];
+
+	$echo = '<section id="soc-section" style="display:none"><div class="row section-container"><div class="col">';
+	if( $section_title ) $echo .= '<h2>'.$section_title.'</h2>';
+	$echo .= '<div class="row"><div class="col-md-6">';
+	$echo .= '<!-- VK Widget --><div id="vk_groups" style="margin: auto;"></div>';
+	$echo .= '</div></div>';
+	$echo .= '<noscript><p><a href="https://vk.com/excurs_orel" target="_blank">ВКонтакте</a></p><p><a href="https://www.facebook.com/groups/excursorel" target="_blank">Фейсбук</a></p></noscript>';
+	$echo .= '</div></div></section>';
+
+	return $echo;
+}

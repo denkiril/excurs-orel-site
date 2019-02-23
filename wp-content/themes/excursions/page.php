@@ -15,27 +15,23 @@
 get_header();
 ?>
 
-	<!-- <div id="primary" class="content-area"> -->
-	<div class="container main-container">
-		<main id="main">
+	<main id="main" class="site-main">
 
-		<?php
-		while ( have_posts() ) :
+	<?php
+	while ( have_posts() ) :
 
-			the_post();
-			the_content();
+		the_post();
+		the_content();
 
-			// get_template_part( 'template-parts/content', 'page' );
-			// if ( comments_open() || get_comments_number() ) :
-			// 	comments_template();
-			// endif;
+		// get_template_part( 'template-parts/content', 'page' );
+		// if ( comments_open() || get_comments_number() ) :
+		// 	comments_template();
+		// endif;
 
-		endwhile; 
-		?>
+	endwhile; 
+	?>
 
-		</main><!-- #main -->
-	</div> <!-- .main-container -->
-	<!-- </div>#primary -->
+	</main><!-- #main -->
 
 <?php
 // get_sidebar();

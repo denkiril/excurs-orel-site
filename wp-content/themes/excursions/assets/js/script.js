@@ -58,9 +58,26 @@ $(document).ready(function(){
     // lazyLoad: 'progressive'
   });
 
-  // autoplay only for big screens
-  if(screen.width > 768)
-    $('.main-carousel').slick('slickPlay');
+  
+	$(window).on('load', function() {
+		if(screen.width > 768){
+			// social widgets only for big screens
+			if( $('#soc-section').length ){
+				console.log('soc-section ok');
+				$.getScript("//vk.com/js/api/openapi.js?160").then(function() {
+					VK.Widgets.Group("vk_groups", {
+					mode: 3,
+					width: "300",
+					height: "400"}, 
+					94410363);
+				});
+				$('#soc-section').removeAttr('style');		
+			}
+
+			// autoplay only for big screens
+			$('.main-carousel').slick('slickPlay');
+		}
+	});
 
   // Меню-гамбургер для адаптивной версии
   $('#menu').on('click', function() {
@@ -72,5 +89,11 @@ $(document).ready(function(){
       }
     });
   });
+
+  // "Сворачиваем" форму после отправки
+  // function HideForm(){
+  //   $('#reg_form').children('.form-item').setAttribute('display', 'none');
+  //   console.log('submit_ok');
+  // }
 
 });

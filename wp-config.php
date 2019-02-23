@@ -86,3 +86,8 @@ if ( !defined('ABSPATH') )
 
 /** Инициализирует переменные WordPress и подключает файлы. */
 require_once(ABSPATH . 'wp-settings.php');
+
+/** Папка для загрузки файлов */
+define('UPLOADS', 'photo');
+// define('WP_CONTENT_DIR', $_SERVER['DOCUMENT_ROOT'].'/photo');
+// define('WP_CONTENT_URL', 'http://'. $_SERVER['HTTP_HOST'] .'/photo');

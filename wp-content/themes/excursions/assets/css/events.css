@@ -1,0 +1,189 @@
+/* 
+  For events pages
+*/
+.event-info{
+    line-height: 1.3;
+}
+.event-info p{
+    margin-block-end: 0;
+}
+@media (max-width: 992px) {
+    .event-info p{
+        margin-block-end: 1em;
+    }
+}
+.ei_label{
+    color: #3f3f3f;
+    /* margin-right: 0.5em; */
+}
+.acf-map {
+	width: 100%;
+	height: 300px;
+	border: #ccc solid 1px;
+	/* margin-bottom: 20px; */
+}
+/* fixes potential theme css conflict */
+.acf-map img {
+   max-width: inherit !important;
+}
+.events-image{
+    float: left;
+    max-width: 768px;
+    width: 40%;
+    height: auto;
+    margin: 0 1em 1em 0;
+}
+@media (max-width: 1200px) {
+    .events-image {
+        width: 50%;
+    }
+}
+@media (max-width: 992px) {
+    .events-image {
+        float: none;
+        display: block;
+        width: 80%;
+        margin: 0 auto 1em auto;
+    }
+}
+@media (max-width: 768px) {
+    .events-image {
+        width: 90%;
+    }
+}
+@media (max-width: 576px) {
+    .events-image {
+        width: 100%;
+    }
+}
+
+#reg_btn{
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font: inherit;
+    color: #015a8d;
+    /* text-decoration: underline dashed; */
+}
+#close_btn{
+    position: absolute;
+    top: 2px;
+    right: 0;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+#close_btn:hover{
+    color: #015a8d;
+}
+#reg_form{
+    border: 1px solid #3f3f3f;
+    width: 80%;
+    margin: 1em auto;
+    /* text-align: center; */
+    padding: 1em;
+    position: relative;
+}
+@media (max-width: 768px) {
+    #reg_form {
+        width: 90%;
+    }
+}
+@media (max-width: 576px) {
+    #reg_form {
+        width: 100%;
+    }
+}
+
+#reg_form label{
+    font-size: 0.9em;
+    line-height: 1.1;
+    color: #3f3f3f;
+}
+#reg_form input,
+#reg_form textarea{
+    font-size: 0.9em;
+    width: 100%;
+} 
+#reg_form input[type="submit"]{
+    background-color: transparent;
+    cursor: pointer;
+    text-transform: uppercase;
+    border: 2px solid;
+    color: #015a8d;
+}
+#reg_form input[type="submit"]:hover{
+    background-color: #015a8d;
+    color: #fff;
+}
+.form-item{
+    /* font-size: 0.9em;
+    width: 100%; */
+    margin: 0 auto;
+    margin-bottom: 1em;
+}
+
+.small-text{
+    font-size: 0.9em;
+}
+
+.pre-gallery{
+    margin: 1em 0;
+    display: flex;
+    display: -ms-flexbox;
+}
+.pre-gallery figcaption{
+    text-align: center;
+    font-size: 0.8em;
+    color: #3f3f3f;
+}
+/* .acf_gallery-item{
+    margin-right: 15px;
+}
+.acf_gallery-item:last-child{
+    margin-right: 0;
+} */
+.acf_gallery-item img{
+    width: 100%;
+    height: auto;
+}
+.acf_gallery-item a:focus{
+    outline: none;
+}
+.acf_gallery-item a:focus img{
+    outline: auto 5px;
+}
+
+.post-gallery figcaption{
+    text-align: center;
+    font-size: 0.9em;
+    color: #3f3f3f;
+    margin-top: 8px;
+}
+.post-gallery img{
+    width: 80%;
+    margin: 0 auto;
+    display: block;
+}
+/* @media (max-width: 1200px) {
+    .post-gallery img {
+        width: 80%;
+    }
+}
+@media (max-width: 992px) {
+    .post-gallery img {
+        width: 80%;
+    }
+} */
+@media (max-width: 768px) {
+    .post-gallery img {
+        width: 90%;
+    }
+}
+@media (max-width: 576px) {
+    .post-gallery img {
+        width: 100%;
+    }
+}
