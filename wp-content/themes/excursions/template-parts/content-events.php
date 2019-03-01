@@ -89,11 +89,12 @@
 			<?php // $show_map id="map" 
 			if( $show_map ):  ?>
 				<div class="col<?=$col_sfx?>">
+					<button id="OpenMap_btn" class="ref_btn">[ Показать карту ]</button>
 					<div class="acf-map">
 						<div class="marker" data-lat="<?php echo $location['lat']; ?>" data-lng="<?php echo $location['lng']; ?>"></div>
 					</div>
 				</div>
-				<?php do_action( 'add_map_scripts' ); ?>
+				<?php // do_action( 'add_map_scripts' ); ?>
 			<?php endif; ?>
 		</div> <!-- event_info row -->
 
@@ -129,29 +130,15 @@
 					if( $offer['alt_registration_text'] )
 						echo '<li>' . esc_html( $offer['alt_registration_text'] ) . ' </li>';
 					if( $offer['show_form'] ): ?>
-						<li><?=esc_html( $offer['form_registration_text'] )?> <button id="reg_btn" onclick="OpenForm()">[ Открыть форму записи ]</button></li>
+						<li><?=esc_html( $offer['form_registration_text'] )?> <button id="reg_btn" class="ref_btn">[ Открыть форму записи ]</button></li>
 					<?php endif;
 					echo '</ul>';
 
 					if( $offer['show_form'] ): ?>
 						<div id="reg_form" style="display: none">
-							<button id="close_btn" onclick="CloseForm()">&#10060;</button>
+							<button id="close_btn">&#10060;</button>
 							<?= do_shortcode('[contact-form-7 id="285" title="RegForm-1" event-title="' . $event_title . '"]'); ?>
 						</div>
-						<script>
-							function OpenForm(){
-								var form = document.getElementById("reg_form");
-								if(form) form.style.display = "block";
-								var btn = document.getElementById("reg_btn");
-								if(btn) btn.style.display = "none";
-							}
-							function CloseForm(){
-								var form = document.getElementById("reg_form");
-								if(form) form.style.display = "none";
-								var btn = document.getElementById("reg_btn");
-								if(btn) btn.style.display = "inline";
-							}
-						</script>
 					<?php endif; /* show_form end */ ?>
 
 				<?php endif; /* show_registration end */ ?>
@@ -184,7 +171,7 @@
 					<div class="acf_gallery-item col-12 col-sm-6 col-md-6 col-lg-4">
 						<figure>
 							<a data-fancybox="gallery" href="<?=$full_image_url?>" data-caption="<?=$title?>">
-							<?= wp_get_attachment_image( $id, 'large', false,  // (thumbnail, medium, large, full or custom size) 
+							<?= wp_get_attachment_image( $id, 'medium_large', false,  // (thumbnail, medium, large, full or custom size) 
 								array( 'title' => $title) ); ?>
 							</a>
 							<?php if( $description ) echo '<figcaption>' . $description . '</figcaption>'; ?>
@@ -194,11 +181,16 @@
 			</div> <!-- pre-gallery row -->
 		<?php endif; ?>
 
-		<?php if( $show_offer && get_field('rules')['show_rules'] ): ?>
+		<?php 
+		$show_rules = get_field('rules_show_rules');
+		$alt_text = get_field('rules_alt_text');
+		if( $show_offer && ($show_rules || $alt_text) ): ?>
 			<div class="row">
 				<div class="col">
-					<?php the_field('rules_rules_text'); ?>
-					<?php // echo get_field('rules')['rules_text']; ?>
+					<?php if( $show_rules ): ?>
+					<p>Участвуя в наших мероприятиях вы соглашаетесь с <a href="/events-rules/" target="_blank">Правилами проведения мероприятий</a> организации «Экскурсии по Орлу».</p>
+					<?php endif; ?>
+					<?php if( $alt_text ) echo $alt_text; ?>
 				</div>
 			</div> <!-- row -->
 		<?php endif; ?>
@@ -219,7 +211,7 @@
 			<?php if( $report['pre-text'] ): ?>
 			<div class="report-text row">
 				<div class="col">
-					<p><?=$report['pre-text']?></p>
+					<?=$report['pre-text']?>
 				</div>
 			</div> <!-- report-text row -->
 			<?php endif; ?>
@@ -258,7 +250,7 @@
 			<?php if( $report['post-text'] ): ?>
 			<div class="report-text row">
 				<div class="col">
-					<p><?=$report['post-text']?></p>
+					<?=$report['post-text']?>
 				</div>
 			</div> <!-- report-text row -->
 			<?php endif; ?>

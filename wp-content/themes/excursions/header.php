@@ -18,9 +18,20 @@
 	<link rel="profile" href="https://gmpg.org/xfn/11">
 
 	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
-	<meta name="description" content="Официальный сайт краеведческого движения «Экскурсии по Орлу»." />
+
+	<?php $is_front_page = is_front_page();
+	if($is_front_page): ?>
+		<meta name="description" content="<?php bloginfo('description'); ?>" />
+	<?php elseif( is_single() || is_page() ): if( have_posts() ): while ( have_posts() ): the_post(); ?>
+		<meta name="description" content="<?php the_excerpt(); ?>" />
+	<?php endwhile; endif; else: ?>
+		<meta name="description" content="<?php bloginfo('description'); ?>" />
+	<?php endif; ?>
+
+	<!-- <meta name="description" content="Официальный сайт краеведческого движения «Экскурсии по Орлу»." /> -->
 	<!-- <link rel="shortcut icon" href="favicon.ico" /> -->
 	<!-- <title><?=get_the_title()?></title> -->
+	<!-- <style>.svg-logo{max-width:60px; max-height:60px;}</style> -->
 
 	<?php wp_head(); ?>
 </head>
@@ -33,10 +44,10 @@
 		<div class="container">
 			<div class="row">
                 <div class="col header-container flex-container">
+					<div>
 					<?php 
 						$alt_headertitle = get_post_meta( $post->ID, 'header-title', true ); 
 						$headertitle = $alt_headertitle ? $alt_headertitle : get_bloginfo();
-						$is_front_page = is_front_page();
 						if ( $is_front_page || $alt_headertitle ) :
 							$headertitle_html = '<h1 class="header-title">'.$headertitle.'</h1>';
 							$h1_is = true;
@@ -45,6 +56,8 @@
 							$h1_is = false;
 						endif;
 						echo $headertitle_html;
+
+						if( $is_front_page) echo '<p class="header-subtitle">мы не стоим на месте</p>';
 
 						$nav_title = (is_page() || is_home()) ? single_post_title(null, false) : '';
 						if( !$nav_title && is_archive() ) $nav_title = get_the_archive_title();
@@ -61,16 +74,18 @@
 							} 
 						}
 					?>
-					<!-- <h1 class="logo-wrapper"><a href="/">Экскурсии по Орлу</a></h1>  -->
-					<a href="<?php echo home_url(); ?>">
-						<img src="<?php echo get_template_directory_uri() ?>/assets/img/Logo_200.png" alt="Экскурсии по Орлу" />
-					</a>
+					</div>
+					
+					<?php if ( function_exists('the_custom_logo') ) the_custom_logo(); ?>
+					<!-- <a href="<?=home_url()?>"> -->
+						<!-- <img src="<?=get_template_directory_uri()?>/assets/img/Logo_200.png" alt="Экскурсии по Орлу" /> -->
+					<!-- </a> -->
                 </div>
             </div>
 		</div>
 
 		<div class="container nav-container">
-			<nav id="nav-block" role="navigation">
+			<nav id="nav-block">
 				<div class="row">
 					<div class="col">
 						<!-- <div class="nav-container"> -->

@@ -41,9 +41,6 @@ if ( ! function_exists( 'excursions_setup' ) ) :
 		 * @link https://developer.wordpress.org/themes/functionality/featured-images-post-thumbnails/
 		 */
 		add_theme_support( 'post-thumbnails' );
-		// set_post_thumbnail_size( 150, 150 );
-
-		// add_image_size( 'anno-thumb', 600, 400, true );
 
 		// This theme uses wp_nav_menu() in locations:
 		register_nav_menus( array(
@@ -142,21 +139,22 @@ function excursions_scripts() {
 	// wp_register_script( 'jquery', get_template_directory_uri() . '/assets/include/jquery-3.3.1.min.js' );
 	wp_enqueue_script( 'jquery', get_template_directory_uri() . '/assets/include/jquery-3.3.1.min.js', array(), false, 'in_footer' );
 	wp_enqueue_script( 'bootstrap-js', get_template_directory_uri() . '/assets/include/bootstrap.min.js', array('jquery'), false, 'in_footer' );
-	wp_enqueue_script( 'slick-js', get_template_directory_uri() . '/assets/include/slick.min.js', array('jquery'), false, 'in_footer' );
+	// wp_enqueue_script( 'slick-js', get_template_directory_uri() . '/assets/include/slick.min.js', array('jquery'), false, 'in_footer' );
 	wp_enqueue_script( 'script', get_template_directory_uri() . '/assets/js/script.js', array('jquery'), false, 'in_footer' );
 	// wp_register_script( 'googlemap-api?key=YOUR_API_KEY', '//maps.googleapis.com/maps/api/js', array(), false, 'in_footer' );
 	// wp_register_script( 'ymap-api?apikey=6ebdbbc2-3779-4216-9d88-129e006559bd&lang=ru_RU', '//api-maps.yandex.ru/2.1/', array(), false, 'in_footer' );
 	wp_register_script( 'acf-map-js', get_template_directory_uri() . '/assets/js/acf-map-yandex.js', array('jquery'), false, 'in_footer' );
-	wp_enqueue_script( 'fancybox-js', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js', array('jquery'), false, 'in_footer' );
+	// wp_enqueue_script( 'fancybox-js', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js', array('jquery'), false, 'in_footer' );
+	wp_enqueue_script( 'yashare-js', '//yastatic.net/share2/share.js', array('jquery'), false, 'in_footer' );
 }
 add_action( 'wp_enqueue_scripts', 'excursions_scripts' );
 
 function styles_to_footer() {
 	wp_enqueue_style( 'main-bottom-css', get_template_directory_uri() . '/assets/css/main-bottom.css' );
-	wp_enqueue_style( 'slick-css', get_template_directory_uri() . '/assets/include/slick.css' );
-    wp_enqueue_style( 'slick-theme', get_template_directory_uri() . '/assets/include/slick-theme.css' );
-    wp_enqueue_style( 'main-font?family=Ubuntu:300,400&amp;subset=cyrillic', '//fonts.googleapis.com/css' );
-	wp_enqueue_style( 'fancybox-css', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css' );
+	// wp_enqueue_style( 'slick-css', get_template_directory_uri() . '/assets/include/slick.css' );
+    // wp_enqueue_style( 'slick-theme', get_template_directory_uri() . '/assets/include/slick-theme.css' );
+    // wp_enqueue_style( 'main-font?family=Ubuntu:300,400&amp;subset=cyrillic', '//fonts.googleapis.com/css' );
+	// wp_enqueue_style( 'fancybox-css', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css' );
 }
 add_action( 'wp_footer', 'styles_to_footer' );
 
@@ -232,10 +230,8 @@ function anno_func( $cat_name, $section_title, $read_more='Подробнее...
 	endif;
 }
 
+// [annocards post_type="post" cat_name="blog" tag_name="promo" section_title="Приходите" read_more="Подробнее..." date="future" exclude="312"] 
 add_shortcode( 'annocards', 'annocards_func' );
-
-// использование: [annocards post_type="post" cat_name="blog" tag_name="promo" section_title="Приходите" read_more="Подробнее..." date="future"] 
-
 function annocards_func( $atts ){
 	// белый список параметров и значения по умолчанию
 	$atts = shortcode_atts( array(
@@ -244,7 +240,8 @@ function annocards_func( $atts ){
 		'tag_name' => '',
 		'section_title' => null,
 		'read_more' => null,
-		'date' => ''
+		'date' => '',
+		'exclude' => array()
 	), $atts );
 
 	$post_type = $atts['post_type'];
@@ -253,16 +250,22 @@ function annocards_func( $atts ){
 	$section_title = $atts['section_title'];
 	$read_more = $atts['read_more'];
 	$date = $atts['date'];
+	$exclude = $atts['exclude'];
+
 	$echo = '';
 
 	global $post;
-	$args = array( 'post_type' => $post_type, 'category_name' => $cat_name, 'tag' => $tag_name );
+	$args = array( 'post_type' => $post_type, 'category_name' => $cat_name, 'tag' => $tag_name, 'exclude' => $exclude );
 
 	if( $post_type == 'events'):
 		$today = date('Ymd');
 		if($date == 'past') $past_events = true;
 		$compare = $past_events ? '<' : '>=';
-		$args += array( 'meta_query' => array( array('key' => 'event_info_event_date', 'compare' => $compare, 'value' => $today) ) );
+		$args += array( 
+			'orderby'    => 'event_info_event_date', 
+			'order'      => 'DESC',
+			'meta_query' => array( array('key' => 'event_info_event_date', 'compare' => $compare, 'value' => $today) )
+		);
 	endif;
 
 	$myposts = get_posts( $args );
@@ -279,7 +282,7 @@ function annocards_func( $atts ){
 
 			$echo .= '<div class="row anno-card"><div class="col-12 col-md-4"><a href="' . $permalink . '" title="Ссылка на: ' . $title . '" tabindex="-1">'; 
 			$echo .= get_the_post_thumbnail(null, 'medium');
-			$echo .= '</a></div><div class="col-12 col-md-8"><h3><a href="' . $permalink . '" title="Ссылка на: '; 
+			$echo .= '</a></div><div class="col-12 col-md-8"><h3 class="annocard-title"><a href="' . $permalink . '" title="Ссылка на: '; 
 			$echo .= $title . '">' . $title . '</a></h3><p>';
 			if( $event_date ) $echo .= $event_date . ' ';
 			$echo .= get_the_excerpt();
@@ -289,6 +292,87 @@ function annocards_func( $atts ){
 		endforeach;
 		if( $past_events && !is_archive() )
 			$echo .= '<p class="anno-ref"><a href="' . get_post_type_archive_link('events') . '" title="Ссылка на все события">Все события ></a></p>';
+
+		$echo .= '</div></div></section>';
+	endif;
+
+	return $echo;
+}
+
+// [newscards section_id="announcement" section_title="Актуальное" future_events="1" promo_posts="2" promo_events="3" read_more="Подробнее..." exclude="312"] 
+add_shortcode( 'newscards', 'newscards_func' );
+function newscards_func( $atts ){
+	// белый список параметров и значения по умолчанию
+	$atts = shortcode_atts( array(
+		'post_type' => array('post','events'),
+		'section_id' => '',
+		'section_title' => null,
+		'cat_name' => 'promo',
+		// 'date' => 'future',
+		'future_events' => '0',
+		'promo_posts' => '0',
+		'promo_events' => '0',
+		'read_more' => null,
+		'exclude' => array()
+	), $atts );
+
+	$numberposts = 9;
+	$post_type = $atts['post_type'];
+	$section_id = $atts['section_id'];
+	$section_title = $atts['section_title'];
+	$cat_name = $atts['cat_name'];
+	$date = $atts['date'];
+	$future_events = $atts['future_events'];
+	$promo_posts = $atts['promo_posts'];
+	$promo_events = $atts['promo_events'];
+	$read_more = $atts['read_more'];
+	$exclude = $atts['exclude'];
+
+	// $args = array( 'numberposts' => $numberposts, 'post_type' => $post_type, 'category_name' => $cat_name );
+	$myposts = array();
+	if( $future_events ){
+		$today = date('Ymd');
+		$compare = '>=';
+		$args_fe = array( 'post_type' => 'events', 'exclude' => $exclude, 'meta_query' => array( array('key' => 'event_info_event_date', 'compare' => $compare, 'value' => $today) ) );
+		$myposts = array_merge($myposts, get_posts( $args_fe ));
+	}
+	if( $promo_posts ){
+		$args_pp = array( 'post_type' => 'post', 'exclude' => $exclude, 'category_name' => $cat_name );
+		$myposts = array_merge($myposts, get_posts( $args_pp ));
+	}
+	if( $promo_events ){
+		$args_pe = array( 'post_type' => 'events', 'exclude' => $exclude, 'category_name' => $cat_name );
+		$myposts = array_merge($myposts, get_posts( $args_pe ));
+	}
+
+	// print_r($args);
+	// $myposts = array_merge($myposts1, $myposts2, $myposts3);
+
+	// $my_posts = new WP_Query;
+	// $myposts = $my_posts->query( $args );
+
+	global $post;
+	$echo = '';
+
+	if ( $myposts ): 
+		if( $section_id ) $section_id = ' id="'.$section_id.'"';
+		$echo .= '<section'.$section_id.'><div class="row section-container"><div class="col">';
+		if( $section_title ) $echo .= '<h2>'.$section_title.'</h2>';
+		$echo .= '<div class="row">';
+		foreach( $myposts as $post ):
+			setup_postdata( $post );
+			// if( $post_type == 'events') $event_date = get_field('event_info_event_date');
+			$permalink = get_the_permalink(); 
+			$title = esc_html( get_the_title() );
+
+			$echo .= '<div class="newscard-container col-md-6 col-lg-4"><div class="newscard"><a href="'.$permalink.'" title="Ссылка на: '.$title.'">'; 
+			$echo .= get_the_post_thumbnail(null, 'medium');
+			$echo .= '</a><h3 class="newscard-title">'.$title.'</h3>';
+			// $echo .= get_the_excerpt();
+			if( $read_more ) $echo .= ' <a href="'.$permalink.'" title="Ссылка на: '.$title.'" tabindex="-1">'.$read_more.'</a>';
+			$echo .= '</div></div>';
+			wp_reset_postdata();
+		endforeach;
 
 		$echo .= '</div></div></section>';
 	endif;
@@ -332,7 +416,7 @@ function register_post_types(){
 		//'map_meta_cap'      => null, // Ставим true чтобы включить дефолтный обработчик специальных прав
 		'hierarchical'        => false,
 		'supports'            => array('title','author','thumbnail','excerpt'), // 'title','editor','author','thumbnail','excerpt','trackbacks','custom-fields','comments','revisions','page-attributes','post-formats'
-		'taxonomies'          => array(),
+		'taxonomies'          => array('category'),
 		'has_archive'         => true,
 		'rewrite'             => true,
 		'query_var'           => true,
@@ -378,24 +462,159 @@ add_filter( 'get_the_archive_title', function( $title ){
 	return preg_replace('~^[^:]+: ~', '', $title );
 });
 
+// [socwidgets section_title="Мы в соцсетях" vk_mode="3" vk_width="300" vk_height="400" vk_id="94410363" no_cover="1"] 
 add_shortcode( 'socwidgets', 'socwidgets_func' );
-// использование: [socwidgets section_title="Мы в соцсетях"] 
 
 function socwidgets_func( $atts ){
 	// белый список параметров и значения по умолчанию
 	$atts = shortcode_atts( array(
-		'section_title' => null
+		'section_title' => null,
+		'vk_mode' => '3',
+		'vk_width' => '300',
+		'vk_height' => '400',
+		'vk_id' => null,
+		'no_cover' => null
 	), $atts );
 
 	$section_title = $atts['section_title'];
+	$vk_mode = $atts['vk_mode'];
+	$vk_width = $atts['vk_width'];
+	$vk_height = $atts['vk_height'];
+	$vk_id = $atts['vk_id'];
+	$no_cover = $atts['no_cover'];
 
-	$echo = '<section id="soc-section" style="display:none"><div class="row section-container"><div class="col">';
+	$echo = '<section id="soc-section"><div class="row section-container"><div class="col">';
 	if( $section_title ) $echo .= '<h2>'.$section_title.'</h2>';
 	$echo .= '<div class="row"><div class="col-md-6">';
-	$echo .= '<!-- VK Widget --><div id="vk_groups" style="margin: auto;"></div>';
+	if( $vk_id ):
+		$echo .= '<!-- VK Widget --><div id="vk_groups" data-id="'.$vk_id.'"';
+		if( $vk_mode ) $echo .= ' data-mode="'.$vk_mode.'"';
+		if( $vk_width ) $echo .= ' data-width="'.$vk_width.'"';
+		if( $vk_height ) $echo .= ' data-height="'.$vk_height.'"';
+		if( $no_cover ) $echo .= ' data-no_cover="'.$no_cover.'"';
+		$echo .= '></div>';
+	endif;
 	$echo .= '</div></div>';
 	$echo .= '<noscript><p><a href="https://vk.com/excurs_orel" target="_blank">ВКонтакте</a></p><p><a href="https://www.facebook.com/groups/excursorel" target="_blank">Фейсбук</a></p></noscript>';
 	$echo .= '</div></div></section>';
 
 	return $echo;
+}
+
+// [carousel class="carousel"]
+add_shortcode( 'carousel', 'carousel_func' );
+
+function carousel_func( $atts ){
+	// белый список параметров и значения по умолчанию
+	$atts = shortcode_atts( array(
+		'class' => 'carousel'
+	), $atts );
+
+	$class = $atts['class'];
+	$class_item = $class.'-item';
+	$echo = '';
+
+	global $post;
+	//Get the images ids from the post_metadata
+	$images = acf_photo_gallery( 'carousel_gal', $post->ID );
+	if( count($images) ):
+		$images_counter = 0;
+		$echo .= '<div class="'.$class.'">';
+		foreach( $images as $image ):
+			$id = $image['id']; // The attachment id of the media
+			$title = $image['title']; //The title
+			// $description = $image['caption']; //The caption (Description!)
+			// $full_image_url= $image['full_image_url']; //Full size image url
+			$echo .= '<div class="'.$class_item.'">';
+			// 1st img item not lazy
+			if( $images_counter == 0 )
+				$echo .= wp_get_attachment_image( $id, 'medium_large', false, array( 'title' => $title) );
+			else
+				$echo .= get_lazy_attachment_image( $id, 'medium_large', false, array( 'title' => $title) );
+			$images_counter++;
+
+			$echo .= '</div>';
+		endforeach;
+		$echo .= '</div> <!-- / '.$class.' -->';
+	endif;
+
+	return $echo;
+}
+
+/*
+	get_lazy_attachment_image() is mod of standart wp_get_attachment_image()
+*/
+function get_lazy_attachment_image( $attachment_id, $size = 'thumbnail', $icon = false, $attr = '' ) {
+	$html  = '';
+	$image = wp_get_attachment_image_src( $attachment_id, $size, $icon );
+	if ( $image ) {
+		list($src, $width, $height) = $image;
+		$hwstring                   = image_hwstring( $width, $height );
+		$size_class                 = $size;
+		if ( is_array( $size_class ) ) {
+			$size_class = join( 'x', $size_class );
+		}
+		$attachment   = get_post( $attachment_id );
+		$default_attr = array(
+			'data-src' => $src,	// was: 'src' => $src,
+			'class' => "attachment-$size_class size-$size_class",
+			'alt' => trim( strip_tags( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) ),
+		);
+
+		$attr = wp_parse_args( $attr, $default_attr );
+
+		// Generate 'srcset' and 'sizes' if not already present.
+		if ( empty( $attr['srcset'] ) ) {
+			$image_meta = wp_get_attachment_metadata( $attachment_id );
+
+			if ( is_array( $image_meta ) ) {
+				$size_array = array( absint( $width ), absint( $height ) );
+				$srcset     = wp_calculate_image_srcset( $size_array, $src, $image_meta, $attachment_id );
+				$sizes      = wp_calculate_image_sizes( $size_array, $src, $image_meta, $attachment_id );
+
+				if ( $srcset && ( $sizes || ! empty( $attr['sizes'] ) ) ) {
+					$attr['data-srcset'] = $srcset; // was: $attr['srcset'] = $srcset;
+
+					if ( empty( $attr['sizes'] ) ) {
+						$attr['sizes'] = $sizes;
+					}
+				}
+			}
+		}
+
+		/**
+		 * Filters the list of attachment image attributes.
+		 *
+		 * @since 2.8.0
+		 *
+		 * @param array        $attr       Attributes for the image markup.
+		 * @param WP_Post      $attachment Image attachment post.
+		 * @param string|array $size       Requested size. Image size or array of width and height values
+		 *                                 (in that order). Default 'thumbnail'.
+		 */
+		$attr = apply_filters( 'wp_get_attachment_image_attributes', $attr, $attachment, $size );
+		$attr = array_map( 'esc_attr', $attr );
+		$html = rtrim( "<img $hwstring" );
+		foreach ( $attr as $name => $value ) {
+			$html .= " $name=" . '"' . $value . '"';
+		}
+		$html .= ' />';
+	}
+
+	return $html;
+}
+
+// Меняем порядок вывода записей для архива типа записи 'events'
+add_action('pre_get_posts', 'events_orderby_meta', 1 );
+function events_orderby_meta( $query ) {
+	// Выходим, если это админ-панель или не основной запрос
+	if( is_admin() || ! $query->is_main_query() )
+		return;
+
+	if( $query->is_post_type_archive('events') ){
+		$query->set( 'posts_per_page', 5 );
+		$query->set( 'orderby', 'meta_value' );
+		$query->set( 'meta_key', 'event_info_event_date' );
+		$query->set( 'post__not_in', [312] );
+	}
 }

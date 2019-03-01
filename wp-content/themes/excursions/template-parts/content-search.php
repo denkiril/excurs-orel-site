@@ -10,26 +10,22 @@
 ?>
 
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-	<header class="entry-header">
-		<?php the_title( sprintf( '<h2 class="entry-title"><a href="%s" rel="bookmark">', esc_url( get_permalink() ) ), '</a></h2>' ); ?>
+	
+	<?php
+	$permalink = get_the_permalink();
+	$title = esc_html( get_the_title() ); 
+	?>
 
-		<?php if ( 'post' === get_post_type() ) : ?>
-		<div class="entry-meta">
-			<?php
-			excursions_posted_on();
-			excursions_posted_by();
-			?>
-		</div><!-- .entry-meta -->
-		<?php endif; ?>
-	</header><!-- .entry-header -->
+	<div class="row anno-card">
+		<div class="col-12 col-md-4">
+			<a href="<?=$permalink?>" title="Ссылка на: <?=$title?>" tabindex="-1">
+			<?php the_post_thumbnail('medium'); ?>
+			</a>
+		</div>
+		<div class="col-12 col-md-8">
+			<h2 class="annocard-title"><a href="<?=$permalink?>" title="Ссылка на: <?=$title?>"><?=$title?></a></h2>
+			<p><?php the_excerpt() ?></p>
+		</div>
+	</div>
 
-	<?php excursions_post_thumbnail(); ?>
-
-	<div class="entry-summary">
-		<?php the_excerpt(); ?>
-	</div><!-- .entry-summary -->
-
-	<footer class="entry-footer">
-		<?php excursions_entry_footer(); ?>
-	</footer><!-- .entry-footer -->
 </article><!-- #post-<?php the_ID(); ?> -->

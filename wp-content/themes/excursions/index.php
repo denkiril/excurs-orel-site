@@ -23,6 +23,8 @@ get_header();
 		// $postmeta = get_post_meta( get_queried_object()->ID, 'header-h1', true ); 
 		// if($postmeta) $headertitle = $postmeta;
 
+		// the_widget( 'WP_Widget_Tag_Cloud' );
+
 		if ( have_posts() ) :
 			// if ( is_home() && ! is_front_page() ) :
 				?>
