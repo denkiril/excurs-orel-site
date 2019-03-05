@@ -206,3 +206,18 @@
         width: 100%;
     }
 }
+
+.video-container{
+    text-align: center;
+    margin-bottom: 1em;
+}
+.video-container iframe{
+    width: 560px;
+    height: 315px;
+}
+
+@media (max-width: 768px) {
+    .video-container iframe{
+        width: 100%;
+    }
+}

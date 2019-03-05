@@ -10,7 +10,7 @@
 get_header();
 ?>
 
-	<main id="main" class="site-main">
+<main id="main" class="site-main">
 
 	<?php
 	while ( have_posts() ) :
@@ -18,13 +18,10 @@ get_header();
 
 		get_template_part( 'template-parts/content', get_post_type() );
 
-		// echo 'single.php, post_type = ' . get_post_type();
-		// the_post_navigation();
-
 	endwhile; // End of the loop.
 	?>
 
-	</main><!-- #main -->
+</main><!-- #main -->
 
 <?php
 // get_sidebar();

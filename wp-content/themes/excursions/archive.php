@@ -10,52 +10,48 @@
 get_header();
 ?>
 
-		<main id="main" class="site-main archive.php">
+<main id="main" class="site-main archive">
 
-		<?php if ( have_posts() ) : ?>
+	<?php if( have_posts() ):
+		while( have_posts() ):
+			the_post();
+			
+			$permalink = get_the_permalink();
+			$title = esc_html( get_the_title() ); 
+			// archive-events.php 
+			if( get_post_type() == 'events'){
+				$event_date = markup_event_date();
+				$show_attention = get_field('event_info_event_date', false, false) >= date('Ymd');
+			}
+			?>		 
 
-			<!-- <header class="page-header"> -->
-				<?php
-				// the_archive_title( '<h1 class="page-title">', '</h1>' );
-				// the_archive_description( '<div class="archive-description">', '</div>' );
-				?>
-			<!--</header> .page-header -->
-			<!-- <section><div class="row section-container"><div class="col"> -->
-
-			<?php
-			/* Start the Loop */
-			while ( have_posts() ) :
-				the_post();
-				// get_template_part( 'template-parts/content', get_post_type() ); 
-				$permalink = get_the_permalink();
-				$title = esc_html( get_the_title() ); ?>		 
-
-				<div class="row anno-card">
-					<div class="col-12 col-md-4">
-						<a href="<?=$permalink?>" title="Ссылка на: <?=$title?>" tabindex="-1">
-						<?php the_post_thumbnail('medium'); ?>
-						</a>
-					</div>
-					<div class="col-12 col-md-8">
-						<h2 class="annocard-title"><a href="<?=$permalink?>" title="Ссылка на: <?=$title?>"><?=$title?></a></h2>
-						<?php the_excerpt(); ?>
-					</div>
+			<div class="row anno-card">
+				<div class="col-12 col-md-4">
+					<a href="<?=$permalink?>" title="Ссылка на: <?=$title?>" tabindex="-1">
+					<?php the_post_thumbnail('medium'); ?>
+					</a>
 				</div>
+				<div class="col-12 col-md-8">
+					<h2 class="annocard-title"><a href="<?=$permalink?>" title="Ссылка на: <?=$title?>"><?=$title?></a></h2>
+					<?php if( $show_attention ): ?>
+						<p class="attention">Не пропустите!</p>
+					<?php endif; ?>
+					<p><?php echo $event_date . get_the_excerpt() ?></p>
+				</div>
+			</div>
 
-			<?php endwhile;
+		<?php endwhile;
 
-			// the_posts_navigation();
-			the_posts_pagination();
+		the_posts_pagination();
 
-		else :
+	else :
 
-			get_template_part( 'template-parts/content', 'none' );
+		get_template_part( 'template-parts/content', 'none' );
 
-		endif;
-		?>
+	endif;
+	?>
 
-		</main><!-- #main -->
+</main><!-- #main -->
 
 <?php
-// get_sidebar();
 get_footer();

@@ -43,9 +43,10 @@
 		else :
 			?>
 
-			<p><?php esc_html_e( 'It seems we can&rsquo;t find what you&rsquo;re looking for. Perhaps searching can help.', 'excursions' ); ?></p>
+			<p><?php // esc_html_e( 'It seems we can&rsquo;t find what you&rsquo;re looking for. Perhaps searching can help.', 'excursions' ); ?>
+			<?php esc_html_e( 'Так уж вышло, что на этой странице ничего нет. Но на других-то точно есть! :)', 'excursions' ); ?></p>
 			<?php
-			get_search_form();
+			// get_search_form();
 
 		endif;
 		?>

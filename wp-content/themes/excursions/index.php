@@ -16,7 +16,7 @@ get_header();
 ?>
 
 	<!-- <div class="container main-container index.php"> -->
-		<main id="main" class="site-main">
+<main id="main" class="site-main">
 
 		<?php
 		// $headertitle = single_post_title(null, false);
@@ -54,7 +54,7 @@ get_header();
 		endif;
 		?>
 
-		</main><!-- #main -->
+</main><!-- #main -->
 
 <?php
 // get_sidebar();

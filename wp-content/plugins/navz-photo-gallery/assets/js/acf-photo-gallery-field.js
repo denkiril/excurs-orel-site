@@ -4,26 +4,11 @@
         //$el.doStuff();
     }
 
-    function acf_photo_gallery_remove_media($btn) {
-        var url = $btn.attr('href');
-        var id = $btn.attr('data-id');
-        var field = $btn.attr('data-field');
-
-        var JsonField = jQuery.parseJSON(field);
-        $('.acf-photo-gallery-group-' + JsonField.key + ' .acf-photo-gallery-mediabox-' + id).fadeOut('fast').remove();
-        if( $('.acf-photo-gallery-group-' + JsonField.key + ' .acf-photo-gallery-metabox-list li').length < 1 ){
-            $('.acf-photo-gallery-group-' + JsonField.key + ' .acf-photo-gallery-metabox-list').append('<li class="acf-photo-gallery-media-box-placeholder"><span class="dashicons dashicons-format-image"></span></li>');
+    function acf_photo_gallery_remove_media( id, field ){
+        $('.acf-photo-gallery-group-' + field + ' .acf-photo-gallery-mediabox-' + id).fadeOut('fast').remove();
+        if( $('.acf-photo-gallery-group-' + field + ' .acf-photo-gallery-metabox-list li').length < 1 ){
+            $('.acf-photo-gallery-group-' + field + ' .acf-photo-gallery-metabox-list').append('<li class="acf-photo-gallery-media-box-placeholder"><span class="dashicons dashicons-format-image"></span></li>');
         }
-
-        /*$.get(url, function() {
-            console.log( JsonField.key );
-
-            $('.acf-photo-gallery-group-' + JsonField.key + ' .acf-photo-gallery-mediabox-' + id).fadeOut('fast').remove();
-            if( $('.acf-photo-gallery-group-' + JsonField.key + ' .acf-photo-gallery-metabox-list li').length < 1 ){
-                $('.acf-photo-gallery-group-' + JsonField.key + ' .acf-photo-gallery-metabox-list').append('<li class="acf-photo-gallery-media-box-placeholder"><span class="dashicons dashicons-format-image"></span></li>');
-            }
-        });*/
-
     }
 
     $(document).ready(function() {
@@ -65,7 +50,7 @@
         html = acf_photo_gallery_edit(id, url, title, caption);
         $('.acf-photo-gallery-group-' + JsonField.key + ' .acf-photo-gallery-metabox-edit').append(html);
         var $list = $('.acf-photo-gallery-group-' + JsonField.key + ' .acf-photo-gallery-metabox-list');
-        html = '<li id="acf-photo-gallery-mediabox-' + id + '" data-id="' + id + '"><a class="dashicons dashicons-edit" href="#" title="Edit" data-id="' + id + '"></a><a class="dashicons dashicons-dismiss" href="#" data-id="' + id + '" data-field="' + field + '" title="Remove this photo from the gallery"></a><input type="hidden" name="' + JsonField._name + '[]" value="' + id + '"/><img src="' + url + '"/></li>';
+        html = '<li class="acf-photo-gallery-mediabox-' + id + '" data-id="' + id + '"><a class="dashicons dashicons-dismiss" href="#" data-id="' + id + '" data-field="' + JsonField.key + '" title="Remove this photo from the gallery"></a><input type="hidden" name="' + JsonField._name + '[]" value="' + id + '"/><img src="' + url + '"/></li>';
         if (options.index) {
             var $cursor = $list.children().eq(options.index);
             $cursor.before(html);
@@ -104,9 +89,11 @@
         };
     }
 
-    $(document).on('click', '.acf-photo-gallery-metabox-list .dashicons-dismiss', function() {
-        if (confirm('You are about to remove this photo from the gallery. Are you sure?')) {
-            acf_photo_gallery_remove_media($(this));
+    $(document).on('click', '.acf-photo-gallery-metabox-list .dashicons-dismiss', function(){
+        var id = $(this).attr('data-id');
+        var field = $(this).attr('data-field');
+        if (confirm('You are about to remove this photo from the gallery. Are you sure?')){
+            acf_photo_gallery_remove_media(id, field);
         }
         return false;
     });

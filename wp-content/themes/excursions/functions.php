@@ -258,34 +258,38 @@ function annocards_func( $atts ){
 	$args = array( 'post_type' => $post_type, 'category_name' => $cat_name, 'tag' => $tag_name, 'exclude' => $exclude );
 
 	if( $post_type == 'events'):
-		$today = date('Ymd');
-		if($date == 'past') $past_events = true;
-		$compare = $past_events ? '<' : '>=';
 		$args += array( 
 			'orderby'    => 'event_info_event_date', 
 			'order'      => 'DESC',
-			'meta_query' => array( array('key' => 'event_info_event_date', 'compare' => $compare, 'value' => $today) )
 		);
+
+		if( $date ):
+			$today = date('Ymd');
+			if($date == 'past') $past_events = true;
+			else $future_events = true;
+			$compare = $past_events ? '<' : '>=';
+			$args += array( 
+				'meta_query' => array( array('key' => 'event_info_event_date', 'compare' => $compare, 'value' => $today) )
+			);
+		endif;
 	endif;
 
 	$myposts = get_posts( $args );
-	if ( $myposts ): 
+	if( $myposts ): 
 		$echo .= '<section><div class="row section-container"><div class="col">';
 		if( $section_title ) $echo .= '<h2>' . $section_title . '</h2>';
 		foreach( $myposts as $post ):
 			setup_postdata( $post );
-			if( $post_type == 'events')
-				$event_date = get_field('event_info_event_date');
-				// $event_date = get_field('event_info_event_date', false, false);
 			$permalink = get_the_permalink(); 
 			$title = esc_html( get_the_title() );
+			if( $post->post_type == 'events') $event_date = markup_event_date( $post->id );
 
 			$echo .= '<div class="row anno-card"><div class="col-12 col-md-4"><a href="' . $permalink . '" title="Ссылка на: ' . $title . '" tabindex="-1">'; 
 			$echo .= get_the_post_thumbnail(null, 'medium');
 			$echo .= '</a></div><div class="col-12 col-md-8"><h3 class="annocard-title"><a href="' . $permalink . '" title="Ссылка на: '; 
-			$echo .= $title . '">' . $title . '</a></h3><p>';
-			if( $event_date ) $echo .= $event_date . ' ';
-			$echo .= get_the_excerpt();
+			$echo .= $title . '">' . $title . '</a></h3>';
+			// if( $event_date ) $echo .= '<time>'.$event_date.'</time> ';
+			$echo .= '<p>'.$event_date.get_the_excerpt();
 			if( $read_more ) $echo .= ' <a href="' . $permalink . '" tabindex="-1">' . $read_more . '</a>';
 			$echo .= '</p></div></div>';
 			wp_reset_postdata();
@@ -294,6 +298,11 @@ function annocards_func( $atts ){
 			$echo .= '<p class="anno-ref"><a href="' . get_post_type_archive_link('events') . '" title="Ссылка на все события">Все события ></a></p>';
 
 		$echo .= '</div></div></section>';
+
+	elseif( $future_events ):
+		$echo = '<p>На ближайшее время у нас ничего не запланировано.</p>
+			<p>Вы можете проверить наши группы в соцсетях (ссылки внизу сайта) – возможно там есть анонсы, которые ещё не добрались до этого сайта.</p>';
+
 	endif;
 
 	return $echo;
@@ -361,13 +370,13 @@ function newscards_func( $atts ){
 		$echo .= '<div class="row">';
 		foreach( $myposts as $post ):
 			setup_postdata( $post );
-			// if( $post_type == 'events') $event_date = get_field('event_info_event_date');
 			$permalink = get_the_permalink(); 
 			$title = esc_html( get_the_title() );
+			if( $post->post_type == 'events') $event_date = markup_event_date( $post->id );
 
 			$echo .= '<div class="newscard-container col-md-6 col-lg-4"><div class="newscard"><a href="'.$permalink.'" title="Ссылка на: '.$title.'">'; 
 			$echo .= get_the_post_thumbnail(null, 'medium');
-			$echo .= '</a><h3 class="newscard-title">'.$title.'</h3>';
+			$echo .= '</a><h3 class="newscard-title">'.$event_date.$title.'</h3>';
 			// $echo .= get_the_excerpt();
 			if( $read_more ) $echo .= ' <a href="'.$permalink.'" title="Ссылка на: '.$title.'" tabindex="-1">'.$read_more.'</a>';
 			$echo .= '</div></div>';
@@ -378,6 +387,18 @@ function newscards_func( $atts ){
 	endif;
 
 	return $echo;
+}
+
+function markup_event_date( $post_id = null ){
+	$event_date = '';
+	if( $event_date = get_field('event_info_event_date', $post_id) ){
+		$raw_date = get_field('event_info_event_date', $post_id, false);
+		$date_obj = new DateTime($raw_date);
+		$datetime = $date_obj->format('Y-m-d');
+		$event_date = '<time datetime="'.$datetime.'">'.$event_date.'</time> ';
+	}
+
+	return $event_date;
 }
 
 add_action( 'init', 'register_post_types' );
@@ -501,17 +522,20 @@ function socwidgets_func( $atts ){
 	return $echo;
 }
 
-// [carousel class="carousel"]
+// [carousel class="carousel" hrefs=1]
 add_shortcode( 'carousel', 'carousel_func' );
 
 function carousel_func( $atts ){
 	// белый список параметров и значения по умолчанию
 	$atts = shortcode_atts( array(
-		'class' => 'carousel'
+		'class' => 'carousel',
+		'hrefs' => false,
 	), $atts );
 
 	$class = $atts['class'];
 	$class_item = $class.'-item';
+	$hrefs = $atts['hrefs'];
+
 	$echo = '';
 
 	global $post;
@@ -525,17 +549,25 @@ function carousel_func( $atts ){
 			$title = $image['title']; //The title
 			// $description = $image['caption']; //The caption (Description!)
 			// $full_image_url= $image['full_image_url']; //Full size image url
+			$post_id = wp_get_post_parent_id( $id ); // get_post($id)->post_parent 
+			$post_link = get_permalink( $post_id ); 
+			$attr = $hrefs ? null : array( 'title' => $title);
+
 			$echo .= '<div class="'.$class_item.'">';
-			// 1st img item not lazy
+			if( $hrefs && $post_link )
+				$echo .= '<a href="'.$post_link.'" title="'.get_the_title( $post_id ).'">';
+
+			// Get img item. 1st is not lazy 
 			if( $images_counter == 0 )
-				$echo .= wp_get_attachment_image( $id, 'medium_large', false, array( 'title' => $title) );
+				$echo .= wp_get_attachment_image( $id, 'medium_large', false, $attr );
 			else
-				$echo .= get_lazy_attachment_image( $id, 'medium_large', false, array( 'title' => $title) );
+				$echo .= get_lazy_attachment_image( $id, 'medium_large', false, $attr );
 			$images_counter++;
 
+			if( $hrefs && $post_link ) $echo .= '</a>';
 			$echo .= '</div>';
 		endforeach;
-		$echo .= '</div> <!-- / '.$class.' -->';
+		$echo .= '</div> <!-- '.$class.' -->';
 	endif;
 
 	return $echo;
@@ -604,6 +636,46 @@ function get_lazy_attachment_image( $attachment_id, $size = 'thumbnail', $icon =
 	return $html;
 }
 
+// [image class="" id=1 size="medium_large" title=false]
+add_shortcode( 'image', 'image_func' );
+
+function image_func( $atts ){
+	// белый список параметров и значения по умолчанию
+	$atts = shortcode_atts( array(
+		'class' => 'image',
+		'id' => null,
+		'size' => 'thumbnail',
+		'title' => true,
+	), $atts );
+
+	$class = $atts['class'];
+	$id = $atts['id'];
+	$size = $atts['size'];
+	$title = $atts['title'];
+
+	$echo = '';
+
+	if( !$id ) $id = get_post_thumbnail_id();
+
+	if( $id ):
+
+		if( $title ){
+			$title = get_the_title( $id );
+			$attr = array( 'title' => $title);
+		}
+
+		$image = wp_get_attachment_image( $id, $size, false, $attr );
+		// $image = get_lazy_attachment_image( $id, $size, false, $attr );
+
+		if( $image ){
+			$echo .= '<div class="'.$class.'"><figure>'.$image.'</figure></div>';
+		}
+
+	endif;
+
+	return $echo;
+}
+
 // Меняем порядок вывода записей для архива типа записи 'events'
 add_action('pre_get_posts', 'events_orderby_meta', 1 );
 function events_orderby_meta( $query ) {
@@ -612,9 +684,17 @@ function events_orderby_meta( $query ) {
 		return;
 
 	if( $query->is_post_type_archive('events') ){
-		$query->set( 'posts_per_page', 5 );
+		// $query->set( 'posts_per_page', 5 ); // default=10
 		$query->set( 'orderby', 'meta_value' );
 		$query->set( 'meta_key', 'event_info_event_date' );
-		$query->set( 'post__not_in', [312] );
+		$query->set( 'post__not_in', [312] ); // exclude="312"
+	}
+}
+
+// Включаем поиск для записей типа 'events'
+add_action('pre_get_posts', 'get_posts_search_filter');
+function get_posts_search_filter( $query ){
+	if ( ! is_admin() && $query->is_main_query() && $query->is_search ) {
+		$query->set('post_type', array('post', 'events') );
 	}
 }

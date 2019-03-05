@@ -1,8 +1,22 @@
 /*
   For bottom part of page
 */
-.soc-buttons{
+.pagination{
+    display: flex;
+    display: -ms-flexbox;
+}
+.nav-links{
+    /* display: inline-block; */
+    border: 1px solid #3f3f3f;
+    padding: 3px;
+    /* margin: 0; */
+    margin-left: auto;
     /* text-align: right; */
+}
+.page-numbers{
+    padding: 0 10px;
+}
+.soc-buttons{
     display: none;
     padding-top: 20px;
 }

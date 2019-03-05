@@ -56,7 +56,8 @@
 				if( $event_info['show_event_date']  && $event_date )
 				{
 					$label = $event_info['event_date_label'] ? '<span class="ei_label">' . esc_html( $event_info['event_date_label'] ) . '</span> ' : '';
-					$echo .= $label . esc_html( $event_date ) . '<br />';
+					$event_date_html = markup_event_date();
+					$echo .= $label . $event_date_html . '<br />';
 				}
 				if( $event_info['show_event_time'] && $event_info['event_time'] )
 				{
@@ -70,15 +71,19 @@
 					$echo .= $label . esc_html( $event_info['event_place_text'] ) . '<br />';
 				}
 					// $echo .= esc_html( $event_info['event_place_label'] ) . ' ' . esc_html( $event_info['event_place_text'] ) . '<br />';
-				$show_guide = $event_info['show_guide'] && $event_info['guide_text'];
+				$show_guide = $event_info['show_guide'] && ($event_info['guide_text'] || $event_info['guide_names']);
 				if( $echo && $show_guide )
 					$echo .= '<br />';
 				if( $show_guide )
 				{
+					$guide_text = $event_info['guide_text'];
+					if( !$guide_text ){
+						$names = $event_info['guide_names'];
+						$guide_text = implode(', ', $names);
+					}
 					$label = $event_info['guide_label'] ? '<span class="ei_label">' . esc_html( $event_info['guide_label'] ) . '</span> ' : '';
-					$echo .= $label . esc_html( $event_info['guide_text'] ) . '<br />';
+					$echo .= $label . esc_html( $guide_text ) . '<br />';
 				}
-					// $echo .= esc_html( $event_info['guide_label'] ) . ' ' . esc_html( $event_info['guide_text'] ) . '<br />';
 
 				if( $echo ) {
 					$echo = '<p>' . $echo . '</p>';
@@ -256,6 +261,48 @@
 			<?php endif; ?>
 
 		</div> <!-- post-gallery -->
+		<?php endif;
+
+		/* video */
+		$video = get_field('video');
+		if( $video ): ?>
+		<div class="video-gallery">
+			<div class="row">
+				<div class="col">
+					<h2>Видео</h2>
+				</div>
+			</div> <!-- row -->
+
+			<?php 
+			$yt_link = $video['youtube']; 
+			// https://youtu.be/MOOqSGOXua0 
+			// https://www.youtube.com/watch?v=MOOqSGOXua0&feature=youtu.be&ab_channel=AlekseyBorisov 
+			// src="https://www.youtube.com/embed/MOOqSGOXua0?rel=0"
+			if( $yt_link ): 
+				$ytarray 	 = explode("/", $yt_link);
+				$ytendstring = end($ytarray);
+				$ytendarray  = explode("?v=", $ytendstring);
+				$ytendstring = end($ytendarray);
+				$ytendarray  = explode("&", $ytendstring);
+				$ytcode 	 = $ytendarray[0]; 
+				?> 
+				<div class="row">
+					<div class="col video-container">
+						<iframe src="https://www.youtube.com/embed/<?=$ytcode?>" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+					</div>
+				</div> <!-- row -->
+			<?php endif; ?>
+
+			<?php 
+			$vk_link = $video['vk']; 
+			if( $vk_link ): ?>
+				<div class="row">
+					<div class="col video-container">
+						<iframe src="<?=$vk_link?>" frameborder="0" allowfullscreen></iframe>
+					</div>
+				</div> <!-- row -->
+			<?php endif; ?>
+
 		<?php endif; ?>
 		
 	</div><!-- .entry-content -->
