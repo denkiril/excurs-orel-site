@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the WordPress - 5.1.x - Development - Administration package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2019-02-23 07:11:20+0000\n"
+"PO-Revision-Date: 2019-03-05 22:08:31+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -279,7 +279,7 @@ msgid "Cannot Install"
 msgstr "Установка невозможна"
 
 #: wp-admin/includes/class-wp-plugin-install-list-table.php:637
-msgid "This plugin doesn&#8217;t work with your versions of WordPress and PHP. "
+msgid "This plugin doesn&#8217;t work with your versions of WordPress and PHP."
 msgstr "Этот плагин не будет работать с вашими текущими версиями WordPress и PHP."
 
 #. translators: 1: "Update WordPress" screen URL, 2: "Update PHP" page URL
@@ -300,7 +300,7 @@ msgid "<a href=\"%s\">Learn more about updating PHP</a>."
 msgstr "<a href=\"%s\">Узнайте больше об обновлении PHP</a>."
 
 #: wp-admin/includes/class-wp-plugin-install-list-table.php:670
-msgid "This plugin doesn&#8217;t work with your version of PHP. "
+msgid "This plugin doesn&#8217;t work with your version of PHP."
 msgstr "Этот плагин не будет работать с вашей версией PHP."
 
 #: wp-admin/includes/schema.php:1242
@@ -312,7 +312,7 @@ msgid "Copy this section to clipboard"
 msgstr "Скопировать этот раздел в буфер обмена"
 
 #: wp-admin/includes/class-wp-plugin-install-list-table.php:661
-msgid "This plugin doesn&#8217;t work with your version of WordPress. "
+msgid "This plugin doesn&#8217;t work with your version of WordPress."
 msgstr "Этот плагин не будет работать с вашей версией WordPress. "
 
 #. translators: %s: default category

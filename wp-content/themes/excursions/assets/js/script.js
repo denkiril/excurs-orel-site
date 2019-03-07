@@ -40,13 +40,13 @@ $(document).ready(function(){
 		}
     });
 
-	// $.ajaxSetup({
-	//   cache: true
-	// });
+	$.ajaxSetup({
+	  cache: true
+	});
 
 	function OpenMap(){
 		if( $('.acf-map').length ){
-			console.log('acf-map ok');
+			// console.log('acf-map ok');
 			// var api_url = "https://api-maps.yandex.ru/2.1/?apikey=6ebdbbc2-3779-4216-9d88-129e006559bd&lang=ru_RU";
 			var api_url = "https://api-maps.yandex.ru/2.1/?lang=ru_RU";
 			// $.getScript(api_url).then(function() {
@@ -54,7 +54,7 @@ $(document).ready(function(){
 				url: api_url,
 				dataType: "script",
 				// cache: true,
-				success: console.log('ymap-api ok')
+				// success: console.log('ymap-api ok')
 			}).then(function() {
 				// E:\OSPanel\domains\excurs-orel\wp-content\themes\excursions\assets\js\acf-map-yandex.js
 				$.getScript("/wp-content/themes/excursions/assets/js/acf-map-yandex.js");
@@ -94,7 +94,7 @@ $(document).ready(function(){
 	})
 
 	$(window).on('load', function() {
-        console.log('onload');
+        // console.log('onload');
         
         // lazyLoad images
         // [].forEach.call(document.querySelectorAll('img[data-src]'), function(img) {
@@ -111,11 +111,11 @@ $(document).ready(function(){
         // }
         // wp_enqueue_script( 'fancybox-js', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js', array('jquery'), false, 'in_footer' );
 
-        $('<link/>', {
-            rel: 'stylesheet',
-            type: 'text/css',
-            href: '//fonts.googleapis.com/css?family=Ubuntu:300,400&amp;subset=cyrillic'
-        }).appendTo('head');
+        // $('<link/>', {
+        //     rel: 'stylesheet',
+        //     type: 'text/css',
+        //     href: '//fonts.googleapis.com/css?family=Ubuntu:300,400&amp;subset=cyrillic'
+        // }).appendTo('head');
 
         // $('<link/>', {
         //     rel: 'stylesheet',
@@ -125,7 +125,7 @@ $(document).ready(function(){
 
         // fancybox
 		if( $('a[data-fancybox]').length ){
-			console.log('fancybox ok');
+			// console.log('fancybox ok');
 			$('<link/>', {
 				rel: 'stylesheet',
 				type: 'text/css',
@@ -146,17 +146,17 @@ $(document).ready(function(){
 
 		// Слайдер-карусель
 		if( $('.carousel').length ){
-			console.log('carousel ok');
-			$('<link/>', {
-				rel: 'stylesheet',
-				type: 'text/css',
-				href: '/wp-content/themes/excursions/assets/include/slick.css'
-			}).appendTo('head');
-			$('<link/>', {
-				rel: 'stylesheet',
-				type: 'text/css',
-				href: '/wp-content/themes/excursions/assets/include/slick-theme.css'
-			}).appendTo('head');
+			// console.log('carousel ok');
+			// $('<link/>', {
+			// 	rel: 'stylesheet',
+			// 	type: 'text/css',
+			// 	href: '/wp-content/themes/excursions/assets/include/slick.css'
+			// }).appendTo('head');
+			// $('<link/>', {
+			// 	rel: 'stylesheet',
+			// 	type: 'text/css',
+			// 	href: '/wp-content/themes/excursions/assets/include/slick-theme.css'
+			// }).appendTo('head');
 			$.getScript("/wp-content/themes/excursions/assets/include/slick.min.js").then(function() {
                 // $('.carousel').each(function(){
                     // $(this).children('img[data-src]').each(function(){
@@ -177,14 +177,14 @@ $(document).ready(function(){
 		}
 
 		if(screen.width > 768){
-			console.log('screen.width > 768');
+			// console.log('screen.width > 768');
 
 			// acf-map only for big screens
 			OpenMap();
 
 			// social widgets only for big screens
 			if( $('#soc-section').length ){
-				console.log('soc-section ok');
+				// console.log('soc-section ok');
 
 				// if( $('#vk_groups').length ){
 					var vk_elem = $('#vk_groups');
@@ -200,8 +200,13 @@ $(document).ready(function(){
                         no_cover: no_cover}, 
 						vk_elem.attr('data-id'));
                     });
-                    console.log('no_cover: ' + no_cover);
+                    // console.log('no_cover: ' + no_cover);
 				// }
+				// if( $('.fb-group').length ){
+					// <script async defer src="https://connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v3.2&appId=330469164341166&autoLogAppEvents=1"></script>
+					// $.getScript("//connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v3.2&appId=330469164341166&autoLogAppEvents=1");
+				// }
+				$('<script async defer src="https://connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v3.2&appId=330469164341166&autoLogAppEvents=1"></script>').insertAfter('#fb-root');
 
 				$('#soc-section').show();
 			}

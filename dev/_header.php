@@ -19,9 +19,47 @@
 
 	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
 
+	<?php $is_front_page = is_front_page();
+	if($is_front_page): ?>
+		<meta name="description" content="<?php bloginfo('description'); ?>" />
+	<?php elseif( is_single() || is_page() ): if( have_posts() ): while ( have_posts() ): the_post(); ?>
+		<meta name="description" content="<?php the_excerpt(); ?>" />
+	<?php endwhile; endif; else: ?>
+		<meta name="description" content="<?php bloginfo('description'); ?>" />
+	<?php endif; ?>
+
 	<link rel="shortcut icon" href="/favicon.ico" />
+	<!-- <title><?=get_the_title()?></title> -->
+	<!-- <style>.svg-logo{max-width:60px; max-height:60px;}</style> -->
 
 	<?php wp_head(); ?>
+
+	<!-- Yandex.Metrika counter -->
+	<script type="text/javascript" >
+	(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+	m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+	(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+	ym(52494430, "init", {
+			clickmap:true,
+			trackLinks:true,
+			accurateTrackBounce:true,
+			webvisor:true
+	});
+	</script>
+	<noscript><div><img src="https://mc.yandex.ru/watch/52494430" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+	<!-- /Yandex.Metrika counter -->
+
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-46857559-2"></script>
+	<script>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+
+	gtag('config', 'UA-46857559-2');
+	</script>
+
 </head>
 
 <body> 
@@ -34,7 +72,6 @@
                 <div class="col header-container flex-container">
 					<div>
 					<?php 
-						$is_front_page = is_front_page();
 						$alt_headertitle = get_post_meta( $post->ID, 'header-title', true ); 
 						$headertitle = $alt_headertitle ? $alt_headertitle : get_bloginfo();
 						if ( $is_front_page || $alt_headertitle ) :

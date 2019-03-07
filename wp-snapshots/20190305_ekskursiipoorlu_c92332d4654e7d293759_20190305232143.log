@@ -1,0 +1,86 @@
+********************************************************************************
+DUPLICATOR-LITE PACKAGE-LOG: 05.03.2019 23:25
+NOTICE: Do NOT post to public sites or forums 
+********************************************************************************
+VERSION:	1.3.8
+WORDPRESS:	5.1
+PHP INFO:	7.2.10 | SAPI: apache2handler
+SERVER:		Apache 
+PHP TIME LIMIT: (0) no time limit imposed 
+PHP MAX MEMORY: 4294967296 (1536M default) 
+MEMORY STACK: 34MB 
+
+********************************************************************************
+DATABASE:
+********************************************************************************
+BUILD MODE:   PHP(query limit - 100)
+MYSQLTIMEOUT: 5000
+MYSQLDUMP:    Not Supported 
+TABLES: total:18 | filtered:0 | create:18 
+FILTERED: [] 
+SQL CREATED: 20190305_ekskursiipoorlu_c92332d4654e7d293759_20190305232143_database.sql 
+SQL FILE SIZE: 1.86MB (1947004) 
+SQL FILE TIME: 2019-03-05 23:25:25 
+SQL RUNTIME: 0.83 sec. 
+
+******************************************************************************** 
+ARCHIVE (ZIP): 
+******************************************************************************** 
+ARCHIVE DIR:  E:/OSPanel/domains/excurs-orel 
+ARCHIVE FILE: 20190305_ekskursiipoorlu_c92332d4654e7d293759_20190305232143_archive.zip 
+FILTERS: *OFF* 
+DIRS:
+	not set 
+FILES:
+	not set 
+EXTS:  not set 
+---------------------------------------- 
+COMPRESSING 
+SIZE:	464.78MB 
+STATS:	Dirs 786 | Files 10,829 
+SQL ADDED: 20190305_ekskursiipoorlu_c92332d4654e7d293759_20190305232143_database.sql 
+ZipArchive Object
+(
+    [status] => 0
+    [statusSys] => 0
+    [numFiles] => 11615
+    [filename] => E:\OSPanel\domains\excurs-orel\wp-snapshots\tmp\20190305_ekskursiipoorlu_c92332d4654e7d293759_20190305232143_archive.zip
+    [comment] => 
+)
+ 
+FILE ADDED TO ZIP: 11614 
+COMPRESSION RESULT: '1' 
+COMPRESSED SIZE: 409.18MB 
+ARCHIVE RUNTIME: 64.32 sec. 
+MEMORY STACK: 36MB 
+building installer 
+add_extra_files1 
+add_extra_files2 
+add_extra_files3 
+add_extra_files4 
+Doing archive file check 
+add_extra_files5 
+add_extra_files6 
+add_extra_files8 
+Successfully opened zip E:/OSPanel/domains/excurs-orel/wp-snapshots/tmp/20190305_ekskursiipoorlu_c92332d4654e7d293759_20190305232143_archive.zip 
+Adding enhanced installer files to archive using ZipArchive 
+Installer files added to archive 
+Added to archive 
+After ziparchive close when adding installer 
+
+******************************************************************************** 
+INTEGRITY CHECKS: 
+******************************************************************************** 
+SQL FILE: 1.86MB 
+INSTALLER FILE: 44.54KB 
+ARCHIVE FILE: 410.18MB  
+EXPECTED FILE/DIRECTORY COUNT: 11,615 
+ACTUAL FILE/DIRECTORY COUNT: 11,614 
+ARCHIVE CONSISTENCY TEST: Pass 
+
+********************************************************************************
+RECORD ID:[1]
+TOTAL PROCESS RUNTIME: 67.44 sec.
+PEAK PHP MEMORY USED: 38MB
+DONE PROCESSING => 20190305_ekskursiipoorlu 05.03.2019 23:26
+ 

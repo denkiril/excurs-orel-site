@@ -139,7 +139,8 @@
 					<?php endif;
 					echo '</ul>';
 
-					if( $offer['show_form'] ): ?>
+					if( $offer['show_form'] ): 
+						do_action( 'add_wpcf7_scripts' ); ?>
 						<div id="reg_form" style="display: none">
 							<button id="close_btn">&#10060;</button>
 							<?= do_shortcode('[contact-form-7 id="285" title="RegForm-1" event-title="' . $event_title . '"]'); ?>
@@ -264,8 +265,10 @@
 		<?php endif;
 
 		/* video */
-		$video = get_field('video');
-		if( $video ): ?>
+		// $video = get_field('video'); 
+		$yt_link = get_field('video_youtube');
+		$vk_link = get_field('video_vk');
+		if( $yt_link || $yt_link ): ?>
 		<div class="video-gallery">
 			<div class="row">
 				<div class="col">
@@ -274,7 +277,6 @@
 			</div> <!-- row -->
 
 			<?php 
-			$yt_link = $video['youtube']; 
 			// https://youtu.be/MOOqSGOXua0 
 			// https://www.youtube.com/watch?v=MOOqSGOXua0&feature=youtu.be&ab_channel=AlekseyBorisov 
 			// src="https://www.youtube.com/embed/MOOqSGOXua0?rel=0"
@@ -294,7 +296,6 @@
 			<?php endif; ?>
 
 			<?php 
-			$vk_link = $video['vk']; 
 			if( $vk_link ): ?>
 				<div class="row">
 					<div class="col video-container">

@@ -132,12 +132,15 @@ function excursions_scripts() {
 	}
 
 	wp_enqueue_style( 'bootstrap-grid', get_template_directory_uri() . '/assets/include/bootstrap-grid.min.css' );
-	wp_enqueue_style( 'events-css', get_template_directory_uri() . '/assets/css/events.css' );
-	// wp_enqueue_style( 'main-top-css', get_template_directory_uri() . '/assets/css/main-top.css' );
+
+	if( is_singular('events') ){
+		wp_enqueue_style( 'events', get_template_directory_uri() . '/assets/css/events.css' );
+	}
 
 	wp_deregister_script( 'jquery' );
-	// wp_register_script( 'jquery', get_template_directory_uri() . '/assets/include/jquery-3.3.1.min.js' );
-	wp_enqueue_script( 'jquery', get_template_directory_uri() . '/assets/include/jquery-3.3.1.min.js', array(), false, 'in_footer' );
+	// <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	wp_enqueue_script( 'jquery', '//code.jquery.com/jquery-3.3.1.min.js', array(), false, 'in_footer' );
+	// wp_enqueue_script( 'jquery', get_template_directory_uri() . '/assets/include/jquery-3.3.1.min.js', array(), false, 'in_footer' );
 	wp_enqueue_script( 'bootstrap-js', get_template_directory_uri() . '/assets/include/bootstrap.min.js', array('jquery'), false, 'in_footer' );
 	// wp_enqueue_script( 'slick-js', get_template_directory_uri() . '/assets/include/slick.min.js', array('jquery'), false, 'in_footer' );
 	wp_enqueue_script( 'script', get_template_directory_uri() . '/assets/js/script.js', array('jquery'), false, 'in_footer' );
@@ -150,10 +153,10 @@ function excursions_scripts() {
 add_action( 'wp_enqueue_scripts', 'excursions_scripts' );
 
 function styles_to_footer() {
-	wp_enqueue_style( 'main-bottom-css', get_template_directory_uri() . '/assets/css/main-bottom.css' );
-	// wp_enqueue_style( 'slick-css', get_template_directory_uri() . '/assets/include/slick.css' );
+	wp_enqueue_style( 'main-bottom', get_template_directory_uri() . '/assets/css/main-bottom.css' );
+	wp_enqueue_style( 'slick', get_template_directory_uri() . '/assets/include/slick.css' );
     // wp_enqueue_style( 'slick-theme', get_template_directory_uri() . '/assets/include/slick-theme.css' );
-    // wp_enqueue_style( 'main-font?family=Ubuntu:300,400&amp;subset=cyrillic', '//fonts.googleapis.com/css' );
+    wp_enqueue_style( 'main-font?family=Ubuntu:300,400&amp;subset=cyrillic', '//fonts.googleapis.com/css' );
 	// wp_enqueue_style( 'fancybox-css', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css' );
 }
 add_action( 'wp_footer', 'styles_to_footer' );
@@ -161,7 +164,7 @@ add_action( 'wp_footer', 'styles_to_footer' );
 add_action( 'add_map_scripts', 'add_map_scripts_func', 10, 0);
 function add_map_scripts_func() {
 	wp_enqueue_script( 'ymap-api?apikey=6ebdbbc2-3779-4216-9d88-129e006559bd&lang=ru_RU', '//api-maps.yandex.ru/2.1/', array(), false, 'in_footer' );
-	wp_enqueue_script('acf-map-js');
+	wp_enqueue_script( 'acf-map-js' );
 }
 
 // function test_styleadd() {
@@ -169,9 +172,25 @@ function add_map_scripts_func() {
 // }
 // add_action( 'wp_enqueue_scripts', 'test_styleadd' );
 // -------------------------------------------------------------------
-// remove_action( 'wp_enqueue_scripts', 'test_styleadd' );
-// add_action( 'wp_footer', 'test_styleadd' );
 
+/* Устраните ресурсы, блокирующие отображение */
+
+// contact-form-7
+// \wp-content\plugins\contact-form-7\includes\controller.php :
+// add_action( 'wp_enqueue_scripts', 'wpcf7_do_enqueue_scripts', 10, 0 );
+remove_action( 'wp_enqueue_scripts', 'wpcf7_do_enqueue_scripts', 10, 0 );
+
+// if( $show_form ) do_action( 'add_wpcf7_scripts' );
+add_action( 'add_wpcf7_scripts', 'add_wpcf7_scripts_func', 10, 0);
+function add_wpcf7_scripts_func() {
+	add_action( 'wp_footer', 'wpcf7_do_enqueue_scripts' );
+}
+
+// block-library
+// wp-includes\default-filters.php :
+// add_action( 'wp_enqueue_scripts', 'wp_common_block_scripts_and_styles' );
+remove_action( 'wp_enqueue_scripts', 'wp_common_block_scripts_and_styles' );
+// add_action( 'wp_footer', 'wp_common_block_scripts_and_styles' );
 
 /**
  * Implement the Custom Header feature.
@@ -423,7 +442,7 @@ function register_post_types(){
 		'description'         => 'События – это наши экскурсии, лекции и прочие мероприятия с датой.',
 		'public'              => true,
 		'publicly_queryable'  => true, // зависит от public
-		'exclude_from_search' => true, // зависит от public
+		'exclude_from_search' => false, // зависит от public
 		'show_ui'             => true, // зависит от public
 		'show_in_menu'        => true, // показывать ли в меню адмнки
 		'show_in_admin_bar'   => true, // по умолчанию значение show_in_menu
@@ -483,7 +502,7 @@ add_filter( 'get_the_archive_title', function( $title ){
 	return preg_replace('~^[^:]+: ~', '', $title );
 });
 
-// [socwidgets section_title="Мы в соцсетях" vk_mode="3" vk_width="300" vk_height="400" vk_id="94410363" no_cover="1"] 
+// [socwidgets section_title="Мы в соцсетях" vk_mode="3" vk_width="300" vk_height="400" vk_id="94410363" no_cover="1" fb=1] 
 add_shortcode( 'socwidgets', 'socwidgets_func' );
 
 function socwidgets_func( $atts ){
@@ -494,7 +513,8 @@ function socwidgets_func( $atts ){
 		'vk_width' => '300',
 		'vk_height' => '400',
 		'vk_id' => null,
-		'no_cover' => null
+		'no_cover' => null,
+		'fb' => false,
 	), $atts );
 
 	$section_title = $atts['section_title'];
@@ -503,19 +523,24 @@ function socwidgets_func( $atts ){
 	$vk_height = $atts['vk_height'];
 	$vk_id = $atts['vk_id'];
 	$no_cover = $atts['no_cover'];
+	$fb = $atts['fb'];
 
 	$echo = '<section id="soc-section"><div class="row section-container"><div class="col">';
 	if( $section_title ) $echo .= '<h2>'.$section_title.'</h2>';
-	$echo .= '<div class="row"><div class="col-md-6">';
+	$echo .= '<div class="row">';
 	if( $vk_id ):
-		$echo .= '<!-- VK Widget --><div id="vk_groups" data-id="'.$vk_id.'"';
+		$echo .= '<div class="col-md-6"><!-- VK Widget --><div class="socwidget" id="vk_groups" data-id="'.$vk_id.'"';
 		if( $vk_mode ) $echo .= ' data-mode="'.$vk_mode.'"';
 		if( $vk_width ) $echo .= ' data-width="'.$vk_width.'"';
 		if( $vk_height ) $echo .= ' data-height="'.$vk_height.'"';
 		if( $no_cover ) $echo .= ' data-no_cover="'.$no_cover.'"';
-		$echo .= '></div>';
+		$echo .= '></div></div>';
 	endif;
-	$echo .= '</div></div>';
+	if( $fb ):
+		$echo .= '<div class="col-md-6"><div id="fb-root"></div>';
+		$echo .= '<div class="socwidget fb-group" data-href="https://www.facebook.com/groups/excursorel" data-width="300" data-show-social-context="true" data-show-metadata="false"></div></div>';
+	endif;
+	$echo .= '</div>';
 	$echo .= '<noscript><p><a href="https://vk.com/excurs_orel" target="_blank">ВКонтакте</a></p><p><a href="https://www.facebook.com/groups/excursorel" target="_blank">Фейсбук</a></p></noscript>';
 	$echo .= '</div></div></section>';
 
@@ -636,7 +661,7 @@ function get_lazy_attachment_image( $attachment_id, $size = 'thumbnail', $icon =
 	return $html;
 }
 
-// [image class="" id=1 size="medium_large" title=false]
+// [image class="" id=1 size="medium_large" title=false href=1]
 add_shortcode( 'image', 'image_func' );
 
 function image_func( $atts ){
@@ -646,12 +671,14 @@ function image_func( $atts ){
 		'id' => null,
 		'size' => 'thumbnail',
 		'title' => true,
+		'href' => false,
 	), $atts );
 
 	$class = $atts['class'];
 	$id = $atts['id'];
 	$size = $atts['size'];
 	$title = $atts['title'];
+	$href = $atts['href'];
 
 	$echo = '';
 
@@ -659,7 +686,14 @@ function image_func( $atts ){
 
 	if( $id ):
 
-		if( $title ){
+		if( $href ){
+			$post_id = wp_get_post_parent_id( $id );
+			if( $post_link = get_permalink( $post_id ) ){
+				$ahref_pre = '<a href="'.$post_link.'" title="'.get_the_title( $post_id ).'">';
+				$ahref_post = '</a>';
+			}
+		}
+		elseif( $title ){
 			$title = get_the_title( $id );
 			$attr = array( 'title' => $title);
 		}
@@ -668,7 +702,7 @@ function image_func( $atts ){
 		// $image = get_lazy_attachment_image( $id, $size, false, $attr );
 
 		if( $image ){
-			$echo .= '<div class="'.$class.'"><figure>'.$image.'</figure></div>';
+			$echo .= '<div class="'.$class.'"><figure>'.$ahref_pre.$image.$ahref_post.'</figure></div>';
 		}
 
 	endif;
