@@ -1,2 +1,4 @@
 # игнорировать все jpg в каталоге photo/ 
 photo/*.jpg
+# Duplicator's wp-snapshots
+ignore/
