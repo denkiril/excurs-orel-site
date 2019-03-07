@@ -91,6 +91,9 @@ footer{
     color: #ee9b02;
     outline: none;
 }
+.sub_copyr{
+    font-size: 0.9em;
+}
 .soc-container{
     /* display: inline-block; */
     text-align: right;

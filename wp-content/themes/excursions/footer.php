@@ -65,8 +65,8 @@
 			<div class="row">
 				<div class="col copyr-container footer-links">
 					<p>© 2015-2019 <a href="<?php echo home_url(); ?>">«Экскурсии по Орлу»</a></p>
-					<p>При использовании наших материалов, не забывайте, пожалуйста, ссылаться на наш сайт.</p>
-					<p>© Разработка сайта: <a href="" target="_blank" rel="noopener noreferrer">Денис Кирилюк</a></p>
+					<p>© Разработка и поддержка сайта: <a href="https://github.com/denkiril" target="_blank" rel="noopener noreferrer">Денис Кирилюк</a></p>
+					<p class="sub_copyr">При использовании наших материалов, не забывайте, пожалуйста, ссылаться на наш сайт.</p>
 				</div>
 			</div>
 		</div>
