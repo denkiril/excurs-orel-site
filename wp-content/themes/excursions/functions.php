@@ -732,3 +732,15 @@ function get_posts_search_filter( $query ){
 		$query->set('post_type', array('post', 'events') );
 	}
 }
+
+// Настраиваем страницам пагинации rel="canonical" на 1-ую стр. архива (для Yoast SEO) 
+function return_canon () {
+	$canon_page = get_pagenum_link(1);
+	return $canon_page;
+}
+function canon_paged() {
+	if (is_paged()) {
+		add_filter( 'wpseo_canonical', 'return_canon' );
+	}
+}
+add_filter('wpseo_head','canon_paged');

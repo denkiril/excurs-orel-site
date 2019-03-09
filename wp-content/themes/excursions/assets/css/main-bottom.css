@@ -94,6 +94,12 @@ footer{
 .sub_copyr{
     font-size: 0.9em;
 }
+@media screen and (max-width: 768px) {
+    .adaptive-hide{
+        display: none;
+    }
+}
+
 .soc-container{
     /* display: inline-block; */
     text-align: right;
