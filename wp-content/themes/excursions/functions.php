@@ -147,8 +147,10 @@ function excursions_scripts() {
 	// wp_register_script( 'googlemap-api?key=YOUR_API_KEY', '//maps.googleapis.com/maps/api/js', array(), false, 'in_footer' );
 	// wp_register_script( 'ymap-api?apikey=6ebdbbc2-3779-4216-9d88-129e006559bd&lang=ru_RU', '//api-maps.yandex.ru/2.1/', array(), false, 'in_footer' );
 	wp_register_script( 'acf-map-js', get_template_directory_uri() . '/assets/js/acf-map-yandex.js', array('jquery'), false, 'in_footer' );
-	// wp_enqueue_script( 'fancybox-js', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js', array('jquery'), false, 'in_footer' );
 	wp_enqueue_script( 'yashare-js', '//yastatic.net/share2/share.js', array('jquery'), false, 'in_footer' );
+	wp_register_script( 'fancybox-js', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js', array('jquery'), false, 'in_footer' );
+	wp_register_style( 'fancybox', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css' );
+	wp_register_style( 'gallery', get_template_directory_uri() . '/assets/css/gallery.css' );
 }
 add_action( 'wp_enqueue_scripts', 'excursions_scripts' );
 
@@ -157,14 +159,21 @@ function styles_to_footer() {
 	wp_enqueue_style( 'slick', get_template_directory_uri() . '/assets/include/slick.css' );
     // wp_enqueue_style( 'slick-theme', get_template_directory_uri() . '/assets/include/slick-theme.css' );
     wp_enqueue_style( 'main-font?family=Ubuntu:300,400&amp;subset=cyrillic', '//fonts.googleapis.com/css' );
-	// wp_enqueue_style( 'fancybox-css', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css' );
 }
 add_action( 'wp_footer', 'styles_to_footer' );
 
-add_action( 'add_map_scripts', 'add_map_scripts_func', 10, 0);
-function add_map_scripts_func() {
-	wp_enqueue_script( 'ymap-api?apikey=6ebdbbc2-3779-4216-9d88-129e006559bd&lang=ru_RU', '//api-maps.yandex.ru/2.1/', array(), false, 'in_footer' );
-	wp_enqueue_script( 'acf-map-js' );
+// add_action( 'add_map_scripts', 'add_map_scripts_func', 10, 0);
+// function add_map_scripts_func() {
+// 	wp_enqueue_script( 'ymap-api?apikey=6ebdbbc2-3779-4216-9d88-129e006559bd&lang=ru_RU', '//api-maps.yandex.ru/2.1/', array(), false, 'in_footer' );
+// 	wp_enqueue_script( 'acf-map-js' );
+// }
+
+// if( $gallery ) do_action( 'add_gallery_scripts' );
+add_action( 'add_gallery_scripts', 'add_gallery_scripts_func', 10, 0);
+function add_gallery_scripts_func() {
+	wp_enqueue_script( 'fancybox-js' );
+	wp_enqueue_style( 'fancybox' );
+	wp_enqueue_style( 'gallery' );
 }
 
 // function test_styleadd() {
@@ -593,7 +602,7 @@ function carousel_func( $atts ){
 			if( $hrefs && $post_link ) $echo .= '</a>';
 			$echo .= '</div>';
 		endforeach;
-		$echo .= '</div> <!-- '.$class.' -->';
+		$echo .= '</div> <!-- .'.$class.' -->';
 	endif;
 
 	return $echo;
@@ -614,7 +623,7 @@ function get_lazy_attachment_image( $attachment_id, $size = 'thumbnail', $icon =
 		}
 		$attachment   = get_post( $attachment_id );
 		$default_attr = array(
-			'src'		=> 'wp-content/themes/excursions/assets/include/ajax-loader.gif', // for validation 
+			'src'		=> '/wp-content/themes/excursions/assets/include/ajax-loader.gif', // for validation 
 			'data-src' 	=> $src, // was: 'src' => $src, 
 			'class' 	=> "attachment-$size_class size-$size_class",
 			'alt' 		=> trim( strip_tags( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) ),
@@ -707,6 +716,53 @@ function image_func( $atts ){
 		if( $image ){
 			$echo .= '<div class="'.$class.'"><figure>'.$ahref_pre.$image.$ahref_post.'</figure></div>';
 		}
+
+	endif;
+
+	return $echo;
+}
+
+// [gallery class="post-gallery" item="gallery-item" fancybox="gallery"]
+add_shortcode( 'gallery', 'gallery_func' );
+
+function gallery_func( $atts ){
+	// белый список параметров и значения по умолчанию
+	$atts = shortcode_atts( array(
+		'class' => 'post-gallery',
+		'item' => 'gallery-item',
+		'fancybox' => 'gallery',
+	), $atts );
+
+	$class = $atts['class'];
+	$item = $atts['item'];
+	$fancybox = $atts['gallery'];
+
+	$echo = '';
+
+	global $post;
+	//Get the images ids from the post_metadata
+	$images = acf_photo_gallery( 'gallery_gal', $post->ID );
+	if( count($images) ):
+		$echo .= '<div class="row '.$class.'">';
+		foreach( $images as $image ):
+			$id = $image['id']; // The attachment id of the media
+			$title = $image['title']; //The title
+			$description = $image['caption']; //The caption (Description!)
+			$full_image_url = $image['full_image_url']; //Full size image url
+
+			if( $title ) $attr = array( 'title' => $title);
+
+			$echo .= '<div class="'.$item.' col-12">';
+			$echo .= '<figure><a data-fancybox="'.$fancybox.'" href="'.$full_image_url.'" data-caption="'.$title.'">';
+			$echo .= get_lazy_attachment_image( $id, 'medium_large', false, $attr );
+			$echo .= '</a>';
+			if( $description ) $echo .= '<figcaption>'.$description.'</figcaption>';
+			$echo .= '</figure></div>';
+
+		endforeach;
+		$echo .= '</div> <!-- row '.$class.' -->';
+
+		do_action( 'add_gallery_scripts' );
 
 	endif;
 

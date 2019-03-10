@@ -124,15 +124,15 @@ $(document).ready(function(){
         // }).appendTo('head');
 
         // fancybox
-		if( $('a[data-fancybox]').length ){
-			// console.log('fancybox ok');
-			$('<link/>', {
-				rel: 'stylesheet',
-				type: 'text/css',
-				href: '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css'
-            }).appendTo('head');
-            $.getScript("//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js");
-        }
+		// if( $('a[data-fancybox]').length ){
+		// 	console.log('fancybox ok');
+		// 	$('<link/>', {
+		// 		rel: 'stylesheet',
+		// 		type: 'text/css',
+		// 		href: '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css'
+        //     }).appendTo('head');
+        //     $.getScript("//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js");
+        // }
 
         $('img[data-src]').each(function(){
             $(this).attr('src', $(this).attr('data-src'));

@@ -12,6 +12,7 @@
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 	<header class="entry-header">
 		<?php
+		$gallery = false;
 		$event_title = get_the_title();
 		$event_info = get_field('event_info');
 		$date_in_title = $event_info['event_date_in_htitle'];
@@ -24,11 +25,11 @@
 	<div class="entry-content">
 		<div class="row">
 			<div class="col">
-				<?php 
-					if( $thumb_id = get_post_thumbnail_id() ): 
+				<?php if( $thumb_id = get_post_thumbnail_id() ): 
 					// $full_image_url = get_the_post_thumbnail_url(); 
 					$full_image_url = wp_get_attachment_image_url( $thumb_id, 'full' ); 
-					$title = get_the_title($thumb_id); ?>
+					$title = get_the_title($thumb_id); 
+					$gallery = true; ?>
 					<a data-fancybox="gallery" href="<?=$full_image_url?>">
 					<?php the_post_thumbnail('medium_large', array( 'class' => "events-image", 'title' => $title )); ?>
 					</a>
@@ -158,7 +159,8 @@
 		//Get the images ids from the post_metadata
 		$images = acf_photo_gallery('pre-gallery', $post->ID);
 		//Check if return array has anything in it
-		if( count($images) ): ?>
+		if( count($images) ): 
+			$gallery = true; ?>
 			<div class="pre-gallery row">
 				<?php //Cool, we got some data so now let's loop over it
 				foreach($images as $image):
@@ -174,7 +176,7 @@
 					// $class = get_field('photo_gallery_class', $id); //Get the class which is a extra field (See below how to add extra fields)
 					// $alt = get_post_meta( $id, '_wp_attachment_image_alt', true );
 					?>
-					<div class="acf_gallery-item col-12 col-sm-6 col-md-6 col-lg-4">
+					<div class="gallery-item col-12 col-sm-6 col-md-6 col-lg-4">
 						<figure>
 							<a data-fancybox="gallery" href="<?=$full_image_url?>" data-caption="<?=$title?>">
 							<?= wp_get_attachment_image( $id, 'medium_large', false,  // (thumbnail, medium, large, full or custom size) 
@@ -224,7 +226,8 @@
 
 			<?php 
 			$images = acf_photo_gallery('post-gallery', $post->ID);
-			if( count($images) ): ?>
+			if( count($images) ): 
+			$gallery = true; ?>
 			<div class="row">
 				<?php 
 				foreach($images as $image):
@@ -240,7 +243,7 @@
 					// $class = get_field('photo_gallery_class', $id); //Get the class which is a extra field (See below how to add extra fields)
 					// $alt = get_post_meta( $id, '_wp_attachment_image_alt', true );
 					?>
-					<div class="acf_gallery-item col-sm-12 offset-md-1 col-md-10">
+					<div class="gallery-item col-12">
 						<figure>
 							<a data-fancybox="gallery" href="<?=$full_image_url?>" data-caption="<?=$title?>">
 							<?= wp_get_attachment_image( $id, 'medium_large', false,  // (thumbnail, medium, large, full or custom size) 
@@ -309,3 +312,5 @@
 		
 	</div><!-- .entry-content -->
 </article><!-- #post-<?php the_ID(); ?> -->
+
+<?php if( $gallery ) do_action( 'add_gallery_scripts' ); ?>
