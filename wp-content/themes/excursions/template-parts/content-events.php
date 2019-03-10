@@ -290,7 +290,7 @@
 				?> 
 				<div class="row">
 					<div class="col video-container">
-						<iframe src="https://www.youtube.com/embed/<?=$ytcode?>" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+						<iframe src="https://www.youtube.com/embed/<?=$ytcode?>" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 					</div>
 				</div> <!-- row -->
 			<?php endif; ?>
@@ -299,11 +299,12 @@
 			if( $vk_link ): ?>
 				<div class="row">
 					<div class="col video-container">
-						<iframe src="<?=$vk_link?>" frameborder="0" allowfullscreen></iframe>
+						<iframe src="<?=$vk_link?>" allowfullscreen></iframe>
 					</div>
 				</div> <!-- row -->
 			<?php endif; ?>
 
+		</div><!-- .video-gallery -->
 		<?php endif; ?>
 		
 	</div><!-- .entry-content -->

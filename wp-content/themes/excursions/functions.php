@@ -402,6 +402,7 @@ function newscards_func( $atts ){
 			wp_reset_postdata();
 		endforeach;
 
+		$echo .= '</div><!-- row -->';
 		$echo .= '</div></div></section>';
 	endif;
 
@@ -613,9 +614,10 @@ function get_lazy_attachment_image( $attachment_id, $size = 'thumbnail', $icon =
 		}
 		$attachment   = get_post( $attachment_id );
 		$default_attr = array(
-			'data-src' => $src,	// was: 'src' => $src,
-			'class' => "attachment-$size_class size-$size_class",
-			'alt' => trim( strip_tags( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) ),
+			'src'		=> 'wp-content/themes/excursions/assets/include/ajax-loader.gif', // for validation 
+			'data-src' 	=> $src, // was: 'src' => $src, 
+			'class' 	=> "attachment-$size_class size-$size_class",
+			'alt' 		=> trim( strip_tags( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) ),
 		);
 
 		$attr = wp_parse_args( $attr, $default_attr );
@@ -630,10 +632,11 @@ function get_lazy_attachment_image( $attachment_id, $size = 'thumbnail', $icon =
 				$sizes      = wp_calculate_image_sizes( $size_array, $src, $image_meta, $attachment_id );
 
 				if ( $srcset && ( $sizes || ! empty( $attr['sizes'] ) ) ) {
+					// $attr['srcset'] = ''; 			// for validation 
 					$attr['data-srcset'] = $srcset; // was: $attr['srcset'] = $srcset;
 
 					if ( empty( $attr['sizes'] ) ) {
-						$attr['sizes'] = $sizes;
+						$attr['data-sizes'] = $sizes;	// was: $attr['sizes'] = $sizes;
 					}
 				}
 			}

@@ -142,6 +142,11 @@ $(document).ready(function(){
         $('img[data-srcset]').each(function(){
             $(this).attr('srcset', $(this).attr('data-srcset'));
             $(this).removeAttr('data-srcset');
+		});
+		
+		$('img[data-sizes]').each(function(){
+            $(this).attr('sizes', $(this).attr('data-sizes'));
+            $(this).removeAttr('data-sizes');
         });
 
 		// Слайдер-карусель

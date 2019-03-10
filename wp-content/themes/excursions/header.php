@@ -31,12 +31,13 @@
 	<header id="masthead" class="site-header">
 		<div class="container">
 			<div class="row">
-                <div class="col header-container flex-container">
+                <div class="col header-container flex-container" itemscope itemtype="http://schema.org/Organization">
 					<div>
 					<?php 
+						$site_name = get_bloginfo();
 						$is_front_page = is_front_page();
 						$alt_headertitle = get_post_meta( $post->ID, 'header-title', true ); 
-						$headertitle = $alt_headertitle ? $alt_headertitle : get_bloginfo();
+						$headertitle = $alt_headertitle ? $alt_headertitle : $site_name;
 						if ( $is_front_page || $alt_headertitle ) :
 							$headertitle_html = '<h1 class="header-title">'.$headertitle.'</h1>';
 							$h1_is = true;
@@ -64,12 +65,12 @@
 						}
 					?>
 					</div>
-					
+						
 					<?php if ( function_exists('the_custom_logo') ) the_custom_logo(); ?>
-					<!-- <a href="<?=home_url()?>"> -->
-						<!-- <img src="<?=get_template_directory_uri()?>/assets/img/Logo_200.png" alt="Экскурсии по Орлу" /> -->
-					<!-- </a> -->
-                </div>
+
+					<meta itemprop="name" content="<?=$site_name?>">
+
+				</div> <!-- header-container itemtype="http://schema.org/Organization" --> 
             </div>
 		</div>
 
