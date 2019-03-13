@@ -150,7 +150,7 @@ $(document).ready(function(){
         });
 
 		// Слайдер-карусель
-		if( $('.carousel').length ){
+		// if( $('.carousel').length ){
 			// console.log('carousel ok');
 			// $('<link/>', {
 			// 	rel: 'stylesheet',
@@ -162,7 +162,7 @@ $(document).ready(function(){
 			// 	type: 'text/css',
 			// 	href: '/wp-content/themes/excursions/assets/include/slick-theme.css'
 			// }).appendTo('head');
-			$.getScript("/wp-content/themes/excursions/assets/include/slick.min.js").then(function() {
+			// $.getScript("/wp-content/themes/excursions/assets/include/slick.min.js").then(function() {
                 // $('.carousel').each(function(){
                     // $(this).children('img[data-src]').each(function(){
                     // $('img[data-src]').each(function(){
@@ -178,8 +178,8 @@ $(document).ready(function(){
 					lazyLoad: 'ondemand'
 					// lazyLoad: 'progressive'
 				});
-			});
-		}
+			// });
+		// }
 
 		if(screen.width > 768){
 			// console.log('screen.width > 768');

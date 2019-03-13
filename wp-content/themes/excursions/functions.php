@@ -142,25 +142,55 @@ function excursions_scripts() {
 	wp_enqueue_script( 'jquery', '//code.jquery.com/jquery-3.3.1.min.js', array(), false, 'in_footer' );
 	// wp_enqueue_script( 'jquery', get_template_directory_uri() . '/assets/include/jquery-3.3.1.min.js', array(), false, 'in_footer' );
 	wp_enqueue_script( 'bootstrap-js', get_template_directory_uri() . '/assets/include/bootstrap.min.js', array('jquery'), false, 'in_footer' );
-	// wp_enqueue_script( 'slick-js', get_template_directory_uri() . '/assets/include/slick.min.js', array('jquery'), false, 'in_footer' );
+	wp_register_script( 'slick-js', get_template_directory_uri() . '/assets/include/slick.min.js', array('jquery'), false, 'in_footer' );
 	wp_enqueue_script( 'script', get_template_directory_uri() . '/assets/js/script.js', array('jquery'), false, 'in_footer' );
 	// wp_register_script( 'googlemap-api?key=YOUR_API_KEY', '//maps.googleapis.com/maps/api/js', array(), false, 'in_footer' );
 	// wp_register_script( 'ymap-api?apikey=6ebdbbc2-3779-4216-9d88-129e006559bd&lang=ru_RU', '//api-maps.yandex.ru/2.1/', array(), false, 'in_footer' );
 	wp_register_script( 'acf-map-js', get_template_directory_uri() . '/assets/js/acf-map-yandex.js', array('jquery'), false, 'in_footer' );
 	wp_enqueue_script( 'yashare-js', '//yastatic.net/share2/share.js', array('jquery'), false, 'in_footer' );
 	wp_register_script( 'fancybox-js', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js', array('jquery'), false, 'in_footer' );
-	wp_register_style( 'fancybox', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css' );
-	wp_register_style( 'gallery', get_template_directory_uri() . '/assets/css/gallery.css' );
+	// wp_register_style( 'fancybox', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css' );
+	// wp_register_style( 'gallery', get_template_directory_uri() . '/assets/css/gallery.css' );
+	wp_register_script( 'cssrelpreload-js', get_template_directory_uri() . '/assets/include/cssrelpreload.js', array(), false, 'in_footer' );
 }
 add_action( 'wp_enqueue_scripts', 'excursions_scripts' );
 
-function styles_to_footer() {
-	wp_enqueue_style( 'main-bottom', get_template_directory_uri() . '/assets/css/main-bottom.css' );
-	wp_enqueue_style( 'slick', get_template_directory_uri() . '/assets/include/slick.css' );
+// function styles_to_footer() {
+	// wp_enqueue_style( 'main-bottom', get_template_directory_uri() . '/assets/css/main-bottom.css' );
+	// wp_enqueue_style( 'slick', get_template_directory_uri() . '/assets/include/slick.css' );
     // wp_enqueue_style( 'slick-theme', get_template_directory_uri() . '/assets/include/slick-theme.css' );
-    wp_enqueue_style( 'main-font?family=Ubuntu:300,400&amp;subset=cyrillic', '//fonts.googleapis.com/css' );
+    // wp_enqueue_style( 'main-font?family=Ubuntu:300,400&amp;subset=cyrillic', '//fonts.googleapis.com/css' );
+// }
+// add_action( 'wp_footer', 'styles_to_footer' );
+
+$style_hrefs = array();
+
+preload_style( get_template_directory_uri().'/assets/css/main-bottom.css' );
+preload_style( '//fonts.googleapis.com/css?family=Ubuntu:300,400&amp;subset=cyrillic' );
+
+function preload_style( $style_href ){
+	global $style_hrefs;
+	// если $style_href ещё не было, добавляем в массив ссылок 
+	if( !in_array( $style_href, $style_hrefs ) )
+		array_push($style_hrefs, $style_href);
 }
-add_action( 'wp_footer', 'styles_to_footer' );
+
+function preload_styles(){ 
+	// <link rel="preload" href="AO.js" as="script">
+	// <link rel="preload" href="AO.css" as="style">
+
+	global $style_hrefs;
+
+	if( !empty($style_hrefs) ):
+		foreach( $style_hrefs as $href ):
+			echo '<link rel="preload" href="'.$href.'" as="style" onload="this.rel=\'stylesheet\'" />'.PHP_EOL;
+			echo '<noscript><link rel="stylesheet" href="'.$href.'"></noscript>'.PHP_EOL;
+		endforeach;
+
+		wp_enqueue_script( 'cssrelpreload-js' );
+	endif;
+}
+add_action( 'wp_footer', 'preload_styles' );
 
 // add_action( 'add_map_scripts', 'add_map_scripts_func', 10, 0);
 // function add_map_scripts_func() {
@@ -172,8 +202,17 @@ add_action( 'wp_footer', 'styles_to_footer' );
 add_action( 'add_gallery_scripts', 'add_gallery_scripts_func', 10, 0);
 function add_gallery_scripts_func() {
 	wp_enqueue_script( 'fancybox-js' );
-	wp_enqueue_style( 'fancybox' );
-	wp_enqueue_style( 'gallery' );
+	// wp_enqueue_style( 'fancybox' );
+	// wp_enqueue_style( 'gallery' );
+	preload_style( '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css' );
+	preload_style( get_template_directory_uri().'/assets/css/gallery.css' );
+}
+
+// if( $carousel ) do_action( 'add_carousel_scripts' );
+add_action( 'add_carousel_scripts', 'add_carousel_scripts_func', 10, 0);
+function add_carousel_scripts_func() {
+	wp_enqueue_script( 'slick-js' );
+	preload_style( get_template_directory_uri().'/assets/include/slick.css' );
 }
 
 // function test_styleadd() {
@@ -601,8 +640,12 @@ function carousel_func( $atts ){
 
 			if( $hrefs && $post_link ) $echo .= '</a>';
 			$echo .= '</div>';
+
 		endforeach;
 		$echo .= '</div> <!-- .'.$class.' -->';
+
+		do_action( 'add_carousel_scripts' );
+
 	endif;
 
 	return $echo;

@@ -228,12 +228,12 @@ p{
     background: #ffd649;
     outline: none;
 }
-@media screen and (max-width: 768px) {
+/* @media screen and (max-width: 768px) {
     .nav-menu a:hover{
         color: #015a8d;
         text-decoration: underline;
     }
-}
+} */
 
 .nav-menu .current-menu-item a{
     color: #000 !important;
