@@ -150,7 +150,16 @@ $(document).ready(function(){
         });
 
 		// Слайдер-карусель
-		// if( $('.carousel').length ){
+		if( $('.carousel').length ){
+			$('.carousel').slick({
+				arrows: false,
+				dots: true,
+				autoplay: (screen.width > 768),
+				autoplaySpeed: 5000,
+				lazyLoad: 'ondemand'
+				// lazyLoad: 'progressive'
+			});
+		}
 			// console.log('carousel ok');
 			// $('<link/>', {
 			// 	rel: 'stylesheet',
@@ -170,16 +179,8 @@ $(document).ready(function(){
                     //     $(this).removeAttr('data-src');
                     // });
                 // });
-				$('.carousel').slick({
-					arrows: false,
-					dots: true,
-					autoplay: (screen.width > 768),
-					autoplaySpeed: 5000,
-					lazyLoad: 'ondemand'
-					// lazyLoad: 'progressive'
-				});
+				
 			// });
-		// }
 
 		if(screen.width > 768){
 			// console.log('screen.width > 768');

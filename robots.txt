@@ -1,4 +1,5 @@
 User-agent: *
+Disallow: /events/k-150-letiyu-orlovskoj-zheleznoj-dorogi-2019/
 Disallow: /cgi-bin
 Disallow: /?
 Disallow: /wp-

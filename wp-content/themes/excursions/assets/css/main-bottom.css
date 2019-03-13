@@ -51,11 +51,17 @@ footer{
     margin: 0;
 }
 
-.search-form{
+/* .search-form{
     margin-bottom: 10px;
 }
 .search-submit{
     visibility: hidden;
+} */
+.search-form{
+    margin: 1em 0;
+}
+.ya-site-form__search-input{
+    padding-left: 0 !important; 
 }
 
 .footer-menu{
