@@ -102,7 +102,14 @@ $(document).ready(function(){
         //     img.onload = function() {
         //     img.removeAttribute('data-src');
         //     };
-        // });
+				// });
+				
+				// [].forEach.call( document.querySelectorAll('source[data-srcset]'), function(source){
+					// source.setAttribute('srcset', source.getAttribute('data-srcset'));
+					// source.onload = function(){
+					// source.removeAttribute('data-srcset');
+				// };
+			// });
 
         // function styles_to_footer() {
         //     wp_enqueue_style( 'main-bottom-css', get_template_directory_uri() . '/assets/css/main-bottom.css' );
@@ -134,20 +141,25 @@ $(document).ready(function(){
         //     $.getScript("//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js");
         // }
 
-        $('img[data-src]').each(function(){
-            $(this).attr('src', $(this).attr('data-src'));
-            $(this).removeAttr('data-src');
-        });
+		$('img[data-src]').each(function(){
+				$(this).attr('src', $(this).attr('data-src'));
+				$(this).removeAttr('data-src');
+		});
 
-        $('img[data-srcset]').each(function(){
-            $(this).attr('srcset', $(this).attr('data-srcset'));
-            $(this).removeAttr('data-srcset');
+		$('img[data-srcset]').each(function(){
+				$(this).attr('srcset', $(this).attr('data-srcset'));
+				$(this).removeAttr('data-srcset');
 		});
 		
 		$('img[data-sizes]').each(function(){
             $(this).attr('sizes', $(this).attr('data-sizes'));
             $(this).removeAttr('data-sizes');
-        });
+		});
+		
+		$('source[data-srcset]').each(function(){
+            $(this).attr('srcset', $(this).attr('data-srcset'));
+            $(this).removeAttr('data-srcset');
+		});
 
 		// Слайдер-карусель
 		if( $('.carousel').length ){

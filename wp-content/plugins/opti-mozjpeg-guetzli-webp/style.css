@@ -1,0 +1,238 @@
+/*  This code was written by Ihor Slyva
+    https://ihorsl.com 
+    License GPLv2 */
+
+.help-link {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    background-size: 22px 22px;
+    position: relative;
+    left: 10px;
+    top: 6px;
+    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xIFRpbnkvL0VOIiAiaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEtdGlueS5kdGQiPg0KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIGJhc2VQcm9maWxlPSJ0aW55IiB4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjQ4MHB4IiBoZWlnaHQ9IjQ4MHB4IiB2aWV3Qm94PSIwIDAgNDgwIDQ4MCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQogIDxnIGlkPSJoZWxwIj4NCiAgCTxwYXRoIGQ9Ik0yMzcuMjI1LDU2LjAwMWMtOTkuNDE0LDAtMTgwLjAwMiw4MC41ODYtMTgwLjAwMiwxODAuMDAxYzAsOTkuNDE0LDgwLjU4OCwxODAuMDAxLDE4MC4wMDIsMTgwLjAwMSAgIHMxODAtODAuNTg3LDE4MC0xODAuMDAxQzQxNy4yMjUsMTM2LjU4NywzMzYuNjM5LDU2LjAwMSwyMzcuMjI1LDU2LjAwMXogTTIzMi43NTQsMzQ3LjMwN2MtMTMuNDA0LDAtMjQuNDI4LTExLjAyMy0yNC40MjgtMjQuNDQxICAgYzAtMTMuNDA1LDExLjAyMy0yNC40MiwyNC40MjgtMjQuNDJjMTMuNDE0LDAsMjQuNDM4LDExLjAxNSwyNC40MzgsMjQuNDJDMjU3LjE5MiwzMzYuMjgzLDI0Ni4xNjgsMzQ3LjMwNywyMzIuNzU0LDM0Ny4zMDd6ICAgIE0yNTUuOTg5LDI1Mi45ODNjLTcuMTQxLDEwLjQzMy00Ljc2LDI1LjAyNC0yNC40MiwyNS4wMjRjLTEyLjgxNCwwLTE5LjA3OC0xMC40MjktMTkuMDc4LTE5Ljk1OSAgIGMwLTM1LjQ1Nyw1Mi4xNDgtNDMuNDk1LDUyLjE0OC03Mi42OTVjMC0xNi4wOTgtMTAuNzIxLTI1LjYyOC0yOC42MDItMjUuNjI4Yy0zOC4xMzUsMC0yMy4yNDIsMzkuMzMxLTUyLjE0MSwzOS4zMzEgICBjLTEwLjQzMiwwLTE5LjM2Ny02LjI2MS0xOS4zNjctMTguMTczYzAtMjkuMjA1LDMzLjM3My01NS4xMjYsNjkuNzA5LTU1LjEyNmMzOC4xNDgsMCw3NS42ODIsMTcuNTg2LDc1LjY4Miw1OS41OTYgICBDMzA5LjkyLDIyNC4wODUsMjY1LjUyLDIzOC45NzksMjU1Ljk4OSwyNTIuOTgzeiIvPg0KICA8L2c+DQo8L3N2Zz4NCg==);
+    background-repeat: no-repeat;
+}
+
+.displaynone {
+    display: none;
+}
+
+input[type=text] {
+    width: 100%;
+}
+
+select {
+    width: 100%;
+}
+
+
+.wrap h2.nav-tab-wrapper {
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+#wpmjgu_pf_items_div {
+    padding: 0 10px 10px 0;
+    height: 150px;
+    background-color: #ffffff;
+    border: 1px solid rgb(221, 221, 221);
+    box-shadow: rgba(0, 0, 0, 0.07) 0px 1px 2px 0px inset;
+}
+
+#wpmjgu_pf_items_div div.wpmjgu_pf_item {
+    display: inline-block;
+    margin: 10px 0 0 10px;
+    border: 1px solid #666666;
+    border-radius: 5px;
+    cursor: pointer;
+    -moz-user-select: none; -webkit-user-select: none; user-select: none; 
+}
+
+#wpmjgu_pf_items_div div.wpmjgu_pf_item.selected {
+    border: 3px solid #0000aa;
+}
+
+#wpmjgu_pf_items_div p.wpmjgu_pf_item_quality {
+    display: inline-block;
+    padding: 5px 20px;
+    margin: 0;
+    background-color: #666666;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+#wpmjgu_pf_items_div div.wpmjgu_pf_item.selected p.wpmjgu_pf_item_quality {
+    padding: 3px 19px;
+}
+
+#wpmjgu_pf_items_div p.wpmjgu_pf_item_pattern {
+    display: inline-block;
+    padding: 5px 40px;
+    margin: 0;
+}
+
+#wpmjgu_pf_items_div div.wpmjgu_pf_item.selected p.wpmjgu_pf_item_pattern {
+        padding: 3px 39px;
+}
+
+
+#wpmjgu_pf_add_button,
+#wpmjgu_pf_export_button,
+#wpmjgu_pf_import_button {
+    width: 8%;
+    margin-left: 1%;
+    margin-bottom: 20px;
+}
+
+#wpmjgu_pf_fileinput {
+    display: none;
+}
+
+#wpmjgu_pf_controls_div {
+    margin-bottom: 15px;
+}
+
+#wpmjgu_pf_controls_div input {
+    height: 34px;
+}
+
+#wpmjgu_pf_controls_div #wpmjgu_pf_ctrl_button_first {
+    font-size: 22px;
+    font-weight: bold;
+    width: 45px;
+}
+
+#wpmjgu_pf_controls_div #wpmjgu_pf_ctrl_button_last {
+    font-size: 22px;
+    font-weight: bold;
+    width: 45px;    
+}
+
+#wpmjgu_pf_controls_div #wpmjgu_pf_ctrl_button_left {
+    font-size: 22px;
+    font-weight: bold;
+    margin-left: 15px;
+    width: 45px;    
+}
+
+#wpmjgu_pf_controls_div #wpmjgu_pf_ctrl_button_right {
+    font-size: 22px;
+    font-weight: bold;
+    width: 45px;    
+}
+
+#wpmjgu_pf_controls_div #wpmjgu_pf_ctrl_button_add {
+    padding-top: 3px;
+    margin-left: 15px;
+    width: 75px;    
+}
+
+#wpmjgu_pf_controls_div #wpmjgu_pf_ctrl_button_edit {
+    padding-top: 3px;
+    width: 75px;    
+}
+
+#wpmjgu_pf_controls_div #wpmjgu_pf_ctrl_button_delete {
+    padding-top: 3px;
+    width: 75px;    
+}
+
+#wpmjgu_pf_controls_div #wpmjgu_pf_ctrl_button_import {
+    padding-top: 3px;
+    width: 90px;    
+    margin-left: 15px;
+}
+
+#wpmjgu_pf_controls_div #wpmjgu_pf_ctrl_button_export {
+    padding-top: 3px;
+    width: 90px;    
+}
+
+#wpmjgu_ssh_password {
+    width: 100%;
+}
+
+.form-table.batch_optimization_results_table *,
+.form-table.batch_revert_results_table *
+{
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+#break_button_cell {
+    position: relative;
+}
+
+#break_batch_optimization,
+#break_batch_revert {
+    position: absolute;
+    left: 200px;
+    top: 5px;
+    height: 28px;
+    line-height: 26px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+#console {
+    width: 100%;
+    height: 45vh;
+    overflow-y: scroll;
+    border: 1px solid rgb(204, 204, 204);
+    background-color: #ffffff;
+}
+
+#wpmjgu_readme .title {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+#wpmjgu_readme p {
+    font-size: 13px;
+}
+
+#wpmjgu_readme ul li {
+    margin-left: 20px;
+    font-style: italic;
+}
+
+#button_save_log {
+    float: right;
+    margin-bottom: 10px;
+    margin-right: 30px;
+}
+
+#lable_guetzli_slow {
+    float: left;
+}
+
+#feedback_p {
+    color: #999999;
+    margin-top: 66px;
+    text-align: right;
+}
+
+#wpmjgu-share {
+    text-align: right;
+    font-style: italic;
+    color: rgb(85, 93, 102);
+}
+
+#wpmjgu-share.wpmjgu-share-bold {
+    color: red;
+    font-weight: bold;
+}
+
+.wpmjgu-share-link {
+    display: inline-block;
+    margin: 8px 0 0 16px;
+    height: 25px;
+    line-height: 25px;
+    font-size: 0;
+
+}
+
+.wpmjgu-share-link:focus {
+    box-shadow: none;
+}

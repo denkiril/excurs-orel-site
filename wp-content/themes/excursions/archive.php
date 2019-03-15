@@ -28,7 +28,11 @@ get_header();
 			<div class="row anno-card">
 				<div class="col-12 col-md-4">
 					<a href="<?=$permalink?>" title="Ссылка на: <?=$title?>" tabindex="-1">
-					<?php the_post_thumbnail('medium'); ?>
+					<?php 
+						// the_post_thumbnail('medium'); 
+						$thumb_id = get_post_thumbnail_id();
+						echo get_attachment_picture( $thumb_id, 'medium' );
+					?>
 					</a>
 				</div>
 				<div class="col-12 col-md-8">

@@ -1,5 +1,5 @@
-# игнорировать все jpg в каталоге photo/ 
-photo/*.jpg
+# игнорировать все .jpg* (в т.ч. .jpg.webp) в каталоге photo/ 
+photo/*.jpg*
 # Duplicator's wp-snapshots
 ignore/
 

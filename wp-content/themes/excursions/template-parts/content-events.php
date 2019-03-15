@@ -31,16 +31,16 @@
 					$title = get_the_title($thumb_id); 
 					$gallery = true; ?>
 					<a data-fancybox="gallery" href="<?=$full_image_url?>">
-					<?php the_post_thumbnail('medium_large', array( 'class' => "events-image", 'title' => $title )); ?>
+					<?php
+						$attr = array( 'class' => "events-image", 'title' => $title );
+						// the_post_thumbnail('medium_large', array( 'class' => "events-image", 'title' => $title )); 
+						echo get_attachment_picture( $thumb_id, 'medium_large', false, $attr, false );
+					?>
 					</a>
-				<?php endif;
+				<?php endif; ?>
 
-				the_field('event_description');
-				// the_post_thumbnail();
-				// the_post_thumbnail( array(420, 420) );
-				// the_post_thumbnail('medium');
-				// the_post_thumbnail('thumbnail');
-				// if( $event_date ) echo '<p>' . $event_date . '</p>'; ?>
+				<?php the_field('event_description'); ?>
+
 			</div>
 		</div> <!-- row -->
 		<hr /> 
@@ -179,8 +179,11 @@
 					<div class="gallery-item col-12 col-sm-6 col-md-6 col-lg-4">
 						<figure>
 							<a data-fancybox="gallery" href="<?=$full_image_url?>" data-caption="<?=$title?>">
-							<?= wp_get_attachment_image( $id, 'medium_large', false,  // (thumbnail, medium, large, full or custom size) 
-								array( 'title' => $title) ); ?>
+							<?php 
+								$attr = array( 'title' => $title);
+								echo get_attachment_picture( $id, 'medium_large', false, $attr, false );
+								// echo wp_get_attachment_image( $id, 'medium_large', false, array( 'title' => $title) ); 
+							?>
 							</a>
 							<?php if( $description ) echo '<figcaption>' . $description . '</figcaption>'; ?>
 						</figure>
@@ -246,8 +249,11 @@
 					<div class="gallery-item col-12">
 						<figure>
 							<a data-fancybox="gallery" href="<?=$full_image_url?>" data-caption="<?=$title?>">
-							<?= wp_get_attachment_image( $id, 'medium_large', false,  // (thumbnail, medium, large, full or custom size) 
-								array( 'title' => $title ) ); ?>
+							<?php 
+							$attr = array( 'title' => $title);
+							echo get_attachment_picture( $id, 'medium_large', false, $attr, 'lazy' );
+							// wp_get_attachment_image( $id, 'medium_large', false, array( 'title' => $title ) ); 
+							?>
 							</a>
 							<?php if( $description ) echo '<figcaption>' . $description . '</figcaption>'; ?>
 						</figure>

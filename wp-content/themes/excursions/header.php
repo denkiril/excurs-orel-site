@@ -19,7 +19,7 @@
 
 	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
 
-	<link rel="shortcut icon" href="/favicon.ico" />
+	<!-- <link rel="shortcut icon" href="/favicon.ico" /> -->
 
 	<?php wp_head(); ?>
 </head>

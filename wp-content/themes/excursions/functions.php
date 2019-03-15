@@ -352,7 +352,9 @@ function annocards_func( $atts ){
 			if( $post->post_type == 'events') $event_date = markup_event_date( $post->id );
 
 			$echo .= '<div class="row anno-card"><div class="col-12 col-md-4"><a href="' . $permalink . '" title="Ссылка на: ' . $title . '" tabindex="-1">'; 
-			$echo .= get_the_post_thumbnail(null, 'medium');
+			// $echo .= get_the_post_thumbnail(null, 'medium');
+			$thumb_id = get_post_thumbnail_id();
+			$echo .= get_attachment_picture( $thumb_id, 'medium' );
 			$echo .= '</a></div><div class="col-12 col-md-8"><h3 class="annocard-title"><a href="' . $permalink . '" title="Ссылка на: '; 
 			$echo .= $title . '">' . $title . '</a></h3>';
 			// if( $event_date ) $echo .= '<time>'.$event_date.'</time> ';
@@ -442,7 +444,9 @@ function newscards_func( $atts ){
 			if( $post->post_type == 'events') $event_date = markup_event_date( $post->id );
 
 			$echo .= '<div class="newscard-container col-md-6 col-lg-4"><div class="newscard"><a href="'.$permalink.'" title="Ссылка на: '.$title.'">'; 
-			$echo .= get_the_post_thumbnail(null, 'medium');
+			// $echo .= get_the_post_thumbnail(null, 'medium');
+			$thumb_id = get_post_thumbnail_id();
+			$echo .= get_attachment_picture( $thumb_id, 'medium' );
 			$echo .= '</a><h3 class="newscard-title">'.$event_date.$title.'</h3>';
 			// $echo .= get_the_excerpt();
 			if( $read_more ) $echo .= ' <a href="'.$permalink.'" title="Ссылка на: '.$title.'" tabindex="-1">'.$read_more.'</a>';
@@ -631,11 +635,10 @@ function carousel_func( $atts ){
 			if( $hrefs && $post_link )
 				$echo .= '<a href="'.$post_link.'" title="'.get_the_title( $post_id ).'">';
 
-			// Get img item. 1st is not lazy 
-			if( $images_counter == 0 )
-				$echo .= wp_get_attachment_image( $id, 'medium_large', false, $attr );
-			else
-				$echo .= get_lazy_attachment_image( $id, 'medium_large', false, $attr );
+			// Get picture item. 1st ($images_counter == 0) is not lazy 
+			// if( $images_counter == 0 ) $echo .= wp_get_attachment_image( $id, 'medium_large', false, $attr );
+			// else $echo .= get_lazy_attachment_image( $id, 'medium_large', false, $attr );
+			$echo .= get_attachment_picture( $id, $size, false, $attr, $images_counter > 0 );
 			$images_counter++;
 
 			if( $hrefs && $post_link ) $echo .= '</a>';
@@ -716,7 +719,102 @@ function get_lazy_attachment_image( $attachment_id, $size = 'thumbnail', $icon =
 	return $html;
 }
 
-// [image class="" id=1 size="medium_large" title=false href=1]
+/*
+	get_attachment_picture() is mod of standart wp_get_attachment_image() 
+*/
+function get_attachment_picture( $attachment_id, $size = 'thumbnail', $icon = false, $attr = '', $lazy = true ) {
+	$html  = '';
+	$image = wp_get_attachment_image_src( $attachment_id, $size, $icon );
+	if ( $image ) {
+		$html = '<picture>';
+		list($src, $width, $height) = $image;
+		$hwstring                   = image_hwstring( $width, $height );
+		$size_class                 = $size;
+		if ( is_array( $size_class ) ) {
+			$size_class = join( 'x', $size_class );
+		}
+		$attachment   = get_post( $attachment_id );
+		$default_attr = array(
+			'src' 		=> $src,
+			'class' 	=> "attachment-$size_class size-$size_class",
+			'alt' 		=> trim( strip_tags( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) ),
+		);
+
+		if( $lazy ){
+			$default_attr = array_merge( $default_attr, array(
+				'src'		=> '/wp-content/themes/excursions/assets/include/placeholder.png', // for validation 
+				'data-src' 	=> $src,
+			));
+		}
+
+		$attr = wp_parse_args( $attr, $default_attr );
+
+		// Generate <source>'s
+
+		$image_meta = wp_get_attachment_metadata( $attachment_id );
+		$image_basename = wp_basename( $image_meta['file'] );
+
+		// Retrieve the uploads sub-directory from the full size image.
+		$dirname = _wp_get_attachment_relative_path( $image_meta['file'] );
+	
+		if( $dirname ) {
+			$dirname = trailingslashit( $dirname );
+		}
+	
+		$upload_dir    = wp_get_upload_dir();
+		$image_baseurl = trailingslashit( $upload_dir['baseurl'] ) . $dirname;
+	
+		/*
+		 * If currently on HTTPS, prefer HTTPS URLs when we know they're supported by the domain
+		 * (which is to say, when they share the domain name of the current request).
+		 */
+		if ( is_ssl() && 'https' !== substr( $image_baseurl, 0, 5 ) && parse_url( $image_baseurl, PHP_URL_HOST ) === $_SERVER['HTTP_HOST'] ) {
+			$image_baseurl = set_url_scheme( $image_baseurl, 'https' );
+		}
+
+		$full_image_url = $image_baseurl . $image_basename;
+		// $srcset = $lazy ? 'data-srcset' : 'srcset';
+		$source = $lazy ? '<source data-srcset="' : '<source srcset="';
+		
+		$html .= $source.$full_image_url.'.webp" media="(min-width: 1200px)" type="image/webp">';
+		$html .= $source.$full_image_url.'" media="(min-width: 1200px)">'; // type="image/jpg"
+
+		$image_sizes = $image_meta['sizes'];
+		$image_sizes = array_reverse( $image_sizes );
+
+		foreach( $image_sizes as $image ){
+			// Check if image meta isn't corrupted.
+			if ( ! is_array( $image ) ) {
+				continue;
+			}
+
+			if( isset($image['file']) ){
+
+				$file_width = $image['width'];
+
+				if( $file_width < 300 ) continue;
+
+				$image_url = $image_baseurl . $image['file'];
+				$media = 'media="(min-width: '.$file_width.'px)"';
+
+				$html .= $source.$image_url.'.webp" type="image/webp" '.$media.'>';
+				$html .= $source.$image_url.'" '.$media.'>';
+			}  
+		}
+
+		// $attr = apply_filters( 'wp_get_attachment_image_attributes', $attr, $attachment, $size );
+		$attr = array_map( 'esc_attr', $attr );
+		$html .= rtrim( "<img $hwstring" );
+		foreach ( $attr as $name => $value ) {
+			$html .= " $name=" . '"' . $value . '"';
+		}
+		$html .= ' /></picture>';
+	}
+
+	return $html;
+}
+
+// [image class="" id=1 size="medium_large" title=false href=1 lazy=0] 
 add_shortcode( 'image', 'image_func' );
 
 function image_func( $atts ){
@@ -727,6 +825,7 @@ function image_func( $atts ){
 		'size' => 'thumbnail',
 		'title' => true,
 		'href' => false,
+		'lazy' =>true,
 	), $atts );
 
 	$class = $atts['class'];
@@ -734,6 +833,7 @@ function image_func( $atts ){
 	$size = $atts['size'];
 	$title = $atts['title'];
 	$href = $atts['href'];
+	$lazy = $atts['lazy'];
 
 	$echo = '';
 
@@ -753,8 +853,8 @@ function image_func( $atts ){
 			$attr = array( 'title' => $title);
 		}
 
-		$image = wp_get_attachment_image( $id, $size, false, $attr );
-		// $image = get_lazy_attachment_image( $id, $size, false, $attr );
+		// $image = wp_get_attachment_image( $id, $size, false, $attr );
+		$image = get_attachment_picture( $id, $size, false, $attr, $lazy );
 
 		if( $image ){
 			$echo .= '<div class="'.$class.'"><figure>'.$ahref_pre.$image.$ahref_post.'</figure></div>';
@@ -765,7 +865,7 @@ function image_func( $atts ){
 	return $echo;
 }
 
-// [gallery class="post-gallery" item="gallery-item" fancybox="gallery"]
+// [gallery class="post-gallery" item="gallery-item" fancybox="gallery" lazy=0] 
 add_shortcode( 'gallery', 'gallery_func' );
 
 function gallery_func( $atts ){
@@ -774,11 +874,13 @@ function gallery_func( $atts ){
 		'class' => 'post-gallery',
 		'item' => 'gallery-item',
 		'fancybox' => 'gallery',
+		'lazy' => true,
 	), $atts );
 
 	$class = $atts['class'];
 	$item = $atts['item'];
 	$fancybox = $atts['gallery'];
+	$lazy = $atts['lazy'];
 
 	$echo = '';
 
@@ -797,7 +899,8 @@ function gallery_func( $atts ){
 
 			$echo .= '<div class="'.$item.' col-12">';
 			$echo .= '<figure><a data-fancybox="'.$fancybox.'" href="'.$full_image_url.'" data-caption="'.$title.'">';
-			$echo .= get_lazy_attachment_image( $id, 'medium_large', false, $attr );
+			// $echo .= get_lazy_attachment_image( $id, 'medium_large', false, $attr );
+			$echo .= get_attachment_picture( $id, 'medium_large', false, $attr, $lazy );
 			$echo .= '</a>';
 			if( $description ) $echo .= '<figcaption>'.$description.'</figcaption>';
 			$echo .= '</figure></div>';
