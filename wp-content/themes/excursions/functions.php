@@ -742,7 +742,7 @@ function get_attachment_picture( $attachment_id, $size = 'thumbnail', $icon = fa
 
 		if( $lazy ){
 			$default_attr = array_merge( $default_attr, array(
-				'src'		=> '/wp-content/themes/excursions/assets/include/placeholder.png', // for validation 
+				'src'		=> '/wp-content/themes/excursions/assets/include/placeholder_3x2.png', // for validation 
 				'data-src' 	=> $src,
 			));
 		}
@@ -888,6 +888,7 @@ function gallery_func( $atts ){
 	//Get the images ids from the post_metadata
 	$images = acf_photo_gallery( 'gallery_gal', $post->ID );
 	if( count($images) ):
+		$images_counter = 0;
 		$echo .= '<div class="row '.$class.'">';
 		foreach( $images as $image ):
 			$id = $image['id']; // The attachment id of the media
@@ -899,8 +900,10 @@ function gallery_func( $atts ){
 
 			$echo .= '<div class="'.$item.' col-12">';
 			$echo .= '<figure><a data-fancybox="'.$fancybox.'" href="'.$full_image_url.'" data-caption="'.$title.'">';
+			// Get picture item. 1st two ($images_counter == 0 || 1) are not lazy 
 			// $echo .= get_lazy_attachment_image( $id, 'medium_large', false, $attr );
-			$echo .= get_attachment_picture( $id, 'medium_large', false, $attr, $lazy );
+			$echo .= get_attachment_picture( $id, 'medium_large', false, $attr, $images_counter > 1 );
+			$images_counter++;
 			$echo .= '</a>';
 			if( $description ) $echo .= '<figcaption>'.$description.'</figcaption>';
 			$echo .= '</figure></div>';
@@ -949,3 +952,49 @@ function canon_paged() {
 	}
 }
 add_filter('wpseo_head','canon_paged');
+
+/**
+ * Генерирует webp копии изображений сразу после загрузки изображения в медиабиблиотеку
+ * - новые файлы сохраняет с именем name.ext.webp, например, thumb.jpg.webp
+ * 
+ * -- на локальном сервере wepb получаются больше jpg. Надо будет дорабатывать. 
+ */
+function gt_webp_generation($metadata) {
+    $uploads = wp_upload_dir(); // получает папку для загрузки медиафайлов
+
+    $file = $uploads['basedir'] . '/' . $metadata['file']; // получает исходный файл
+    $ext = wp_check_filetype($file); // получает расширение файла
+    
+    if ( $ext['type'] == 'image/jpeg' ) { // в зависимости от расширения обрабатаывает файлы разными функциями
+        $image = imagecreatefromjpeg($file); // создает изображение из jpg
+        
+    } elseif ( $ext['type'] == 'image/png' ){
+        $image = imagecreatefrompng($file); // создает изображение из png
+        imagepalettetotruecolor($image); // восстанавливает цвета
+        imagealphablending($image, false); // выключает режим сопряжения цветов
+        imagesavealpha($image, true); // сохраняет прозрачность
+
+    }
+    imagewebp($image, $uploads['basedir'] . '/' . $metadata['file'] . '.webp', 90); // сохраняет файл в webp
+
+    foreach ($metadata['sizes'] as $size) { // перебирает все размеры файла и также сохраняет в webp
+        $file = $uploads['url'] . '/' . $size['file'];
+        $ext = $size['mime-type'];
+
+        if ( $ext == 'image/jpeg' ) {
+            $image = imagecreatefromjpeg($file); 
+            
+        } elseif ( $ext == 'image/png' ){
+            $image = imagecreatefrompng($file);
+            imagepalettetotruecolor($image);
+            imagealphablending($image, false);
+            imagesavealpha($image, true);
+        }
+        
+        imagewebp($image, $uploads['basedir'] . $uploads['subdir'] . '/' . $size['file'] . '.webp', 90);
+
+    }
+
+    return $metadata;
+}
+// add_filter('wp_generate_attachment_metadata', 'gt_webp_generation');

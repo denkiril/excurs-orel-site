@@ -30,6 +30,9 @@ php_value error_reporting -1;
 # Serve Images with correct Mime Type
 AddType image/webp .webp
 
-# Setup Cache
-ExpiresActive On
-ExpiresByType image/webp A2592000
+# Setup Cache 
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/webp A2592000
+</IfModule>
+
