@@ -1,11 +1,14 @@
 User-agent: *
+# Disallow IDs: 312,314,345,352 
 Disallow: /events/k-150-letiyu-orlovskoj-zheleznoj-dorogi-2019/
+Disallow: /search/
+Disallow: /policy/
+Disallow: /events-rules/
 Disallow: /cgi-bin
 Disallow: /?
 Disallow: /wp-
 Disallow: *?s=
 Disallow: *&s=
-Disallow: /search/
 Disallow: /author/
 Disallow: /users/
 Disallow: */trackback

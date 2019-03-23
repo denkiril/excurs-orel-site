@@ -526,9 +526,10 @@ img[data-src]{
 }
 .anno-card img{
     display: block;
-    margin: 0 auto 0.8em auto;
-    max-width: 100%;
+    width: 100%;
     height: auto;
+    /* margin: 0 auto 0.8em auto; */
+    margin-bottom: 0.8em;
 }
 /* .anno-card p{
     margin-top: 0.8em;

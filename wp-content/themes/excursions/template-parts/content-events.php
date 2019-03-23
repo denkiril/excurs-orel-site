@@ -95,7 +95,7 @@
 			<?php // $show_map id="map" 
 			if( $show_map ):  ?>
 				<div class="col<?=$col_sfx?>">
-					<button id="OpenMap_btn" class="ref_btn">[ Показать карту ]</button>
+					<button id="OpenMap_btn" class="ref_btn mobview_btn">[ Показать карту ]</button>
 					<div class="acf-map">
 						<div class="marker" data-lat="<?php echo $location['lat']; ?>" data-lng="<?php echo $location['lng']; ?>"></div>
 					</div>

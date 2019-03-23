@@ -8,6 +8,8 @@
 
 $(document).ready(function(){
 
+	// global
+	var no_events_map = true;	
 	// Фиксированное меню при прокрутке страницы
 	var NavBlock = $('#nav-block'); // ID шапки
 	var NavBlockTop = NavBlock.offset().top;
@@ -38,10 +40,10 @@ $(document).ready(function(){
 			});
 			}
 		}
-    });
+	});
 
 	$.ajaxSetup({
-	  cache: true
+	  // cache: true
 	});
 
 	function OpenMap(){
@@ -68,6 +70,43 @@ $(document).ready(function(){
 	$('#OpenMap_btn').click(function() {
 		OpenMap();
 	})
+
+	$('.events_map').each(function(){
+		var events_map = $(this);
+		// var $emb_map = $(this).find('.events_block_map');
+		// var $emb_filter = $(this).find('.events_block_filter');
+		// var $emb_list = $(this).find('.events_block_list');
+		var emb_panel = $('<div class="events_block events_block_panel"></div>');
+		var emb_button = $('<button class="NewEventsMap_btn" data-state="open">[ Показать на карте ]</button>');
+		emb_button.click( function() { ClickEventsMapBtn(events_map, $(this)); } )
+		emb_panel.append(emb_button);
+		events_map.append(emb_panel);
+		// events_map.before(emb_panel);
+	});
+
+	var ClickEventsMapBtn = function(events_map, button){
+			if( button.attr('data-state') == 'open' ){
+					if( no_events_map ){
+						var api_url = "https://api-maps.yandex.ru/2.1/?lang=ru_RU";
+						// var events_map_js = "/wp-content/themes/excursions/assets/js/events_map.js";
+						$.getScript(api_url).then(function(){
+								// $.getScript(events_map_js);
+							// }).then(function(){
+								NewEventsMap(events_map);
+								no_events_map = false;									
+							});
+					}
+
+					button.attr('data-state', 'close');
+					button.text('[Закрыть карту]');
+					events_map.find('.events_map_content').show();
+			}
+			else{
+					button.attr('data-state', 'open');
+					button.text('[Открыть карту]');
+					events_map.find('.events_map_content').hide();
+			}
+	}
 
 	// function OpenForm(){
 		// var form = document.getElementById("reg_form");
@@ -228,9 +267,6 @@ $(document).ready(function(){
 
 				$('#soc-section').show();
 			}
-
-			// autoplay only for big screens
-			// $('.carousel').slick('slickPlay');
 
 		}
 

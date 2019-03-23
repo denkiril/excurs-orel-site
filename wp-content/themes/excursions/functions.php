@@ -146,7 +146,9 @@ function excursions_scripts() {
 	wp_enqueue_script( 'script', get_template_directory_uri() . '/assets/js/script.js', array('jquery'), false, 'in_footer' );
 	// wp_register_script( 'googlemap-api?key=YOUR_API_KEY', '//maps.googleapis.com/maps/api/js', array(), false, 'in_footer' );
 	// wp_register_script( 'ymap-api?apikey=6ebdbbc2-3779-4216-9d88-129e006559bd&lang=ru_RU', '//api-maps.yandex.ru/2.1/', array(), false, 'in_footer' );
+	// wp_register_script( 'ymap-api', '//api-maps.yandex.ru/2.1/' );
 	wp_register_script( 'acf-map-js', get_template_directory_uri() . '/assets/js/acf-map-yandex.js', array('jquery'), false, 'in_footer' );
+	wp_register_script( 'events_map-js', get_template_directory_uri() . '/assets/js/events_map.js', array('jquery'), false, 'in_footer' );
 	wp_enqueue_script( 'yashare-js', '//yastatic.net/share2/share.js', array('jquery'), false, 'in_footer' );
 	wp_register_script( 'fancybox-js', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js', array('jquery'), false, 'in_footer' );
 	// wp_register_style( 'fancybox', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css' );
@@ -213,6 +215,20 @@ add_action( 'add_carousel_scripts', 'add_carousel_scripts_func', 10, 0);
 function add_carousel_scripts_func() {
 	wp_enqueue_script( 'slick-js' );
 	preload_style( get_template_directory_uri().'/assets/include/slick.css' );
+}
+
+// if( '.events_map' ) do_action( 'events_map_scripts' );
+add_action( 'events_map_scripts', 'events_map_scripts_func', 10, 0);
+function events_map_scripts_func() {
+	preload_style( get_template_directory_uri().'/assets/css/events_map.css' );
+	// wp_enqueue_script( 'ymap-api?lang=ru_RU' );
+	// wp_enqueue_script( 'ymap-api?lang=ru_RU', '//api-maps.yandex.ru/2.1/' );
+	wp_enqueue_script( 'events_map-js' );
+	wp_localize_script( 'events_map-js', 'myajax', 
+		array(
+			'url' => admin_url('admin-ajax.php')
+		)
+	);  
 }
 
 // function test_styleadd() {
@@ -291,8 +307,8 @@ function anno_func( $cat_name, $section_title, $read_more='Подробнее...
 			$echo .= $title . '">' . $title . '</a></h3><p>' . get_the_excerpt() . '  ';
 			$echo .= '<a href="' . $permalink . '" tabindex="-1">' . $read_more . '</a></p></div></div>';
 			echo $echo; 
-			wp_reset_postdata();
 		endforeach;
+		wp_reset_postdata();
 		echo '</div></div></section>';
 	endif;
 }
@@ -361,8 +377,8 @@ function annocards_func( $atts ){
 			$echo .= '<p>'.$event_date.get_the_excerpt();
 			if( $read_more ) $echo .= ' <a href="' . $permalink . '" tabindex="-1">' . $read_more . '</a>';
 			$echo .= '</p></div></div>';
-			wp_reset_postdata();
 		endforeach;
+		wp_reset_postdata();
 		if( $past_events && !is_archive() )
 			$echo .= '<p class="anno-ref"><a href="' . get_post_type_archive_link('events') . '" title="Ссылка на все события">Все события ></a></p>';
 
@@ -451,8 +467,8 @@ function newscards_func( $atts ){
 			// $echo .= get_the_excerpt();
 			if( $read_more ) $echo .= ' <a href="'.$permalink.'" title="Ссылка на: '.$title.'" tabindex="-1">'.$read_more.'</a>';
 			$echo .= '</div></div>';
-			wp_reset_postdata();
 		endforeach;
+		wp_reset_postdata();
 
 		$echo .= '</div><!-- row -->';
 		$echo .= '</div></div></section>';
@@ -750,9 +766,7 @@ function get_attachment_picture( $attachment_id, $size = 'thumbnail', $icon = fa
 		$attr = wp_parse_args( $attr, $default_attr );
 
 		// Generate <source>'s
-
 		$image_meta = wp_get_attachment_metadata( $attachment_id );
-		$image_basename = wp_basename( $image_meta['file'] );
 
 		// Retrieve the uploads sub-directory from the full size image.
 		$dirname = _wp_get_attachment_relative_path( $image_meta['file'] );
@@ -772,35 +786,17 @@ function get_attachment_picture( $attachment_id, $size = 'thumbnail', $icon = fa
 			$image_baseurl = set_url_scheme( $image_baseurl, 'https' );
 		}
 
-		$full_image_url = $image_baseurl . $image_basename;
-		// $srcset = $lazy ? 'data-srcset' : 'srcset';
+		// $html .= $source.$full_image_url.'.webp" media="(min-width: 1200px)" type="image/webp">';
+		// $image_sizes = $image_meta['sizes'];
+		// $image_sizes = array_reverse( $image_sizes );
+
 		$source = $lazy ? '<source data-srcset="' : '<source srcset="';
-		
-		$html .= $source.$full_image_url.'.webp" media="(min-width: 1200px)" type="image/webp">';
-		$html .= $source.$full_image_url.'" media="(min-width: 1200px)">'; // type="image/jpg"
 
-		$image_sizes = $image_meta['sizes'];
-		$image_sizes = array_reverse( $image_sizes );
+		$srcset = generate_image_srcset( $image_meta, $image_baseurl, true );
+		if( $srcset ) $html .= $source.$srcset.'" type="image/webp">';
 
-		foreach( $image_sizes as $image ){
-			// Check if image meta isn't corrupted.
-			if ( ! is_array( $image ) ) {
-				continue;
-			}
-
-			if( isset($image['file']) ){
-
-				$file_width = $image['width'];
-
-				if( $file_width < 300 ) continue;
-
-				$image_url = $image_baseurl . $image['file'];
-				$media = 'media="(min-width: '.$file_width.'px)"';
-
-				$html .= $source.$image_url.'.webp" type="image/webp" '.$media.'>';
-				$html .= $source.$image_url.'" '.$media.'>';
-			}  
-		}
+		$srcset = generate_image_srcset( $image_meta, $image_baseurl );
+		if( $srcset ) $html .= $source.$srcset.'">';
 
 		// $attr = apply_filters( 'wp_get_attachment_image_attributes', $attr, $attachment, $size );
 		$attr = array_map( 'esc_attr', $attr );
@@ -812,6 +808,49 @@ function get_attachment_picture( $attachment_id, $size = 'thumbnail', $icon = fa
 	}
 
 	return $html;
+}
+
+function generate_image_srcset( $image_meta, $image_baseurl, $webp = false ){
+	$srcset = '';
+	$image_sizes = $image_meta['sizes'];
+
+	if ( !is_array( $image_sizes ) ) {
+		return $srcset;
+	}
+
+	$sfx = $webp ? '.webp' : '';
+	$image_basename = wp_basename( $image_meta['file'] );
+
+	$strings = array();
+	foreach( $image_sizes as $image ){
+		// Check if image meta isn't corrupted.
+		if ( ! is_array( $image ) ) {
+			continue;
+		}
+
+		if( isset($image['file']) ){
+
+			$file_width = $image['width'];
+
+			if( $file_width < 300 ) continue;
+
+			$image_url = $image_baseurl . $image['file'];
+			$string = $image_url.$sfx.' '.$file_width.'w';
+			array_push($strings, $string);
+			// $srcset .= 
+			// $media = 'media="(min-width: '.$file_width.'px)"';
+			// $html .= $source.$image_url.'" '.$media.'>';
+		}  
+	}
+
+	$image_url = $image_baseurl . $image_basename; // full_image_url
+	$file_width  = (int) $image_meta['width']; // full_image_width
+	$string = $image_url.$sfx.' '.$file_width.'w';
+	array_push($strings, $string);
+
+	$srcset = implode(', ', $strings);
+
+	return $srcset;
 }
 
 // [image class="" id=1 size="medium_large" title=false href=1 lazy=0] 
@@ -998,3 +1037,56 @@ function gt_webp_generation($metadata) {
     return $metadata;
 }
 // add_filter('wp_generate_attachment_metadata', 'gt_webp_generation');
+
+// подключаем AJAX обработчики, только когда в этом есть смысл
+if( wp_doing_ajax() ){
+	add_action('wp_ajax_get_events', 'get_events_func');
+	add_action('wp_ajax_nopriv_get_events', 'get_events_func');
+}
+function get_events_func() {
+	// $whatever = intval( $_POST['whatever'] );
+	// $whatever += 10;
+	// echo $whatever;	
+	global $post;
+	$events = array();
+
+	$args = array( 
+		'post_type' => 'events', 
+		// 'orderby'   => 'event_info_event_date',  
+		'orderby' 	=> 'meta_value',
+		'meta_key' 	=> 'event_info_event_date',
+		'order'     => 'DESC',
+		'exclude' 	=> '312',
+		'numberposts' => 999, 
+	);
+	$myposts = get_posts( $args );
+
+	if( $myposts ){
+		$ev_counter = 0;
+		
+		foreach( $myposts as $post ){
+			setup_postdata( $post );
+			$post_id = get_the_ID();
+			$permalink = get_the_permalink();
+			$title = esc_html( get_field('event_info_event_date') . ' ' . get_the_title() );
+			$location = get_field('event_info_event_place_map');
+
+			$events[$ev_counter]['post_id'] = $post_id;
+			$events[$ev_counter]['permalink'] = $permalink;
+			$events[$ev_counter]['title'] = $title;
+			$events[$ev_counter]['lat'] = $location['lat'];
+			$events[$ev_counter]['lng'] = $location['lng'];
+
+			$ev_counter++;
+
+		}
+		wp_reset_postdata();		
+	}
+
+	// $str = json_encode( print_r($events, true) );
+	// echo "<script> console.log('$str'); </script>";
+	// echo $events_num;
+	echo json_encode( $events );
+
+	wp_die(); // выход нужен для того, чтобы в ответе не было ничего лишнего, только то что возвращает функция
+}

@@ -13,6 +13,67 @@ get_header();
 <main id="main" class="site-main archive-events">
 <!-- <div class="row section-container"> -->
 	<!-- <div class="col"> -->
+	<?php
+	$args = array( 
+		'post_type' => 'events', 
+		'exclude' 	=> '312',
+		'orderby'   => 'event_info_event_date',  
+		'numberposts' => 999, 
+	);
+	$myposts = get_posts( $args );
+
+	if( $myposts ): 
+		do_action( 'events_map_scripts' );
+		?>
+		<div class="events_map" style="display: none;">
+			<div class="events_block events_block_map">
+				<!-- <div class="ev-map"> -->
+
+					<?php
+					// foreach( $myposts as $post ):
+					// 	setup_postdata( $post );
+					// 	// $event_info = get_field('event_info');
+					// 	// $location = $event_info['event_place_map'];
+					// 	$location = get_field('event_info_event_place_map');
+					// 	if( $location ): 
+					// 		$post_id = get_the_ID();
+					// 		$permalink = get_the_permalink();
+					// 		$title = esc_html( get_field('event_info_event_date') . ' ' . get_the_title() );
+						?>
+
+						<!-- <div class="marker" data-lat="<$location['lat']>" data-lng="<=$location['lng']?>"
+											data-post_id="<=$post_id?>" data-url="<=$permalink?>" data-title="<=$title?>"></div> -->
+
+						<?php 
+					// 	endif;
+					// endforeach;
+					// wp_reset_postdata();
+					?>
+
+				<!--</div>  ev-map -->
+			</div> <!-- events_block_map -->
+			<div class="events_block events_block_filter">
+			</div> <!-- events_block_filter -->
+			<div class="events_block events_block_list">
+				<?php
+				// <ul class="events_list">
+				// foreach( $myposts as $post ):
+				// 	setup_postdata( $post );
+				// 	$post_id = get_the_ID();
+				// 	$permalink = get_the_permalink();
+				// 	$title = esc_html( get_field('event_info_event_date') . ' ' . get_the_title() );
+				
+				// 	<li class="events_li" data-post_id="<=$post_id>" ><?=$title><a class="hiddenlink" href="<?=$permalink>">Перейти</a></li>
+				// endforeach;
+				// wp_reset_postdata();
+				// </ul>
+				?>
+			</div> <!-- events_block_list -->
+		</div> <!-- events_map -->
+	<?php endif; ?>
+	<!-- <div> -->
+		<!-- <button id="OpenMap_btn">[ Показать карту ]</button> -->
+	<!-- </div> -->
 
 	<?php 
 		// global $query_string; // параметры базового запроса
