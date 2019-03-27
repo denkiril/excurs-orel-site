@@ -14,6 +14,17 @@ $(document).ready(function(){
 	var NavBlock = $('#nav-block'); // ID шапки
 	var NavBlockTop = NavBlock.offset().top;
 
+	// Меню-гамбургер для адаптивной версии
+	$('#menu').on('click', function() {
+		// $(this).closest('.nav-container').toggleClass('menu_state_open');
+		$(this).toggleClass('menu_state_open');
+		$('.nav-menu').slideToggle(300, function() {
+			if($(this).css('display') === 'none') {
+				$(this).removeAttr('style');
+			}
+		});
+	});
+
 	$(window).resize(function() {
 		if(screen.width > 768)
 			NavBlock.removeClass('fixed');
@@ -25,18 +36,19 @@ $(document).ready(function(){
 
 	$(window).scroll(function() {
 		if(screen.width <= 768) {
-			if($(window).scrollTop() > NavBlockTop) { // Тут идея в том, что блок привязывается к верху, как только "прилипает" к верху окна браузера. Замените $block.offset().top на любое значение и получится, что когда вы проскроллили на большее кол-во пиксейлей, чем указали, добавиться класс к шапке.
+			
+			if(NavBlock.hasClass('fixable') && $(window).scrollTop() > NavBlockTop) { // Тут идея в том, что блок привязывается к верху, как только "прилипает" к верху окна браузера. Замените $block.offset().top на любое значение и получится, что когда вы проскроллили на большее кол-во пиксейлей, чем указали, добавиться класс к шапке.
 				NavBlock.addClass('fixed'); // Добавляем класс fixed. В стилях указываем для него position:fixed, height и прочее, чтобы сделать шапку фиксированной.
 			} else {
 				NavBlock.removeClass('fixed'); // удаляем класс
 			}
 
 			if($('#menu').hasClass('menu_state_open')){
-			$('#menu').removeClass('menu_state_open');
-			$('.nav-menu').slideUp(300, function() {
-				if($(this).css('display') === 'none') {
-				$(this).removeAttr('style');
-				}
+				$('#menu').removeClass('menu_state_open');
+				$('.nav-menu').slideUp(300, function() {
+					if($(this).css('display') === 'none'){
+						$(this).removeAttr('style');
+					}
 			});
 			}
 		}
@@ -46,7 +58,7 @@ $(document).ready(function(){
 	  // cache: true
 	});
 
-	function OpenMap(){
+	function OpenEventMap(){
 		if( $('.acf-map').length ){
 			// console.log('acf-map ok');
 			// var api_url = "https://api-maps.yandex.ru/2.1/?apikey=6ebdbbc2-3779-4216-9d88-129e006559bd&lang=ru_RU";
@@ -68,7 +80,7 @@ $(document).ready(function(){
 	}
 
 	$('#OpenMap_btn').click(function() {
-		OpenMap();
+		OpenEventMap();
 	})
 
 	$('.events_map').each(function(){
@@ -100,11 +112,13 @@ $(document).ready(function(){
 					button.attr('data-state', 'close');
 					button.text('[Закрыть карту]');
 					events_map.find('.events_map_content').show();
+					NavBlock.removeClass('fixable');
 			}
 			else{
 					button.attr('data-state', 'open');
 					button.text('[Открыть карту]');
 					events_map.find('.events_map_content').hide();
+					NavBlock.addClass('fixable');
 			}
 	}
 
@@ -237,7 +251,7 @@ $(document).ready(function(){
 			// console.log('screen.width > 768');
 
 			// acf-map only for big screens
-			OpenMap();
+			OpenEventMap();
 
 			// social widgets only for big screens
 			if( $('#soc-section').length ){
@@ -276,16 +290,7 @@ $(document).ready(function(){
 		}
 	});
 
-	// Меню-гамбургер для адаптивной версии
-	$('#menu').on('click', function() {
-		// $(this).closest('.nav-container').toggleClass('menu_state_open');
-		$(this).toggleClass('menu_state_open');
-		$('.nav-menu').slideToggle(300, function() {
-			if($(this).css('display') === 'none') {
-				$(this).removeAttr('style');
-			}
-		});
-	});
+
 
   // "Сворачиваем" форму после отправки
   // function HideForm(){

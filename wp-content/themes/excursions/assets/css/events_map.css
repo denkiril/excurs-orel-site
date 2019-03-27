@@ -10,14 +10,15 @@
 }
 @media (max-width: 768px) {
     .events_map{
-        width: 90%;
+        width: 100%;
+        /* margin-left: 0; */
     }
 }
-@media (max-width: 576px) {
+/* @media (max-width: 576px) {
     .events_map{
         width: 100%;
     }
-}
+} */
 
 .events_block{
     width: 100%;
@@ -25,6 +26,9 @@
 }
 .events_block_panel{
     height: 30px;
+    margin-bottom: 4px;
+    /* background: url(/wp-content/themes/excursions/assets/img/old_map.jpg) repeat; */
+    background: url(../img/old_map.jpg) repeat;
 }
 .NewEventsMap_btn{
     background-color: transparent;
@@ -35,9 +39,19 @@
     display: block;
     margin: 0 auto;
 }
+.NewEventsMap_btn:hover,
+.NewEventsMap_btn:focus{
+    font-weight: bolder;
+    outline: none;
+}
 .events_block_map{
     height: 300px;
     margin-bottom: 4px;
+}
+@media (max-width: 768px) {
+    .events_block_map{
+        height: 250px;
+    }
 }
 .ev-map{
     width: 100%;
@@ -54,10 +68,22 @@
     border-bottom: none;
     display: none;
 }
+@media (max-width: 768px) {
+    .events_block_filter{
+        width: 90%;
+        margin-left: 0;
+    }
+}
 .events_block_list{
-    /* width: 50%; */
     height: 400px;
     overflow: auto;
+}
+@media (max-width: 768px) {
+    .events_block_list{
+        width: 90%;
+        height: 300px;
+        margin-left: 0;
+    }
 }
 .events_list{
     padding: 0;

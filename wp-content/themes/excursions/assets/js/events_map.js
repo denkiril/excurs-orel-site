@@ -112,6 +112,16 @@ function add_marker(event, map) {
         mark.options.set('iconColor', '#005281');
     });
 
+    marker.events.add('balloonopen', function (e) {
+        var mark = e.get('target');
+        mark.options.set('iconColor', '#bc3134'); // ffd649
+    });
+
+    marker.events.add('balloonclose', function (e) {
+        var mark = e.get('target');
+        mark.options.set('iconColor', '#005281');
+    });
+
     // Размещение геообъекта на карте.
     map.geoObjects.add(marker);
 
@@ -127,7 +137,7 @@ var NewEventsList = function( emb_list, events ){
         events_li.text(events[i].title);
         var hiddenlink = $('<a class="hiddenlink"></a>');
         hiddenlink.attr('href', events[i].permalink);
-        hiddenlink.text('[Перейти]');
+        hiddenlink.text('[Перейти\u00A0>>]');
         
         events_li.append(hiddenlink);
 

@@ -75,7 +75,7 @@
 		</div>
 
 		<div class="container nav-container">
-			<nav id="nav-block">
+			<nav id="nav-block" class="fixable">
 				<div class="row">
 					<div class="col">
 						<!-- <div class="nav-container"> -->
