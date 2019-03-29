@@ -1,11 +1,11 @@
 <?php
-/*
+/* 
  Plugin Name: Custom Upload Dir
  Plugin URI: http://wordpress.org/extend/plugins/custom-upload-dir/
  Description: Keeps your uploaded files organized in smart folder structures.
- Version: 3.4.3.1
+ Version: 3.4.4
  Author: Ulf Benjaminsson
- Author URI: http://www.ulfben.com/
+ Author URI: http://www.ulfbenjaminsson.com/
  License: GPL2
  Text Domain: cud
  Domain Path: /lang
@@ -14,9 +14,7 @@
 	- rewrite admin panel to support per-post-type settings. Either list all post types after on another (ugly), or do an ajax-selection thing (nice).
 	- add quick-bail if post-type is wrong
 	- block uploads when post isn't saved
-	- 
-
- */
+*/
 add_action('plugins_loaded', 'cud_init');
 register_activation_hook(__FILE__, 'cud_install_options');	
 register_uninstall_hook(__FILE__, 'cud_delete_options');	
@@ -68,9 +66,14 @@ function cud_install_options(){
 	$old = get_option('custom_upload_dir');	
 	if(is_array($old)){
 		if(!empty($old['template'])){ //update deprecated placeholders to match permalink tags
-			$newtags = array('%post_id%','%postname%','%author%','%monthnum%');
-			$oldtags = array('%ID%', '%post_name%','%post_author%','%month%');			
-			$old['template'] = str_replace($oldtags, $newtags, $old['template']);
+			$newtags = array('%post_id%','%postname%','%author%','%monthnum%','%permalink%');
+			$oldtags = array('%ID%', '%post_name%','%post_author%','%month%','');			
+			
+			if(stripos($old['template'], '%permalink%') !== false){
+				cud_error_notice();
+			}
+			
+			$old['template'] = str_replace($oldtags, $newtags, $old['template']);			
 			//$old['post'] = str_replace($oldtags, $newtags, $old['template']);			
 			//unset($old['template']);
 		}	
@@ -80,6 +83,14 @@ function cud_install_options(){
 		$defaults['test_ids'] = implode(',', $defaults['test_ids']);
 	}
 	update_option('custom_upload_dir', $defaults);
+}
+
+function cud_error_notice() {
+    ?>
+    <div class="error notice">
+        <p><?php _e( 'Please update your Custom Upload Dir settings and remove the %permalink% placeholder.', 'cud' ); ?></p>
+    </div>
+    <?php
 }
 
 function cud_xmlrpc_call($call){
@@ -99,7 +110,8 @@ function cud_xmlrpc_call($call){
 
 //* @param array $file Reference to a single element of $_FILES. Call the function once for each uploaded file.
 function cud_pre_upload($file){	
-	global $cud_file_ext,$cud_file_type;	
+	global $cud_file_ext, $cud_file_type;	
+	global $post_id;	
 	$cud_file_ext = '';
 	$cud_file_type = '';
 	if(!empty($file['name'])){
@@ -154,13 +166,32 @@ function cud_getTemplate($post_type = false){
 	return isset($settings[$post_type]) ? $settings[$post_type] : '';
 }
 
-function cud_generate_path(){	
-	global $post, $post_id, $current_user, $cud_file_ext, $cud_file_type, $cud_rpc_id;	
-	$post_id = (!empty($post_id) ? $post_id : (!empty($_REQUEST['post_id']) ? $_REQUEST['post_id'] : (!empty($cud_rpc_id) ? $cud_rpc_id : '')));
+function cud_generate_path(){		
+	global $post;
+	global $post_id;
+	global $current_user;
+	global $cud_file_ext;
+	global $cud_file_type;
+	global $cud_rpc_id;			
+	$url = parse_url(wp_get_referer());	
+	$queries = null; 
+	if(array_key_exists('query', $url)){
+		parse_str($url['query'], $queries);		
+	}		
+	if(empty($post_id)){
+		if(array_key_exists('post_id', $_REQUEST)){
+			$post_id = intval($_REQUEST['post_id'], 10); //post id from post or get variables
+		}else if(array_key_exists('post', $queries)){
+			$post_id = intval($queries['post'], 10); //post id from referal URL query string
+		} else if(!empty($cud_rpc_id)){
+			$post_id = $cud_rpc_id; //post id from an xml rpc call. Hardly ever provided though. :/
+		}			
+	}		
 	$my_post;
 	if(empty($post) || (!empty($post) && is_numeric($post_id) && $post_id != $post->ID)){ 
 		$my_post = get_post($post_id);
 	}	
+	
 	$customdir = cud_getTemplate('template');
 	//$customdir = cud_getTemplate(get_post_type($my_post));
 	
@@ -189,7 +220,7 @@ function cud_generate_path(){
 	$replace = array($post_id, $post_name, $post_type, $date[0], $date[1], $date[1], $date[2], $date[3], $date[4], $date[5], $cud_file_ext, $cud_file_type);
 	
 	$customdir = str_replace($tags,	$replace, $customdir); //do all cheap replacements in one go.
-	$customdir = str_replace('%permalink%', 	cud_get_permalink($post_id),$customdir);
+
 	$customdir = str_replace('%author%', 		cud_get_user_name($author), $customdir);
 	$customdir = str_replace('%author_role%', 	cud_get_user_role($author), $customdir);
 	$customdir = str_replace('%current_user%', 	cud_get_user_name($user_id),$customdir);
@@ -217,61 +248,55 @@ function cud_generate_path(){
 	return apply_filters('cud_generate_path', $customdir, $post_id);
 }
 //ripped wp_upload_dir to generate a basepath preview on the admin page.
-function cud_wp_upload_dir($time = null){	
-	$upload_path = trim( get_option( 'upload_path' ) );
-	$basedir = '';
-	if ( empty( $upload_path ) || 'wp-content/uploads' == $upload_path ) {
-		$basedir = WP_CONTENT_DIR . '/uploads';
-	} elseif ( 0 !== strpos( $upload_path, ABSPATH ) ) {
-		// $basedir is absolute, $upload_path is (maybe) relative to ABSPATH
-		$basedir = path_join( ABSPATH, $upload_path );
-	} else {
-		$basedir = $upload_path;
-	}	
-	// Obey the value of UPLOADS. This happens as long as ms-files rewriting is disabled.
-	// We also sometimes obey UPLOADS when rewriting is enabled -- see the next block.
-	if ( defined( 'UPLOADS' ) && ! ( is_multisite() && get_site_option( 'ms_files_rewriting' ) ) ) {
-		$basedir = ABSPATH . UPLOADS;		
+function cud_wp_upload_dir( $time = null, $create_dir = true, $refresh_cache = false ) {
+	static $cache = array(), $tested_paths = array();
+
+	$key = sprintf( '%d-%s', get_current_blog_id(), (string) $time );
+
+	if ( $refresh_cache || empty( $cache[ $key ] ) ) {
+		$cache[ $key ] = _wp_upload_dir( $time );
 	}
-	// If multisite (and if not the main site in a post-MU network)
-	if ( is_multisite() && ! ( is_main_site() && defined( 'MULTISITE' ) ) ) {
-		if ( ! get_site_option( 'ms_files_rewriting' ) ) {
-			// If ms-files rewriting is disabled (networks created post-3.5), it is fairly straightforward:
-			// Append sites/%d if we're not on the main site (for post-MU networks). (The extra directory
-			// prevents a four-digit ID from conflicting with a year-based directory for the main site.
-			// But if a MU-era network has disabled ms-files rewriting manually, they don't need the extra
-			// directory, as they never had wp-content/uploads for the main site.)
-			if ( defined( 'MULTISITE' ) )
-				$ms_dir = '/sites/' . get_current_blog_id();
-			else
-				$ms_dir = '/' . get_current_blog_id();
 
-			$basedir .= $ms_dir;
-		} elseif ( defined( 'UPLOADS' ) && ! ms_is_switched() ) {
-			// Handle the old-form ms-files.php rewriting if the network still has that enabled.
-			// When ms-files rewriting is enabled, then we only listen to UPLOADS when:
-			//   1) we are not on the main site in a post-MU network,
-			//      as wp-content/uploads is used there, and
-			//   2) we are not switched, as ms_upload_constants() hardcodes
-			//      these constants to reflect the original blog ID.
-			//
-			// Rather than UPLOADS, we actually use BLOGUPLOADDIR if it is set, as it is absolute.
-			// (And it will be set, see ms_upload_constants().) Otherwise, UPLOADS can be used, as
-			// as it is relative to ABSPATH. For the final piece: when UPLOADS is used with ms-files
-			// rewriting in multisite, the resulting URL is /files. (#WP22702 for background.)
+	/**
+	 * Filters the uploads directory data.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param array $uploads Array of upload directory data with keys of 'path',
+	 *                       'url', 'subdir, 'basedir', and 'error'.
+	 */
+	$uploads = apply_filters( 'upload_dir', $cache[ $key ] );
 
-			if ( defined( 'BLOGUPLOADDIR' ) )
-				$basedir = untrailingslashit( BLOGUPLOADDIR );
-			else
-				$basedir = ABSPATH . UPLOADS;			
+	if ( $create_dir ) {
+		$path = $uploads['path'];
+
+		if ( array_key_exists( $path, $tested_paths ) ) {
+			$uploads['error'] = $tested_paths[ $path ];
+		} else {
+			if ( ! wp_mkdir_p( $path ) ) {
+				if ( 0 === strpos( $uploads['basedir'], ABSPATH ) ) {
+					$error_path = str_replace( ABSPATH, '', $uploads['basedir'] ) . $uploads['subdir'];
+				} else {
+					$error_path = basename( $uploads['basedir'] ) . $uploads['subdir'];
+				}
+
+				$uploads['error'] = sprintf(
+					/* translators: %s: directory path */
+					__( 'Unable to create directory %s. Is its parent directory writable by the server?' ),
+					esc_html( $error_path )
+				);
+			}
+
+			$tested_paths[ $path ] = $uploads['error'];
 		}
-	}	
-	return $basedir;
+	}
+
+	return $uploads['basedir'];
 }
 
 function cud_get_permalink($post_id){
-	$url = get_permalink($post_id);
-	return ($url) ? str_replace(get_option('siteurl'), '', $url) : '';
+	_deprecated_function( __FUNCTION__, '3.4.4', 'Please update your Custom Upload Dir settings and remove the %permalink% placeholder.' );		
+	return '';
 }
 function cud_get_parent_slug($post){
 	if(empty($post)){return '';}
@@ -409,6 +434,9 @@ function cud_sanitize_settings($options){
 	$clean_options = array();
 	$clean_options['test_ids'] = $options['test_ids'];
 	$options['template'] = cud_leadingslashit($options['template']);
+	
+	$options['template'] = str_replace('%permalink%', '', $options['template']); //remove deprecated %permalink% settings.
+	
 	if(get_option('uploads_use_yearmonth_folders') && stripos($options['template'], '/%year%/%monthnum%') !== 0){
 		$options['template'] = '/%year%/%monthnum%'.$options['template'];
 	}	
@@ -457,15 +485,18 @@ function cud_option_page() {
 		'post_type' 		=> __('(post|page|attachment)', 'cud'),
 		'year'				=> __('The post\'s year (YYYY)', 'cud'),
 		'monthnum'			=> __('The post\'s month (MM)', 'cud'),
-		'day'				=> __('The post\'s day (DD)', 'cud'),
-		'permalink'			=> __('Match your blog\'s permalink structure', 'cud'),
+		'day'				=> __('The post\'s day (DD)', 'cud'),		
 		'current_user'		=> __('The currently logged in user', 'cud'),
 		'category'			=> __('The post\'s categories (see: Taxonomies)', 'cud'),
 		'post_tag'			=> __('The post\'s tags (see: Taxonomies)', 'cud'),		
 	);		
 ?>
+<style type="text/css">
+	#about{ float: right; width:350px; background: #ffc; border: 1px solid #333; padding: 5px; text-align: justify; font-family:verdana; font-size:11px;}
+	#about h3 {text-align:center;}
+	.field_info {text-align:right;};
+</style>
 <div class="wrap">
-<?php include_once(plugin_dir_path(__FILE__).'about.php'); ?>
 <div id="about" style="clear: both;margin-top: 10px;">
 	<h3><?php esc_html_e('Taxonomies:');?></h3>
 	<p>A taxonomy is a way to group things together; <code>category</code> and <code>post_tag</code> are built in taxanomies, 

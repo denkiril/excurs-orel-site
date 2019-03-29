@@ -1,31 +1,29 @@
 === Custom Upload Dir ===
 Contributors: ulfben
-Donate link: http://flattr.com/thing/367557/Support-my-WordPress-plugins
+Donate link: https://www.amazon.com/gp/registry/wishlist/2QB6SQ5XX2U0N/105-3209188-5640446?reveal=unpurchased&filter=all&sort=priority&layout=standard&x=21&y=17
 Tags: upload, organize, files, media
 Requires at least: 3.9
-Tested up to: 4.3
-Stable tag: 3.4.2
+Tested up to: 5.1.1
+Stable tag: 3.4.4
+Requires PHP: 5.2
 
 Keeps your uploaded files organized in smart folder structures.
 
 == Description ==
-WordPress allow you to put uploads in year- and month-based folders. Custom Upload Dir is more flexible. You can construct paths from variables like post title, 
-category, post author, post date [and many more](http://wordpress.org/extend/plugins/custom-upload-dir/screenshots/). 
+WordPress allow you to put uploads in year- and month-based folders. Custom Upload Dir is more flexible. You can construct paths from variables like post title, category, post author, post date [and many more](http://wordpress.org/extend/plugins/custom-upload-dir/screenshots/). 
 
 I created Custom Upload Dir ensure my file system is always mirroring the site structure. This ensures I can always find files manually when needed. It also simplifies backups and platform migrations. 
 
-[The screenshots might help explain](http://wordpress.org/extend/plugins/custom-upload-dir/screenshots/).
+//*[Ulf Benjaminsson](http://www.ulfbenjaminsson.com)*
 
-If you value [my plugins](http://profiles.wordpress.org/users/ulfben/), there's several ways you can help me out; 
+= Changelog v. 3.4.4 (2019-03-24) =
 
-* Help me out by [Flattr-ing them](http://flattr.com/thing/367557/Support-my-WordPress-plugins)
-* or [sign up to Microsoft OneDrive using my referral link](https://onedrive.live.com?invref=b1f728851abada15&invsrc=90) - we both get 0.5GB extra for free!
-* or [sign up to RealPlayer Cloud using my referral link](https://cloud.real.com/r/UzKHSP) - we both get 1GB extra for free! 
-* get me anything from [my Amazon whislisth](http://www.amazon.com/gp/registry/wishlist/2QB6SQ5XX2U0N/105-3209188-5640446?reveal=unpurchased&filter=all&sort=priority&layout=standard&x=11&y=10) (used items are OK!)
+1. Fixed a few PHP warnings
+2. Removed the %permalink% template as it broke uploads to drafts.
 
-Any help is greatly appreciated. Thanks!
+= Changelog v. 3.4.3.2 (2019-03-24) =
 
-//*[Ulf Benjaminsson](http://www.ulfben.com)*
+1. Added support for the Gutenberg editor.
 
 = Changelog v. 3.4.2 (2015-03-16) =
 
@@ -54,6 +52,15 @@ Any help is greatly appreciated. Thanks!
 [Older changelogs moved here.](http://wordpress.org/extend/plugins/custom-upload-dir/changelog/)
 
 == Changelog ==
+
+= Changelog v. 3.4.4 (2019-03-24) =
+
+1. Fixed a few PHP warnings
+2. Removed the %permalink% template as it broke uploads to drafts.
+
+= Changelog v. 3.4.3.2 (2019-03-24) =
+
+1. Fixed 'upload_dir' not providing $post_id in Gutenberg editor.
 
 = Changelog v. 3.4.1 (2015-03-16) =
 
@@ -143,6 +150,12 @@ More problems have crept up due to the [massive amount of dry runs of 'upload_di
 
 == Upgrade Notice ==
 
+= 3.4.4 =
+Fixed a few PHP warnings, and removed %permalink% template as it broke drafts.
+
+= 3.4.3.2 =
+Added support for uploads from the Gutenberg editor.
+
 = 3.4.2 =
 Added filter, allows users to easily extend the list of tags with anything they want.
 
@@ -200,8 +213,9 @@ add_filter('cud_generate_path', 'my_generate_path');`
 2. Shows how the upload path corresponds to the post's timestamp.
 
 
-== Other Notes ==
-Copyright (C) 2007-2015 Ulf Benjaminsson (my first name at ulfben dot com).
+== Additional Info ==
+
+Copyright (C) 2007-2019 [Ulf Benjaminsson](https://www.ulfbenjaminsson.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
