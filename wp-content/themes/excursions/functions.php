@@ -149,7 +149,7 @@ function excursions_scripts() {
 	// wp_register_script( 'ymap-api', '//api-maps.yandex.ru/2.1/' );
 	wp_register_script( 'acf-map-js', get_template_directory_uri() . '/assets/js/acf-map-yandex.js', array('jquery'), false, 'in_footer' );
 	wp_register_script( 'events_map-js', get_template_directory_uri() . '/assets/js/events_map.js', array('jquery'), false, 'in_footer' );
-	wp_enqueue_script( 'yashare-js', '//yastatic.net/share2/share.js', array('jquery'), false, 'in_footer' );
+	// wp_enqueue_script( 'yashare-js', '//yastatic.net/share2/share.js', array(), false, 'in_footer' );
 	wp_register_script( 'fancybox-js', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js', array('jquery'), false, 'in_footer' );
 	// wp_register_style( 'fancybox', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css' );
 	// wp_register_style( 'gallery', get_template_directory_uri() . '/assets/css/gallery.css' );
@@ -457,13 +457,17 @@ function newscards_func( $atts ){
 			setup_postdata( $post );
 			$permalink = get_the_permalink(); 
 			$title = esc_html( get_the_title() );
-			if( $post->post_type == 'events') $event_date = markup_event_date( $post->id );
+			$newscard_title = esc_html( get_field('newscard-title') );
+			if( empty($newscard_title) ){
+				if( $post->post_type == 'events') $event_date = markup_event_date( $post->id );
+				$newscard_title = $event_date.$title;
+			}
 
 			$echo .= '<div class="newscard-container col-md-6 col-lg-4"><div class="newscard"><a href="'.$permalink.'" title="Ссылка на: '.$title.'">'; 
 			// $echo .= get_the_post_thumbnail(null, 'medium');
 			$thumb_id = get_post_thumbnail_id();
 			$echo .= get_attachment_picture( $thumb_id, 'medium' );
-			$echo .= '</a><h3 class="newscard-title">'.$event_date.$title.'</h3>';
+			$echo .= '</a><h3 class="newscard-title">'.$newscard_title.'</h3>';
 			// $echo .= get_the_excerpt();
 			if( $read_more ) $echo .= ' <a href="'.$permalink.'" title="Ссылка на: '.$title.'" tabindex="-1">'.$read_more.'</a>';
 			$echo .= '</div></div>';
@@ -757,6 +761,8 @@ function get_attachment_picture( $attachment_id, $size = 'thumbnail', $icon = fa
 		);
 
 		if( $lazy ){
+			$def_attr = wp_parse_args( $attr, $default_attr );
+
 			$default_attr = array_merge( $default_attr, array(
 				'src'		=> '/wp-content/themes/excursions/assets/include/placeholder_3x2.png', // for validation 
 				'data-src' 	=> $src,
@@ -805,6 +811,18 @@ function get_attachment_picture( $attachment_id, $size = 'thumbnail', $icon = fa
 			$html .= " $name=" . '"' . $value . '"';
 		}
 		$html .= ' /></picture>';
+
+		// <noscript> for JS-off clients 
+		if( $lazy ){
+			$def_attr = array_map( 'esc_attr', $def_attr );
+			$html .= rtrim( "<noscript><img $hwstring" );
+			foreach ( $def_attr as $name => $value ) {
+				$html .= " $name=" . '"' . $value . '"';
+			}
+			$html .= ' /></noscript>';
+		}
+		
+		// $html .= '</picture>';
 	}
 
 	return $html;

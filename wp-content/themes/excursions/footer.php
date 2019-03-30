@@ -14,9 +14,8 @@
 	<!-- <script src="//yastatic.net/es5-shims/0.0.2/es5-shims.min.js"></script> -->
 	<!-- <script src="//yastatic.net/share2/share.js"></script> -->
 	<?php if( !(is_404() || is_search() || is_page('search')) ): ?> 
-	<div class="soc-buttons">
+	<div id="soc-buttons">
 		<span>Поделиться: </span>
-		<noscript>у вас выключены скрипты, без них вы можете поделиться этой страницей вручную.</noscript>
 		<div class="ya-share2" data-services="vkontakte,facebook,odnoklassniki,moimir,twitter,viber,whatsapp,skype,telegram"></div>
 	</div>
 	<?php endif; ?>
