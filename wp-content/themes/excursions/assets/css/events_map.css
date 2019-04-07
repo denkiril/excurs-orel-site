@@ -29,6 +29,8 @@
     margin-bottom: 4px;
     /* background: url(/wp-content/themes/excursions/assets/img/old_map.jpg) repeat; */
     background: url(../img/old_map.jpg) repeat;
+    /* transition: height .25s ease-in-out; */
+    /* overflow: hidden; */
 }
 .NewEventsMap_btn{
     background-color: transparent;

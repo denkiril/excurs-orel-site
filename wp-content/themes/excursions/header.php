@@ -19,8 +19,12 @@
 
 	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
 
-	<!-- <link rel="shortcut icon" href="/favicon.ico" /> -->
+	<link rel="shortcut icon" href="/favicon.ico">
 
+	<?php $theme_path = get_template_directory_uri(); ?>
+	<link rel="preload" as="font" type="font/woff2" href="<?=$theme_path?>/assets/fonts/ubuntu-v13-cyrillic_latin-300.woff2" crossorigin>
+	<link rel="preload" as="font" type="font/woff2" href="<?=$theme_path?>/assets/fonts/ubuntu-v13-cyrillic_latin-regular.woff2" crossorigin>
+	
 	<?php wp_head(); ?>
 </head>
 

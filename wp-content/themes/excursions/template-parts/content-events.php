@@ -93,14 +93,14 @@
 				echo $echo; ?>
 			</div>
 			<?php // $show_map id="map" 
-			if( $show_map ):  ?>
+			if( $show_map ):
+				do_action( 'event_map_scripts' ); ?>
 				<div class="col<?=$col_sfx?>">
-					<button id="OpenMap_btn" class="ref_btn mobview_btn">[ Показать карту ]</button>
+					<button id="OpenMap_btn" class="ref_btn">[ Показать карту ]</button>
 					<div class="acf-map">
 						<div class="marker" data-lat="<?php echo $location['lat']; ?>" data-lng="<?php echo $location['lng']; ?>"></div>
 					</div>
 				</div>
-				<?php // do_action( 'add_map_scripts' ); ?>
 			<?php endif; ?>
 		</div> <!-- event_info row -->
 
@@ -251,7 +251,7 @@
 							<a data-fancybox="gallery" href="<?=$full_image_url?>" data-caption="<?=$title?>">
 							<?php 
 							$attr = array( 'title' => $title);
-							echo get_attachment_picture( $id, 'medium_large', false, $attr, 'lazy' );
+							echo get_attachment_picture( $id, 'large', false, $attr, 'lazy' );
 							// wp_get_attachment_image( $id, 'medium_large', false, array( 'title' => $title ) ); 
 							?>
 							</a>

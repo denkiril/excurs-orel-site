@@ -15,7 +15,11 @@ get_header();
 	<?php if( have_posts() ):
 		do_action( 'events_map_scripts' ); ?>
 
-		<div class="events_map"></div>
+		<div class="events_map" style="display: none;">
+			<div class="events_block events_block_panel">
+				<button class="NewEventsMap_btn" data-state="open">[ Показать на карте ]</button>
+			</div>
+		</div>
 
 		<?php while( have_posts() ):
 			the_post();
@@ -33,7 +37,7 @@ get_header();
 					<?php 
 						// the_post_thumbnail('medium'); 
 						$thumb_id = get_post_thumbnail_id();
-						echo get_attachment_picture( $thumb_id, 'medium' );
+						echo get_attachment_picture( $thumb_id, 'medium_large' );
 					?>
 					</a>
 				</div>

@@ -59,15 +59,15 @@
    max-width: inherit !important;
 }
 
-.mobview_btn {
+#OpenMap_btn{
     margin: 0 auto;
     display: none;
 }
-@media (max-width: 768px) {
-    .mobview_btn {
+/* @media (max-width: 768px) {
+    #OpenMap_btn{
         display: block;
     }
-}
+} */
 .ref_btn{
     background-color: transparent;
     border: none;

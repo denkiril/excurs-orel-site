@@ -120,8 +120,15 @@ add_action( 'widgets_init', 'excursions_widgets_init' );
 /**
  * Enqueue scripts and styles.
  */
+
+$links = array();
+$scripts = array();
+$SCRIPTS_VER = '20190407';
+
 function excursions_scripts() {
-	wp_enqueue_style( 'excursions-style', get_stylesheet_uri() );
+	global $SCRIPTS_VER;
+	wp_enqueue_style( 'excursions-style', get_stylesheet_uri(), array(), $SCRIPTS_VER );
+	wp_enqueue_style( 'bootstrap-grid', get_template_directory_uri() . '/assets/include/bootstrap-grid.min.css', array(), null );
 
 	wp_enqueue_script( 'excursions-navigation', get_template_directory_uri() . '/js/navigation.js', array(), '20151215', true );
 
@@ -131,104 +138,180 @@ function excursions_scripts() {
 		wp_enqueue_script( 'comment-reply' );
 	}
 
-	wp_enqueue_style( 'bootstrap-grid', get_template_directory_uri() . '/assets/include/bootstrap-grid.min.css' );
-
 	if( is_singular('events') ){
-		wp_enqueue_style( 'events', get_template_directory_uri() . '/assets/css/events.css' );
+		wp_enqueue_style( 'events', get_template_directory_uri() . '/assets/css/events.css', array(), $SCRIPTS_VER );
 	}
 
 	wp_deregister_script( 'jquery' );
 	// <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-	wp_enqueue_script( 'jquery', '//code.jquery.com/jquery-3.3.1.min.js', array(), false, 'in_footer' );
+	wp_enqueue_script( 'jquery', '//code.jquery.com/jquery-3.3.1.min.js', array(), null, 'in_footer' );
 	// wp_enqueue_script( 'jquery', get_template_directory_uri() . '/assets/include/jquery-3.3.1.min.js', array(), false, 'in_footer' );
-	wp_enqueue_script( 'bootstrap-js', get_template_directory_uri() . '/assets/include/bootstrap.min.js', array('jquery'), false, 'in_footer' );
-	wp_register_script( 'slick-js', get_template_directory_uri() . '/assets/include/slick.min.js', array('jquery'), false, 'in_footer' );
-	wp_enqueue_script( 'script', get_template_directory_uri() . '/assets/js/script.js', array('jquery'), false, 'in_footer' );
+	wp_enqueue_script( 'bootstrap-js', get_template_directory_uri() . '/assets/include/bootstrap.min.js', array('jquery'), null, 'in_footer' );
+	wp_register_script( 'slick-js', get_template_directory_uri() . '/assets/include/slick.min.js', array('jquery'), null, 'in_footer' );
+	wp_enqueue_script( 'script-es5', get_template_directory_uri() . '/assets/js/script-es5.js', array(), $SCRIPTS_VER, 'in_footer' );
+	wp_enqueue_script( 'script', get_template_directory_uri() . '/assets/js/script.js', array('jquery'), $SCRIPTS_VER, 'in_footer' );
 	// wp_register_script( 'googlemap-api?key=YOUR_API_KEY', '//maps.googleapis.com/maps/api/js', array(), false, 'in_footer' );
 	// wp_register_script( 'ymap-api?apikey=6ebdbbc2-3779-4216-9d88-129e006559bd&lang=ru_RU', '//api-maps.yandex.ru/2.1/', array(), false, 'in_footer' );
 	// wp_register_script( 'ymap-api', '//api-maps.yandex.ru/2.1/' );
-	wp_register_script( 'acf-map-js', get_template_directory_uri() . '/assets/js/acf-map-yandex.js', array('jquery'), false, 'in_footer' );
-	wp_register_script( 'events_map-js', get_template_directory_uri() . '/assets/js/events_map.js', array('jquery'), false, 'in_footer' );
-	// wp_enqueue_script( 'yashare-js', '//yastatic.net/share2/share.js', array(), false, 'in_footer' );
-	wp_register_script( 'fancybox-js', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js', array('jquery'), false, 'in_footer' );
+	wp_register_script( 'acf-map-js', get_template_directory_uri() . '/assets/js/acf-map-yandex.js', array(), $SCRIPTS_VER, 'in_footer' );
+	wp_register_script( 'events_map-js', get_template_directory_uri() . '/assets/js/events_map.js', array(), $SCRIPTS_VER, 'in_footer' );
+	// wp_register_script( 'yashare-js', '//yastatic.net/share2/share.js', array(), false, 'in_footer' );
+	wp_register_script( 'fancybox-js', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js', array('jquery'), null, 'in_footer' );
 	// wp_register_style( 'fancybox', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css' );
-	// wp_register_style( 'gallery', get_template_directory_uri() . '/assets/css/gallery.css' );
-	wp_register_script( 'cssrelpreload-js', get_template_directory_uri() . '/assets/include/cssrelpreload.js', array(), false, 'in_footer' );
+	wp_register_style( 'slick-full', get_template_directory_uri() . '/assets/include/slick-full.css', array(), null );
+	wp_register_style( 'events_map', get_template_directory_uri() . '/assets/css/events_map.css', array(), $SCRIPTS_VER );
+	wp_register_script( 'cssrelpreload-js', get_template_directory_uri() . '/assets/include/cssrelpreload.js', array(), null, 'in_footer' );
 }
 add_action( 'wp_enqueue_scripts', 'excursions_scripts' );
 
 // function styles_to_footer() {
-	// wp_enqueue_style( 'main-bottom', get_template_directory_uri() . '/assets/css/main-bottom.css' );
+	// wp_enqueue_style( 'excursions-style', get_stylesheet_uri(), array(), $SCRIPTS_VER );
+	// wp_enqueue_style( 'bootstrap-grid', get_template_directory_uri() . '/assets/include/bootstrap-grid.min.css', array(), null );
 	// wp_enqueue_style( 'slick', get_template_directory_uri() . '/assets/include/slick.css' );
     // wp_enqueue_style( 'slick-theme', get_template_directory_uri() . '/assets/include/slick-theme.css' );
     // wp_enqueue_style( 'main-font?family=Ubuntu:300,400&amp;subset=cyrillic', '//fonts.googleapis.com/css' );
 // }
 // add_action( 'wp_footer', 'styles_to_footer' );
 
-$style_hrefs = array();
+preload_link( get_template_directory_uri().'/assets/css/main-bottom.css', $SCRIPTS_VER );
 
-preload_style( get_template_directory_uri().'/assets/css/main-bottom.css' );
-preload_style( '//fonts.googleapis.com/css?family=Ubuntu:300,400&amp;subset=cyrillic' );
+function preload_link( $href, $ver=false, $type='style' ){
+	global $links;
+	// если $href ещё не было, добавляем в массив ссылок 
+	// if( !in_array( $style_href, $style_hrefs ) ) array_push($style_hrefs, $style_href);
 
-function preload_style( $style_href ){
-	global $style_hrefs;
-	// если $style_href ещё не было, добавляем в массив ссылок 
-	if( !in_array( $style_href, $style_hrefs ) )
-		array_push($style_hrefs, $style_href);
+	foreach( $links as $link ){
+		if( $links['href'] == $href ) return;
+	}
+	$links[] = array('href' => $href, 'ver' => $ver, 'type' => $type);
 }
 
-function preload_styles(){ 
+function preload_links(){ 
 	// <link rel="preload" href="AO.js" as="script">
 	// <link rel="preload" href="AO.css" as="style">
+	global $links;
+	// echo '<script>console.log('.print_r($links).');</script>'.PHP_EOL;
 
-	global $style_hrefs;
+	if( !empty($links) ){
+		foreach( $links as $link ){
+			$href = $link['href'];
+			if( $link['ver'] ){
+				$href .= '?ver='.$link['ver'];
+			}
 
-	if( !empty($style_hrefs) ):
-		foreach( $style_hrefs as $href ):
-			echo '<link rel="preload" href="'.$href.'" as="style" onload="this.rel=\'stylesheet\'" />'.PHP_EOL;
-			echo '<noscript><link rel="stylesheet" href="'.$href.'"></noscript>'.PHP_EOL;
-		endforeach;
+			if( $link['type'] == 'style' ){
+				echo '<link rel="preload" as="style" href="'.$href.'" onload="this.rel=\'stylesheet\'" />'.PHP_EOL;
+				echo '<noscript><link rel="stylesheet" href="'.$href.'"></noscript>'.PHP_EOL;
+			}
+			else if( $link['type'] == 'font' ){
+				echo '<link rel="preload" as="font" type="font/woff" href="'.$href.'" crossorigin />'.PHP_EOL;
+			}
+		}
 
 		wp_enqueue_script( 'cssrelpreload-js' );
-	endif;
+	}
 }
-add_action( 'wp_footer', 'preload_styles' );
+add_action( 'wp_footer', 'preload_links' );
 
-// add_action( 'add_map_scripts', 'add_map_scripts_func', 10, 0);
-// function add_map_scripts_func() {
-// 	wp_enqueue_script( 'ymap-api?apikey=6ebdbbc2-3779-4216-9d88-129e006559bd&lang=ru_RU', '//api-maps.yandex.ru/2.1/', array(), false, 'in_footer' );
-// 	wp_enqueue_script( 'acf-map-js' );
-// }
+function add_script( $script_href, $attr='' ){
+	global $scripts;
+
+	foreach( $scripts as $script ){
+		if( $script['href'] == $script_href ) return;
+	}
+	$scripts[] = array('href' => $script_href, 'attr' => $attr);
+}
+
+function add_scripts(){
+	global $scripts;
+
+	if( !empty($scripts) ){
+		foreach( $scripts as $script ){
+			// echo '<script async defer src="'.$href.'"></script>'.PHP_EOL;
+			echo '<script '.$script['attr'].' defer src="'.$script['href'].'"></script>'.PHP_EOL;
+		}
+	}
+}
+add_action( 'wp_footer', 'add_scripts' );
+
 
 // if( $gallery ) do_action( 'add_gallery_scripts' );
 add_action( 'add_gallery_scripts', 'add_gallery_scripts_func', 10, 0);
 function add_gallery_scripts_func() {
+	global $SCRIPTS_VER;
 	wp_enqueue_script( 'fancybox-js' );
 	// wp_enqueue_style( 'fancybox' );
 	// wp_enqueue_style( 'gallery' );
-	preload_style( '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css' );
-	preload_style( get_template_directory_uri().'/assets/css/gallery.css' );
+	preload_link( '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css' );
+	preload_link( get_template_directory_uri().'/assets/css/gallery.css', $SCRIPTS_VER );
 }
 
-// if( $carousel ) do_action( 'add_carousel_scripts' );
-add_action( 'add_carousel_scripts', 'add_carousel_scripts_func', 10, 0);
-function add_carousel_scripts_func() {
+// do_action( 'add_carousel_scripts' );
+// add_action( 'add_carousel_scripts', 'add_carousel_scripts_func', 10, 0);
+function add_carousel_scripts() {
+	// global $SCRIPTS_VER;
 	wp_enqueue_script( 'slick-js' );
-	preload_style( get_template_directory_uri().'/assets/include/slick.css' );
+	wp_enqueue_style( 'slick-full' );
+	// preload_link( get_template_directory_uri().'/assets/include/slick-full.css' ); -- markup flash in Firefox 
+	// <link rel="preload" as="font" type="font/woff" href="$theme_path/assets/include/fonts/slick.woff" crossorigin>
+	preload_link( get_template_directory_uri().'/assets/include/fonts/slick.woff', false, 'font' );
 }
 
 // if( '.events_map' ) do_action( 'events_map_scripts' );
 add_action( 'events_map_scripts', 'events_map_scripts_func', 10, 0);
 function events_map_scripts_func() {
-	preload_style( get_template_directory_uri().'/assets/css/events_map.css' );
+	// global $SCRIPTS_VER;
+	// preload_link( get_template_directory_uri().'/assets/css/events_map.css', $SCRIPTS_VER );
 	// wp_enqueue_script( 'ymap-api?lang=ru_RU' );
 	// wp_enqueue_script( 'ymap-api?lang=ru_RU', '//api-maps.yandex.ru/2.1/' );
+	// add_script('//api-maps.yandex.ru/2.1/?lang=ru_RU');
+	wp_enqueue_style( 'events_map' );
 	wp_enqueue_script( 'events_map-js' );
 	wp_localize_script( 'events_map-js', 'myajax', 
 		array(
 			'url' => admin_url('admin-ajax.php')
 		)
 	);  
+}
+
+// if( $show_map ) do_action( 'event_map_scripts' );
+add_action( 'event_map_scripts', 'event_map_scripts_func', 10, 0);
+function event_map_scripts_func() {
+	// wp_enqueue_script( 'ymap-api?apikey=6ebdbbc2-3779-4216-9d88-129e006559bd&lang=ru_RU', '//api-maps.yandex.ru/2.1/', array(), false, 'in_footer' );
+	wp_enqueue_script( 'acf-map-js' );
+	// add_script('//api-maps.yandex.ru/2.1/?lang=ru_RU');
+	// add_script( get_template_directory_uri().'/assets/js/acf-map-yandex.js' );
+}
+
+// do_action( 'add_social_scripts' );
+// add_action( 'add_social_scripts', 'add_social_scripts_func', 10, 2);
+function add_social_scripts_func( $vk=true, $fb=true ) {
+	if($vk) add_script( '//vk.com/js/api/openapi.js?160', 'async' );
+	// $('<script async defer src="https://connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v3.2&appId=330469164341166&autoLogAppEvents=1"></script>').insertAfter('#fb-root');
+	if($fb) add_script( '//connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v3.2&appId=330469164341166&autoLogAppEvents=1', 'async' );
+}
+
+// do_action( 'add_social_scripts' );
+// add_action( 'wp_footer', 'preload_social_scripts' );
+// function preload_social_scripts( $vk=true, $fb=true ){ 
+// 	// <link rel="preload" href="AO.js" as="script">
+// 	$onload = 'if(screen.width > 768){ var script = document.createElement(\'script\'); script.src = this.href; document.body.appendChild(script); }';
+// 	if( $vk ){
+// 		$href = '//vk.com/js/api/openapi.js?160';
+// 		echo '<link rel="preload" href="'.$href.'" as="script" onload="'.$onload.'" />'.PHP_EOL;
+// 	}
+// 	if( $fb ){
+// 		$href = '//connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v3.2&appId=330469164341166&autoLogAppEvents=1';
+// 		echo '<link rel="preload" href="'.$href.'" as="script" onload="'.$onload.'" />'.PHP_EOL;
+// 	}
+
+// 	wp_enqueue_script( 'cssrelpreload-js' );
+// }
+
+// do_action( 'add_share_scripts' );
+add_action( 'add_share_scripts', 'add_share_scripts_func', 10, 0);
+function add_share_scripts_func() {
+	add_script( '//yastatic.net/share2/share.js', 'async' );
 }
 
 // function test_styleadd() {
@@ -288,52 +371,30 @@ if ( defined( 'JETPACK__VERSION' ) ) {
 // remove_filter( 'the_excerpt', 'wpautop' );
 // remove_filter( 'comment_text', 'wpautop' );
 
-add_action( 'anno-cards', 'anno_func', 10, 3);
 
-function anno_func( $cat_name, $section_title, $read_more='Подробнее...' ) {
-	global $post;
-	$args = array( 'post_type' => 'post', 'category_name' => $cat_name );
-	$myposts = get_posts( $args );
-	if ( $myposts ): 
-		echo '<section role="' . $cat_name . '"><div class="row section-container"><div class="col">';
-		echo '<h2>' . $section_title . '</h2>';
-		foreach( $myposts as $post ):
-			setup_postdata( $post );
-			$permalink = get_the_permalink(); 
-			$title = esc_html( get_the_title() );
-			$echo = '<div class="row anno-card"><div class="col-12 col-md-4"><a href="' . $permalink . '" tabindex="-1">'; 
-			$echo .= get_the_post_thumbnail(null, 'medium');
-			$echo .= '</a></div><div class="col-12 col-md-8"><h3><a href="' . $permalink . '" title="Ссылка на: '; 
-			$echo .= $title . '">' . $title . '</a></h3><p>' . get_the_excerpt() . '  ';
-			$echo .= '<a href="' . $permalink . '" tabindex="-1">' . $read_more . '</a></p></div></div>';
-			echo $echo; 
-		endforeach;
-		wp_reset_postdata();
-		echo '</div></div></section>';
-	endif;
-}
-
-// [annocards post_type="post" cat_name="blog" tag_name="promo" section_title="Приходите" read_more="Подробнее..." date="future" exclude="312"] 
+// [annocards post_type="post" cat_name="blog" tag_name="promo" section_title="Приходите" read_more="Подробнее..." date="future" exclude="312" size="medium"] 
 add_shortcode( 'annocards', 'annocards_func' );
 function annocards_func( $atts ){
 	// белый список параметров и значения по умолчанию
 	$atts = shortcode_atts( array(
-		'post_type' => 'post',
-		'cat_name' => '',
-		'tag_name' => '',
+		'post_type' 	=> 'post',
+		'cat_name' 		=> '',
+		'tag_name' 		=> '',
 		'section_title' => null,
-		'read_more' => null,
-		'date' => '',
-		'exclude' => array()
+		'read_more' 	=> null,
+		'date' 			=> '',
+		'exclude' 		=> '312',
+		'size' 			=> 'medium_large',
 	), $atts );
 
-	$post_type = $atts['post_type'];
-	$cat_name = $atts['cat_name'];
-	$tag_name = $atts['tag_name'];
-	$section_title = $atts['section_title'];
-	$read_more = $atts['read_more'];
-	$date = $atts['date'];
-	$exclude = $atts['exclude'];
+	$post_type 		= $atts['post_type'];
+	$cat_name 		= $atts['cat_name'];
+	$tag_name 		= $atts['tag_name'];
+	$section_title 	= $atts['section_title'];
+	$read_more 		= $atts['read_more'];
+	$date 			= $atts['date'];
+	$exclude 		= $atts['exclude'];
+	$size 			= $atts['size'];
 
 	$echo = '';
 
@@ -359,6 +420,7 @@ function annocards_func( $atts ){
 
 	$myposts = get_posts( $args );
 	if( $myposts ): 
+		// $post_counter = 0;
 		$echo .= '<section><div class="row section-container"><div class="col">';
 		if( $section_title ) $echo .= '<h2>' . $section_title . '</h2>';
 		foreach( $myposts as $post ):
@@ -367,10 +429,11 @@ function annocards_func( $atts ){
 			$title = esc_html( get_the_title() );
 			if( $post->post_type == 'events') $event_date = markup_event_date( $post->id );
 
+			// $post_thumbnail = ($post_counter++ == 1) ? get_the_post_thumbnail(null, 'medium') : get_attachment_picture( get_post_thumbnail_id(), 'medium' );
+			$post_thumbnail = get_attachment_picture( get_post_thumbnail_id(), $size );
+			
 			$echo .= '<div class="row anno-card"><div class="col-12 col-md-4"><a href="' . $permalink . '" title="Ссылка на: ' . $title . '" tabindex="-1">'; 
-			// $echo .= get_the_post_thumbnail(null, 'medium');
-			$thumb_id = get_post_thumbnail_id();
-			$echo .= get_attachment_picture( $thumb_id, 'medium' );
+			$echo .= $post_thumbnail;
 			$echo .= '</a></div><div class="col-12 col-md-8"><h3 class="annocard-title"><a href="' . $permalink . '" title="Ссылка на: '; 
 			$echo .= $title . '">' . $title . '</a></h3>';
 			// if( $event_date ) $echo .= '<time>'.$event_date.'</time> ';
@@ -393,34 +456,36 @@ function annocards_func( $atts ){
 	return $echo;
 }
 
-// [newscards section_id="announcement" section_title="Актуальное" future_events="1" promo_posts="2" promo_events="3" read_more="Подробнее..." exclude="312"] 
+// [newscards section_id="announcement" section_title="Актуальное" future_events="1" promo_posts="2" promo_events="3" read_more="Подробнее..." exclude="312" size="medium"] 
 add_shortcode( 'newscards', 'newscards_func' );
 function newscards_func( $atts ){
 	// белый список параметров и значения по умолчанию
 	$atts = shortcode_atts( array(
-		'post_type' => array('post','events'),
-		'section_id' => '',
+		'post_type'		=> array('post','events'),
+		'section_id' 	=> '',
 		'section_title' => null,
-		'cat_name' => 'promo',
-		// 'date' => 'future',
+		'cat_name' 		=> 'promo',
+		// 'date' 		=> 'future',
 		'future_events' => '0',
-		'promo_posts' => '0',
-		'promo_events' => '0',
-		'read_more' => null,
-		'exclude' => array()
+		'promo_posts' 	=> '0',
+		'promo_events' 	=> '0',
+		'read_more' 	=> null,
+		'exclude' 		=> array(),
+		'size' 			=> 'medium_large',
 	), $atts );
 
-	$numberposts = 9;
-	$post_type = $atts['post_type'];
-	$section_id = $atts['section_id'];
-	$section_title = $atts['section_title'];
-	$cat_name = $atts['cat_name'];
-	$date = $atts['date'];
-	$future_events = $atts['future_events'];
-	$promo_posts = $atts['promo_posts'];
-	$promo_events = $atts['promo_events'];
-	$read_more = $atts['read_more'];
-	$exclude = $atts['exclude'];
+	$numberposts 	= 9;
+	$post_type 		= $atts['post_type'];
+	$section_id 	= $atts['section_id'];
+	$section_title 	= $atts['section_title'];
+	$cat_name 		= $atts['cat_name'];
+	$date 			= $atts['date'];
+	$future_events 	= $atts['future_events'];
+	$promo_posts 	= $atts['promo_posts'];
+	$promo_events	= $atts['promo_events'];
+	$read_more 		= $atts['read_more'];
+	$exclude 		= $atts['exclude'];
+	$size 			= $atts['size'];
 
 	// $args = array( 'numberposts' => $numberposts, 'post_type' => $post_type, 'category_name' => $cat_name );
 	$myposts = array();
@@ -462,11 +527,11 @@ function newscards_func( $atts ){
 				if( $post->post_type == 'events') $event_date = markup_event_date( $post->id );
 				$newscard_title = $event_date.$title;
 			}
+			// $post_thumbnail = get_the_post_thumbnail(null, 'medium');
+			$post_thumbnail = get_attachment_picture( get_post_thumbnail_id(), $size );
 
 			$echo .= '<div class="newscard-container col-md-6 col-lg-4"><div class="newscard"><a href="'.$permalink.'" title="Ссылка на: '.$title.'">'; 
-			// $echo .= get_the_post_thumbnail(null, 'medium');
-			$thumb_id = get_post_thumbnail_id();
-			$echo .= get_attachment_picture( $thumb_id, 'medium' );
+			$echo .= $post_thumbnail;
 			$echo .= '</a><h3 class="newscard-title">'.$newscard_title.'</h3>';
 			// $echo .= get_the_excerpt();
 			if( $read_more ) $echo .= ' <a href="'.$permalink.'" title="Ссылка на: '.$title.'" tabindex="-1">'.$read_more.'</a>';
@@ -582,45 +647,49 @@ function socwidgets_func( $atts ){
 	// белый список параметров и значения по умолчанию
 	$atts = shortcode_atts( array(
 		'section_title' => null,
-		'vk_mode' => '3',
-		'vk_width' => '300',
-		'vk_height' => '400',
-		'vk_id' => null,
-		'no_cover' => null,
-		'fb' => false,
+		'vk_mode' 		=> '3',
+		'vk_width' 		=> '300',
+		'vk_height' 	=> '400',
+		'vk_id' 		=> null,
+		'no_cover' 		=> null,
+		'fb' 			=> false,
 	), $atts );
 
-	$section_title = $atts['section_title'];
-	$vk_mode = $atts['vk_mode'];
-	$vk_width = $atts['vk_width'];
-	$vk_height = $atts['vk_height'];
-	$vk_id = $atts['vk_id'];
-	$no_cover = $atts['no_cover'];
-	$fb = $atts['fb'];
+	$section_title 	= $atts['section_title'];
+	$vk_mode 		= $atts['vk_mode'];
+	$vk_width 		= $atts['vk_width'];
+	$vk_height 		= $atts['vk_height'];
+	$vk_id 			= $atts['vk_id'];
+	$no_cover 		= $atts['no_cover'];
+	$fb 			= $atts['fb'];
+
+	// add_social_scripts_func( $vk_id, $fb );
 
 	$echo = '<section id="soc-section"><div class="row section-container"><div class="col">';
-	if( $section_title ) $echo .= '<h2>'.$section_title.'</h2>';
+	if( $section_title ){
+		$echo .= '<h2>'.$section_title.'</h2>';
+	}
 	$echo .= '<div class="row">';
-	if( $vk_id ):
+	if( $vk_id ){
 		$echo .= '<div class="col-md-6"><!-- VK Widget --><div class="socwidget" id="vk_groups" data-id="'.$vk_id.'"';
-		if( $vk_mode ) $echo .= ' data-mode="'.$vk_mode.'"';
+		if( $vk_mode ) 	$echo .= ' data-mode="'.$vk_mode.'"';
 		if( $vk_width ) $echo .= ' data-width="'.$vk_width.'"';
-		if( $vk_height ) $echo .= ' data-height="'.$vk_height.'"';
+		if( $vk_height) $echo .= ' data-height="'.$vk_height.'"';
 		if( $no_cover ) $echo .= ' data-no_cover="'.$no_cover.'"';
 		$echo .= '></div></div>';
-	endif;
-	if( $fb ):
+	}
+	if( $fb ){
 		$echo .= '<div class="col-md-6"><div id="fb-root"></div>';
 		$echo .= '<div class="socwidget fb-group" data-href="https://www.facebook.com/groups/excursorel" data-width="300" data-show-social-context="true" data-show-metadata="false"></div></div>';
-	endif;
+	}
 	$echo .= '</div>';
-	$echo .= '<noscript><p><a href="https://vk.com/excurs_orel" target="_blank">ВКонтакте</a></p><p><a href="https://www.facebook.com/groups/excursorel" target="_blank">Фейсбук</a></p></noscript>';
+	// $echo .= '<noscript><p><a href="https://vk.com/excurs_orel" target="_blank">ВКонтакте</a></p><p><a href="https://www.facebook.com/groups/excursorel" target="_blank">Фейсбук</a></p></noscript>';
 	$echo .= '</div></div></section>';
 
 	return $echo;
 }
 
-// [carousel class="carousel" hrefs=1]
+// [carousel class="carousel" hrefs=1 size="medium_large"]
 add_shortcode( 'carousel', 'carousel_func' );
 
 function carousel_func( $atts ){
@@ -628,11 +697,13 @@ function carousel_func( $atts ){
 	$atts = shortcode_atts( array(
 		'class' => 'carousel',
 		'hrefs' => false,
+		'size' 	=> 'medium_large',
 	), $atts );
 
-	$class = $atts['class'];
+	$class 		= $atts['class'];
 	$class_item = $class.'-item';
-	$hrefs = $atts['hrefs'];
+	$hrefs 		= $atts['hrefs'];
+	$size 		= $atts['size'];
 
 	$echo = '';
 
@@ -667,7 +738,7 @@ function carousel_func( $atts ){
 		endforeach;
 		$echo .= '</div> <!-- .'.$class.' -->';
 
-		do_action( 'add_carousel_scripts' );
+		add_carousel_scripts();
 
 	endif;
 
@@ -743,14 +814,27 @@ function get_lazy_attachment_image( $attachment_id, $size = 'thumbnail', $icon =
 	get_attachment_picture() is mod of standart wp_get_attachment_image() 
 */
 function get_attachment_picture( $attachment_id, $size = 'thumbnail', $icon = false, $attr = '', $lazy = true ) {
-	$html  = '';
-	$image = wp_get_attachment_image_src( $attachment_id, $size, $icon );
-	if ( $image ) {
-		$html = '<picture>';
-		list($src, $width, $height) = $image;
-		$hwstring                   = image_hwstring( $width, $height );
-		$size_class                 = $size;
-		if ( is_array( $size_class ) ) {
+	$html = '';
+	// $image 		= wp_get_attachment_image_src( $attachment_id, $size, $icon );
+	// anti image_constrain_size_for_editor() to $content_width 
+	$is_image = wp_attachment_is_image( $attachment_id );
+	if( $is_image ){
+		$img_url			= wp_get_attachment_url( $attachment_id );
+		$image_meta 		= wp_get_attachment_metadata( $attachment_id );
+		$width  			= $image_meta['width'];
+		$height 			= $image_meta['height'];
+		$img_url_basename 	= wp_basename( $img_url );
+		// try for a new style intermediate size
+		if( $intermediate = image_get_intermediate_size( $attachment_id, $size ) ){
+			$img_url        = str_replace( $img_url_basename, $intermediate['file'], $img_url );
+			$width          = $intermediate['width'];
+			$height         = $intermediate['height'];
+		}
+		// list($src, $width, $height) = $image;
+		$src				= $img_url;
+		$hwstring           = image_hwstring( $width, $height );
+		$size_class         = $size;
+		if( is_array( $size_class ) ){
 			$size_class = join( 'x', $size_class );
 		}
 		$attachment   = get_post( $attachment_id );
@@ -772,12 +856,10 @@ function get_attachment_picture( $attachment_id, $size = 'thumbnail', $icon = fa
 		$attr = wp_parse_args( $attr, $default_attr );
 
 		// Generate <source>'s
-		$image_meta = wp_get_attachment_metadata( $attachment_id );
-
 		// Retrieve the uploads sub-directory from the full size image.
 		$dirname = _wp_get_attachment_relative_path( $image_meta['file'] );
 	
-		if( $dirname ) {
+		if( $dirname ){
 			$dirname = trailingslashit( $dirname );
 		}
 	
@@ -795,14 +877,23 @@ function get_attachment_picture( $attachment_id, $size = 'thumbnail', $icon = fa
 		// $html .= $source.$full_image_url.'.webp" media="(min-width: 1200px)" type="image/webp">';
 		// $image_sizes = $image_meta['sizes'];
 		// $image_sizes = array_reverse( $image_sizes );
+		$size_array = array( absint( $width ), absint( $height ) );
+		$sizes 		= wp_calculate_image_sizes( $size_array, $src, $image_meta, $attachment_id );
+		if($sizes) $sizes_html = $lazy ? 'data-sizes="'.$sizes.'"' : 'sizes="'.$sizes.'"';
 
-		$source = $lazy ? '<source data-srcset="' : '<source srcset="';
+		$html = '<picture>';
 
 		$srcset = generate_image_srcset( $image_meta, $image_baseurl, true );
-		if( $srcset ) $html .= $source.$srcset.'" type="image/webp">';
+		if( $srcset ){
+			$srcset_html = $lazy ? 'data-srcset="'.$srcset.'"' : 'srcset="'.$srcset.'"';
+			$html .= '<source type="image/webp" '.$srcset_html.' '.$sizes_html.'>';
+		}
 
 		$srcset = generate_image_srcset( $image_meta, $image_baseurl );
-		if( $srcset ) $html .= $source.$srcset.'">';
+		if( $srcset ){
+			$srcset_html = $lazy ? 'data-srcset="'.$srcset.'"' : 'srcset="'.$srcset.'"';
+			$html .= '<source '.$srcset_html.' '.$sizes_html.'>';
+		}
 
 		// $attr = apply_filters( 'wp_get_attachment_image_attributes', $attr, $attachment, $size );
 		$attr = array_map( 'esc_attr', $attr );
@@ -832,7 +923,7 @@ function generate_image_srcset( $image_meta, $image_baseurl, $webp = false ){
 	$srcset = '';
 	$image_sizes = $image_meta['sizes'];
 
-	if ( !is_array( $image_sizes ) ) {
+	if( !is_array( $image_sizes ) ){
 		return $srcset;
 	}
 
@@ -842,28 +933,24 @@ function generate_image_srcset( $image_meta, $image_baseurl, $webp = false ){
 	$strings = array();
 	foreach( $image_sizes as $image ){
 		// Check if image meta isn't corrupted.
-		if ( ! is_array( $image ) ) {
+		if( ! is_array( $image ) ){
 			continue;
 		}
 
 		if( isset($image['file']) ){
-
 			$file_width = $image['width'];
 
 			if( $file_width < 300 ) continue;
 
-			$image_url = $image_baseurl . $image['file'];
-			$string = $image_url.$sfx.' '.$file_width.'w';
+			$image_url 	= $image_baseurl . $image['file'];
+			$string 	= $image_url.$sfx.' '.$file_width.'w';
 			array_push($strings, $string);
-			// $srcset .= 
-			// $media = 'media="(min-width: '.$file_width.'px)"';
-			// $html .= $source.$image_url.'" '.$media.'>';
 		}  
 	}
 
-	$image_url = $image_baseurl . $image_basename; // full_image_url
-	$file_width  = (int) $image_meta['width']; // full_image_width
-	$string = $image_url.$sfx.' '.$file_width.'w';
+	$image_url 	= $image_baseurl . $image_basename; // full_image_url
+	$file_width = (int) $image_meta['width']; // full_image_width
+	$string 	= $image_url.$sfx.' '.$file_width.'w';
 	array_push($strings, $string);
 
 	$srcset = implode(', ', $strings);
@@ -878,26 +965,25 @@ function image_func( $atts ){
 	// белый список параметров и значения по умолчанию
 	$atts = shortcode_atts( array(
 		'class' => 'image',
-		'id' => null,
-		'size' => 'thumbnail',
+		'id' 	=> null,
+		'size' 	=> 'thumbnail',
 		'title' => true,
-		'href' => false,
-		'lazy' =>true,
+		'href' 	=> false,
+		'lazy' 	=>true,
 	), $atts );
 
-	$class = $atts['class'];
-	$id = $atts['id'];
-	$size = $atts['size'];
-	$title = $atts['title'];
-	$href = $atts['href'];
-	$lazy = $atts['lazy'];
+	$class 	= $atts['class'];
+	$id 	= $atts['id'];
+	$size 	= $atts['size'];
+	$title 	= $atts['title'];
+	$href 	= $atts['href'];
+	$lazy 	= $atts['lazy'];
 
 	$echo = '';
 
 	if( !$id ) $id = get_post_thumbnail_id();
 
-	if( $id ):
-
+	if( $id ){
 		if( $href ){
 			$post_id = wp_get_post_parent_id( $id );
 			if( $post_link = get_permalink( $post_id ) ){
@@ -916,28 +1002,29 @@ function image_func( $atts ){
 		if( $image ){
 			$echo .= '<div class="'.$class.'"><figure>'.$ahref_pre.$image.$ahref_post.'</figure></div>';
 		}
-
-	endif;
+	}
 
 	return $echo;
 }
 
-// [gallery class="post-gallery" item="gallery-item" fancybox="gallery" lazy=0] 
+// [gallery class="post-gallery" item="gallery-item" fancybox="gallery" lazy=0 size="medium_large"] 
 add_shortcode( 'gallery', 'gallery_func' );
 
 function gallery_func( $atts ){
 	// белый список параметров и значения по умолчанию
 	$atts = shortcode_atts( array(
-		'class' => 'post-gallery',
-		'item' => 'gallery-item',
-		'fancybox' => 'gallery',
-		'lazy' => true,
+		'class' 	=> 'post-gallery',
+		'item' 		=> 'gallery-item',
+		'fancybox' 	=> 'gallery',
+		'lazy' 		=> true,
+		'size' 		=> 'large',
 	), $atts );
 
-	$class = $atts['class'];
-	$item = $atts['item'];
-	$fancybox = $atts['gallery'];
-	$lazy = $atts['lazy'];
+	$class 		= $atts['class'];
+	$item 		= $atts['item'];
+	$fancybox 	= $atts['gallery'];
+	$lazy 		= $atts['lazy'];
+	$size 		= $atts['size'];
 
 	$echo = '';
 
@@ -948,9 +1035,9 @@ function gallery_func( $atts ){
 		$images_counter = 0;
 		$echo .= '<div class="row '.$class.'">';
 		foreach( $images as $image ):
-			$id = $image['id']; // The attachment id of the media
-			$title = $image['title']; //The title
-			$description = $image['caption']; //The caption (Description!)
+			$id 			= $image['id']; // The attachment id of the media
+			$title 			= $image['title']; //The title
+			$description 	= $image['caption']; //The caption (Description!)
 			$full_image_url = $image['full_image_url']; //Full size image url
 
 			if( $title ) $attr = array( 'title' => $title);
@@ -959,7 +1046,7 @@ function gallery_func( $atts ){
 			$echo .= '<figure><a data-fancybox="'.$fancybox.'" href="'.$full_image_url.'" data-caption="'.$title.'">';
 			// Get picture item. 1st two ($images_counter == 0 || 1) are not lazy 
 			// $echo .= get_lazy_attachment_image( $id, 'medium_large', false, $attr );
-			$echo .= get_attachment_picture( $id, 'medium_large', false, $attr, $images_counter > 1 );
+			$echo .= get_attachment_picture( $id, $size, false, $attr, $images_counter > 1 );
 			$images_counter++;
 			$echo .= '</a>';
 			if( $description ) $echo .= '<figcaption>'.$description.'</figcaption>';
@@ -999,9 +1086,9 @@ function get_posts_search_filter( $query ){
 }
 
 // Настраиваем страницам пагинации rel="canonical" на 1-ую стр. архива (для Yoast SEO) 
-function return_canon () {
-	$canon_page = get_pagenum_link(1);
-	return $canon_page;
+function return_canon() {
+	// $canon_page = get_pagenum_link(1);
+	return get_pagenum_link(1);
 }
 function canon_paged() {
 	if (is_paged()) {
@@ -1058,10 +1145,11 @@ function gt_webp_generation($metadata) {
 
 // подключаем AJAX обработчики, только когда в этом есть смысл
 if( wp_doing_ajax() ){
-	add_action('wp_ajax_get_events', 'get_events_func');
-	add_action('wp_ajax_nopriv_get_events', 'get_events_func');
+	add_action('wp_ajax_get_events', 'get_events');
+	add_action('wp_ajax_nopriv_get_events', 'get_events');
 }
-function get_events_func() {
+// function get_events_func() {
+function get_events() {
 	// $whatever = intval( $_POST['whatever'] );
 	// $whatever += 10;
 	// echo $whatever;	
@@ -1080,23 +1168,27 @@ function get_events_func() {
 	$myposts = get_posts( $args );
 
 	if( $myposts ){
-		$ev_counter = 0;
-		
+		// foreach( $myposts as $counter => $post ){
 		foreach( $myposts as $post ){
 			setup_postdata( $post );
-			$post_id = get_the_ID();
-			$permalink = get_the_permalink();
-			$title = esc_html( get_field('event_info_event_date') . ' ' . get_the_title() );
-			$location = get_field('event_info_event_place_map');
+			$post_id 	= get_the_ID();
+			$permalink 	= get_the_permalink();
+			$title 		= esc_html( get_field('event_info_event_date') . ' ' . get_the_title() );
+			$location 	= get_field('event_info_event_place_map');
 
-			$events[$ev_counter]['post_id'] = $post_id;
-			$events[$ev_counter]['permalink'] = $permalink;
-			$events[$ev_counter]['title'] = $title;
-			$events[$ev_counter]['lat'] = $location['lat'];
-			$events[$ev_counter]['lng'] = $location['lng'];
-
-			$ev_counter++;
-
+			// $events[$counter]['post_id'] 	= $post_id;
+			// $events[$counter]['permalink'] 	= $permalink;
+			// $events[$counter]['title'] 		= $title;
+			// $events[$counter]['lat'] 		= $location['lat'];
+			// $events[$counter]['lng'] 		= $location['lng'];
+			
+			$events[] = array(
+				'post_id' 	=> $post_id, 
+				'permalink' => $permalink,
+				'title' 	=> $title,
+				'lat' 		=> $location['lat'],
+				'lng' 		=> $location['lng'],
+			);
 		}
 		wp_reset_postdata();		
 	}
@@ -1104,6 +1196,7 @@ function get_events_func() {
 	// $str = json_encode( print_r($events, true) );
 	// echo "<script> console.log('$str'); </script>";
 	// echo $events_num;
+	// wp_send_json( $events );
 	echo json_encode( $events );
 
 	wp_die(); // выход нужен для того, чтобы в ответе не было ничего лишнего, только то что возвращает функция

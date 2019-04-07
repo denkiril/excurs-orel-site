@@ -18,7 +18,8 @@
 		<span>Поделиться: </span>
 		<div class="ya-share2" data-services="vkontakte,facebook,odnoklassniki,moimir,twitter,viber,whatsapp,skype,telegram"></div>
 	</div>
-	<?php endif; ?>
+	<?php do_action( 'add_share_scripts' );
+	endif; ?>
 
 	</div> <!-- .main-container -->
 	</div> <!-- #content -->

@@ -50,18 +50,40 @@ Author: vk.com/denkiril
 /*
   Above-the-Fold
 */
+/* ubuntu-300 - cyrillic_latin */
 @font-face {
     font-family: 'Ubuntu';
+    font-style: normal;
+    font-weight: 300;
     font-display: swap;
+    src: local('Ubuntu Light'), local('Ubuntu-Light'),
+         url('assets/fonts/ubuntu-v13-cyrillic_latin-300.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+         url('assets/fonts/ubuntu-v13-cyrillic_latin-300.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+  }
+/* ubuntu-regular - cyrillic_latin */
+@font-face {
+    font-family: 'Ubuntu';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: local('Ubuntu Regular'), local('Ubuntu-Regular'),
+         url('assets/fonts/ubuntu-v13-cyrillic_latin-regular.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+         url('assets/fonts/ubuntu-v13-cyrillic_latin-regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+/* @font-face { */
+    /* font-family: 'Ubuntu'; */
+    /* font-display: swap; */
     /* font-display: fallback; */
     /* font-display: auto; */
     /* font-display: block; */
-    src: local('Ubuntu');
-}
+    /* src: local('Ubuntu'); */
+/* } */
 
 body{
     font-family: 'Ubuntu', sans-serif;
     font-size: 20px;
+    font-weight: 400;
     line-height: 1.3;
     margin: 0;
 }
@@ -164,16 +186,26 @@ p{
     .nav-menu{
         position: absolute;
         z-index: 10;
+        /* display: block; */
         display: none;
         height: auto;
+        /* height: 0; */
         /* width: auto; */
         /* margin-top: -2px; */
         left: 0;
         /* right: 0; */
         padding: 0 15px;
         background-color: #e0f3fc;
+        transition: height .25s ease-in-out;
+        overflow: hidden;
     }
 }
+/* #nav-block.menu_state_open .nav-menu{
+    height: 200px;
+} */
+/* #nav-block.menu_state_open .nav-menu{
+    display: none;
+} */
 .nav-menu li{
     list-style: none;
     height: 4em;
@@ -303,22 +335,23 @@ p{
     top: 24px;
 }
 /* .nav-container.menu_state_open #menu span:nth-child(1) { */
-#menu.menu_state_open span:nth-child(1){
+#nav-block.menu_state_open #menu span:nth-child(1){
     top: 18px;
     width: 0%;
     left: 50%;
 }
-#menu.menu_state_open span:nth-child(2){
+#nav-block.menu_state_open #menu span:nth-child(2){
     transform: rotate(45deg);
 }
-#menu.menu_state_open span:nth-child(3){
+#nav-block.menu_state_open #menu span:nth-child(3){
     transform: rotate(-45deg);
 }
-#menu.menu_state_open span:nth-child(4){
+#nav-block.menu_state_open #menu span:nth-child(4){
     top: 18px;
     width: 0%;
     left: 50%;
 }
+
 .nav-title{
     text-transform: uppercase;
     /* display: inline-block;
@@ -334,12 +367,6 @@ p{
     text-decoration: none;
     color: #015a8d;
 }
-/* .nav-container.menu_state_open .nav-menu {
-    display: block;  
-}
-.nav-container.menu_state_open .nav-title {
-    display: none;
-} */
 .fixed{
     position: fixed;
     z-index: 10;
