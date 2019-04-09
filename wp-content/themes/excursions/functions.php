@@ -123,7 +123,8 @@ add_action( 'widgets_init', 'excursions_widgets_init' );
 
 $links = array();
 $scripts = array();
-$SCRIPTS_VER = '20190407';
+$consolelog = '';
+$SCRIPTS_VER = '20190409';
 
 function excursions_scripts() {
 	global $SCRIPTS_VER;
@@ -140,6 +141,7 @@ function excursions_scripts() {
 
 	if( is_singular('events') ){
 		wp_enqueue_style( 'events', get_template_directory_uri() . '/assets/css/events.css', array(), $SCRIPTS_VER );
+		wp_enqueue_script( 'events-js', get_template_directory_uri() . '/assets/js/events.js', array('script'), $SCRIPTS_VER, 'in_footer' );
 	}
 
 	wp_deregister_script( 'jquery' );
@@ -153,8 +155,8 @@ function excursions_scripts() {
 	// wp_register_script( 'googlemap-api?key=YOUR_API_KEY', '//maps.googleapis.com/maps/api/js', array(), false, 'in_footer' );
 	// wp_register_script( 'ymap-api?apikey=6ebdbbc2-3779-4216-9d88-129e006559bd&lang=ru_RU', '//api-maps.yandex.ru/2.1/', array(), false, 'in_footer' );
 	// wp_register_script( 'ymap-api', '//api-maps.yandex.ru/2.1/' );
-	wp_register_script( 'acf-map-js', get_template_directory_uri() . '/assets/js/acf-map-yandex.js', array(), $SCRIPTS_VER, 'in_footer' );
-	wp_register_script( 'events_map-js', get_template_directory_uri() . '/assets/js/events_map.js', array(), $SCRIPTS_VER, 'in_footer' );
+	wp_register_script( 'acf-map-js', get_template_directory_uri() . '/assets/js/acf-map-yandex.js', array('script'), $SCRIPTS_VER, 'in_footer' );
+	wp_register_script( 'events_map-js', get_template_directory_uri() . '/assets/js/events_map.js', array('script'), $SCRIPTS_VER, 'in_footer' );
 	// wp_register_script( 'yashare-js', '//yastatic.net/share2/share.js', array(), false, 'in_footer' );
 	wp_register_script( 'fancybox-js', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js', array('jquery'), null, 'in_footer' );
 	// wp_register_style( 'fancybox', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css' );
@@ -507,8 +509,8 @@ function newscards_func( $atts ){
 	// print_r($args);
 	// $myposts = array_merge($myposts1, $myposts2, $myposts3);
 
-	// $my_posts = new WP_Query;
-	// $myposts = $my_posts->query( $args );
+	// $attachments = new WP_Query;
+	// $myposts = $attachments->query( $args );
 
 	global $post;
 	$echo = '';
@@ -1201,3 +1203,64 @@ function get_events() {
 
 	wp_die(); // выход нужен для того, чтобы в ответе не было ничего лишнего, только то что возвращает функция
 }
+
+/**
+ * "ACF Photo Gallery Field" Plugin extension - add post_parent to attachment.
+ * Fires off when the WordPress update button is clicked 
+ */
+function acf_photo_gallery_addPostParent( $post_id ){
+	
+	if ( ! wp_is_post_revision( $post_id ) ){
+		// unhook this function so it doesn't loop infinitely
+		// remove_action( 'save_post', 'acf_photo_gallery_save' );
+		remove_action( 'save_post', 'acf_photo_gallery_addPostParent' );
+
+		$field = isset($_POST['acf-photo-gallery-groups'])? $_POST['acf-photo-gallery-groups']: null;
+		if( !empty($field) ){
+			foreach($field as $k => $v ){
+				$field_id = isset($_POST['acf-photo-gallery-groups'][$k])? $_POST['acf-photo-gallery-groups'][$k]: null;
+				if(!empty($field_id)) {
+					$ids = !empty($field) && isset($_POST[$field_id])? $_POST[$field_id]: null;
+					if(!empty($ids)) {
+						$post_type = get_post($post_id)->post_type;
+						// $ids = implode(',', $ids);
+						// update_post_meta($post_id, $field_id, $ids);
+						foreach($ids as $attachment_id) {
+							$attachment_parent = get_post($attachment_id)->post_parent;
+							// Если у вложения нет post_parent, устанавливаем его равным id текущего поста 
+							// Без проверки $post_type работает некорректно 
+							if( ($post_type == 'events' || $post_type == 'post') &&  $attachment_parent == 0 ){
+								// Обновляем данные в БД
+								wp_update_post( array( 'ID' => $attachment_id, 'post_parent' => $post_id ) );
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// re-hook this function
+		// add_action( 'save_post', 'acf_photo_gallery_save' );
+		add_action( 'save_post', 'acf_photo_gallery_addPostParent' );
+	}
+}
+add_action( 'save_post', 'acf_photo_gallery_addPostParent' );
+
+
+function console_log( $str ){
+	global $consolelog;
+
+	$consolelog .= $str . '\n';
+}
+
+function echo_console_log(){
+	global $consolelog;
+
+	if( $consolelog ){
+		// echo '<script>console.log("echo_console_log");</script>'.PHP_EOL;
+		echo "<script>console.log($consolelog);</script>".PHP_EOL;
+	}
+}
+add_action( 'wp_footer', 'echo_console_log' );
+add_action( 'admin_footer', 'echo_console_log' );
+

@@ -5,9 +5,7 @@ const NavMenu 		= document.querySelector('.nav-menu');
 const SocialSection = document.querySelector('#soc-section');
 const vk_groups 	= document.querySelector('#vk_groups');
 const fb_root 		= document.querySelector('#fb-root');
-const reg_btn 		= document.querySelector('#reg_btn');
-const close_btn 	= document.querySelector('#close_btn');
-const reg_form 		= document.querySelector('#reg_form');
+
 var NavMenuHeight;
 var menu_state_open = false;
 
@@ -137,24 +135,6 @@ Menu.addEventListener('click', function() {
 		NavMenu.style.height = '0px';
 	}
 });
-
-// $('#reg_btn').click(function() { $(this).hide(); $("#reg_form").slideDown(); })
-if(reg_btn){
-
-	reg_btn.addEventListener('click', function() {
-		this.style.display = 'none';
-		reg_form.style.display = 'block'; // slideDown()
-	});
-}
-
-// $('#close_btn').click(function() { $("#reg_form").slideUp(400, function() { $('#reg_btn').show(); }); })
-if(close_btn){
-
-	close_btn.addEventListener('click', function() {
-		reg_form.style.display = 'none'; // slideUp
-		reg_btn.style.display = 'inline';
-	});
-}
 
 $(document).ready(function(){
 
