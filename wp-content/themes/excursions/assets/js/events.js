@@ -23,31 +23,80 @@ if(close_btn){
 }
 
 // ShowVideo 
-registerListener('load', initShowVideo);
+// registerListener('load', initShowVideo);
+window.addEventListener('load', initShowVideo);
+
+let lazy = [];
+// let bShowVideo = false;
 
 function initShowVideo(){
-    if(screen.width > 768){
-      // console.log('screen.width > 768');
-  
-      // acf-map only for big screens
-      ShowVideo();
-    }
-    else{
-      if( ShowVideo_btn ){
+    lazy = document.querySelectorAll('iframe[data-iframe_src]');
+    // console.log('Found ' + lazy.length + ' lazy iframes');
+
+    if(lazy.length){
+      if( screen.width > 768 ){
+        ShowVideo();
+      }
+      else if( ShowVideo_btn ){
         ShowVideo_btn.style.display = 'block';
         ShowVideo_btn.addEventListener('click', ShowVideo);
-      }
+      }      
     }
+} 
+
+function iframeLazyLoad(){
+  // console.log('iframeLoad ' + lazy.length);
+  if(lazy.length){
+    // for(var i=0; i<lazy.length; i++){
+    lazy.forEach( function(iframe) {
+        if(isInViewport(iframe)){
+          if(iframe.getAttribute('data-iframe_src')){
+            iframe.src = iframe.getAttribute('data-iframe_src');
+            iframe.removeAttribute('data-iframe_src');
+          }
+        }
+      });
+      
+    iframeCleanLazy();
+  }
+}
+
+function iframeCleanLazy(){
+    lazy = Array.prototype.filter.call(lazy, function(l){ return l.getAttribute('data-iframe_src');});
+
+    if( lazy.length == 0 ){
+      window.removeEventListener('scroll', iframeLazyLoad);
+      window.removeEventListener('resize', iframeLazyLoad);
+    }
+}
+
+function isInViewport(el){
+    const rect = el.getBoundingClientRect();
+    // console.log(rect);
+    
+    return (
+        rect.bottom >= 0 && 
+        rect.right >= 0 && 
+        rect.top <= (window.innerHeight || document.documentElement.clientHeight) && 
+        rect.left <= (window.innerWidth || document.documentElement.clientWidth)
+     );
 }
 
 function ShowVideo(){
 
-    [].forEach.call( document.querySelectorAll('iframe[data-iframe_src]'), function(iframe){
-        // iframe.setAttribute('srcset', iframe.getAttribute('data-srcset'));
-        iframe.setAttribute('src', iframe.dataset.iframe_src);
-        iframe.removeAttribute('data-iframe_src');
-        iframe.style.display = 'inline';
-	});
+  // console.log('ShowVideo');
+  window.addEventListener('scroll', iframeLazyLoad);
+  window.addEventListener('resize', iframeLazyLoad);
 
-    this.style.display = 'none';
+  // bShowVideo = true;
+  lazy.forEach( function(iframe) {
+    iframe.style.display = 'inline';
+  });
+
+  if( ShowVideo_btn ){
+    ShowVideo_btn.style.display = 'none';
+  }
+
+  iframeLazyLoad();
 }
+

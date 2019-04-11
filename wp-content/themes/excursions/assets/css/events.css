@@ -54,6 +54,11 @@
     border: #ccc solid 1px;
     display: none;
 }
+@media (max-width: 768px) {
+    .acf-map {
+        height: 200px;
+    }
+}
 /* fixes potential theme css conflict */
 .acf-map img {
    max-width: inherit !important;

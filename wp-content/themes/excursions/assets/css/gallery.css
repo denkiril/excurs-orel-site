@@ -2,13 +2,12 @@
 .gallery-item{
     margin-bottom: 2em;
 }
-.gallery-item img{
-    width: 100%;
-    height: auto;
+.gallery-item figure{
+    text-align: center;
 }
 .gallery-item figcaption{
     width: 90%;
-    text-align: center;
+    /* text-align: center; */
     color: #3f3f3f;
     margin: 0 auto;
 }
@@ -29,6 +28,10 @@
     display: flex;
     display: -ms-flexbox;
 }
+.pre-gallery img{
+    width: 100%;
+    height: auto;
+}
 .pre-gallery figcaption{
     font-size: 0.8em;
 }
@@ -36,17 +39,15 @@
 .post-gallery{
     margin-top: 1em;
 }
-.post-gallery figcaption{
-    font-size: 0.9em;
-    margin-top: 8px;
-}
+/* .post-gallery img{ */
 .post-gallery img{
     width: 70%;
-    margin: 0 auto;
-    display: block;
+    height: auto;
+    /* margin: 0 auto; */
+    /* display: block; */
 }
 @media (max-width: 1200px) {
-    .post-gallery img {
+    .post-gallery img{
         width: 80%;
     }
 }
@@ -56,12 +57,16 @@
     }
 } */
 @media (max-width: 768px) {
-    .post-gallery img {
+    .post-gallery img{
         width: 90%;
     }
 }
 @media (max-width: 576px) {
-    .post-gallery img {
+    .post-gallery img{
         width: 100%;
     }
+}
+.post-gallery figcaption{
+    font-size: 0.9em;
+    margin-top: 8px;
 }

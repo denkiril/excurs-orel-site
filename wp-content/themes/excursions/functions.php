@@ -124,7 +124,7 @@ add_action( 'widgets_init', 'excursions_widgets_init' );
 $links = array();
 $scripts = array();
 $consolelog = '';
-$SCRIPTS_VER = '20190409';
+$SCRIPTS_VER = '20190411';
 
 function excursions_scripts() {
 	global $SCRIPTS_VER;
