@@ -171,3 +171,15 @@
         width: 100%;
     }
 }
+
+.guidebook h2{
+    font-size: 1.1em;
+    text-align: left;
+    text-transform: none;
+    margin: 0;
+    margin-bottom: 1em;
+    font-weight: normal;
+}
+.info-block{
+    margin-bottom: 2em;
+}

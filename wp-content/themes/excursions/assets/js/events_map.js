@@ -320,7 +320,8 @@ function AddListenersToItem(item){
 
     // events_li.mouseleave( function(e){
     item.addEventListener('mouseleave', function(e){
-        if(e.target.matches('.events_li')) {
+        // if(e.target.matches('.events_li')) {
+        if(e.target.matches('[data-post_id]')) {
             const post_id = e.target.dataset.post_id;
             storage.search('properties.post_id = ' + post_id).each( function(mark){
                 const geoObjectState = clusterer.getObjectState(mark);

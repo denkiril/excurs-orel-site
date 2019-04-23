@@ -19,10 +19,10 @@ get_header();
 			$permalink = get_the_permalink();
 			$title = esc_html( get_the_title() ); 
 			// archive-events.php 
-			if( get_post_type() == 'events'){
-				$event_date = markup_event_date();
-				$show_attention = get_field('event_info_event_date', false, false) >= date('Ymd');
-			}
+			// if( get_post_type() == 'events'){
+			// 	$event_date = markup_event_date();
+			// 	$show_attention = get_field('event_info_event_date', false, false) >= date('Ymd');
+			// }
 			?>		 
 
 			<div class="row anno-card">
@@ -37,10 +37,7 @@ get_header();
 				</div>
 				<div class="col-12 col-md-8">
 					<h2 class="annocard-title"><a href="<?=$permalink?>" title="Ссылка на: <?=$title?>"><?=$title?></a></h2>
-					<?php if( $show_attention ): ?>
-						<p class="attention">Не пропустите!</p>
-					<?php endif; ?>
-					<p><?php echo $event_date . get_the_excerpt() ?></p>
+					<p><?php echo get_the_excerpt() ?></p>
 				</div>
 			</div>
 

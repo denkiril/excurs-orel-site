@@ -10,7 +10,7 @@
 get_header();
 ?>
 
-<main id="main" class="site-main">
+<main id="main" class="site-main single">
 
 	<?php
 	while ( have_posts() ) :
@@ -24,5 +24,6 @@ get_header();
 </main><!-- #main -->
 
 <?php
+// echo get_post_type();
 // get_sidebar();
 get_footer();

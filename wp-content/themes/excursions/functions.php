@@ -121,10 +121,13 @@ add_action( 'widgets_init', 'excursions_widgets_init' );
  * Enqueue scripts and styles.
  */
 
-$links = array();
+$LINKS = array();
 $scripts = array();
 $consolelog = '';
-$SCRIPTS_VER = '20190411';
+$SCRIPTS_VER = '20190423';
+$WEBP_ON = !(home_url() == 'http://excurs-orel/');
+$PLACEHOLDER_URL = get_template_directory_uri() . '/assets/img/placeholder_3x2.png';
+// $PLACEHOLDER_URL = '/wp-content/themes/excursions/assets/img/placeholder_3x2.png';
 
 function excursions_scripts() {
 	global $SCRIPTS_VER;
@@ -139,7 +142,7 @@ function excursions_scripts() {
 		wp_enqueue_script( 'comment-reply' );
 	}
 
-	if( is_singular('events') ){
+	if( is_singular('events') || is_singular('guidebook') ){
 		wp_enqueue_style( 'events', get_template_directory_uri() . '/assets/css/events.css', array(), $SCRIPTS_VER );
 		wp_enqueue_script( 'events-js', get_template_directory_uri() . '/assets/js/events.js', array('script'), $SCRIPTS_VER, 'in_footer' );
 	}
@@ -157,11 +160,13 @@ function excursions_scripts() {
 	// wp_register_script( 'ymap-api', '//api-maps.yandex.ru/2.1/' );
 	wp_register_script( 'acf-map-js', get_template_directory_uri() . '/assets/js/acf-map-yandex.js', array('script'), $SCRIPTS_VER, 'in_footer' );
 	wp_register_script( 'events_map-js', get_template_directory_uri() . '/assets/js/events_map.js', array('script'), $SCRIPTS_VER, 'in_footer' );
+	wp_register_script( 'guidebook_map-js', get_template_directory_uri() . '/assets/js/guidebook_map.js', array('script'), $SCRIPTS_VER, 'in_footer' );
 	// wp_register_script( 'yashare-js', '//yastatic.net/share2/share.js', array(), false, 'in_footer' );
 	wp_register_script( 'fancybox-js', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js', array('jquery'), null, 'in_footer' );
 	// wp_register_style( 'fancybox', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css' );
 	wp_register_style( 'slick-full', get_template_directory_uri() . '/assets/include/slick-full.css', array(), null );
 	wp_register_style( 'events_map', get_template_directory_uri() . '/assets/css/events_map.css', array(), $SCRIPTS_VER );
+	wp_register_style( 'guidebook_map', get_template_directory_uri() . '/assets/css/guidebook_map.css', array(), $SCRIPTS_VER );
 	wp_register_script( 'cssrelpreload-js', get_template_directory_uri() . '/assets/include/cssrelpreload.js', array(), null, 'in_footer' );
 }
 add_action( 'wp_enqueue_scripts', 'excursions_scripts' );
@@ -178,24 +183,24 @@ add_action( 'wp_enqueue_scripts', 'excursions_scripts' );
 preload_link( get_template_directory_uri().'/assets/css/main-bottom.css', $SCRIPTS_VER );
 
 function preload_link( $href, $ver=false, $type='style' ){
-	global $links;
+	global $LINKS;
 	// если $href ещё не было, добавляем в массив ссылок 
 	// if( !in_array( $style_href, $style_hrefs ) ) array_push($style_hrefs, $style_href);
 
-	foreach( $links as $link ){
-		if( $links['href'] == $href ) return;
+	foreach( $LINKS as $link ){
+		if( $link['href'] == $href ) return;
 	}
-	$links[] = array('href' => $href, 'ver' => $ver, 'type' => $type);
+	$LINKS[] = array('href' => $href, 'ver' => $ver, 'type' => $type);
 }
 
 function preload_links(){ 
 	// <link rel="preload" href="AO.js" as="script">
 	// <link rel="preload" href="AO.css" as="style">
-	global $links;
+	global $LINKS;
 	// echo '<script>console.log('.print_r($links).');</script>'.PHP_EOL;
 
-	if( !empty($links) ){
-		foreach( $links as $link ){
+	if( !empty($LINKS) ){
+		foreach( $LINKS as $link ){
 			$href = $link['href'];
 			if( $link['ver'] ){
 				$href .= '?ver='.$link['ver'];
@@ -270,6 +275,17 @@ function events_map_scripts_func() {
 	wp_enqueue_style( 'events_map' );
 	wp_enqueue_script( 'events_map-js' );
 	wp_localize_script( 'events_map-js', 'myajax', 
+		array(
+			'url' => admin_url('admin-ajax.php')
+		)
+	);  
+}
+
+add_action( 'guidebook_map_scripts', 'guidebook_map_scripts_func', 10, 0);
+function guidebook_map_scripts_func() {
+	wp_enqueue_style( 'guidebook_map' );
+	wp_enqueue_script( 'guidebook_map-js' );
+	wp_localize_script( 'guidebook_map-js', 'myajax', 
 		array(
 			'url' => admin_url('admin-ajax.php')
 		)
@@ -372,6 +388,168 @@ if ( defined( 'JETPACK__VERSION' ) ) {
 // remove_filter( 'the_content', 'wpautop' );
 // remove_filter( 'the_excerpt', 'wpautop' );
 // remove_filter( 'comment_text', 'wpautop' );
+
+/* Custom post types: events, guidebook... */
+add_action( 'init', 'register_post_types' );
+
+function register_post_types(){
+	// post_type => events
+	register_post_type('events', array(
+		'label'  => null,
+		'labels' => array(
+			'name'               => 'События', // основное название для типа записи
+			'singular_name'      => 'Событие', // название для одной записи этого типа
+			'add_new'            => 'Добавить событие', // для добавления новой записи
+			'add_new_item'       => 'Добавление события', // заголовка у вновь создаваемой записи в админ-панели.
+			'edit_item'          => 'Редактировать событие', // для редактирования типа записи
+			'new_item'           => 'Новое событие', // текст новой записи
+			'view_item'          => 'Смотреть событие', // для просмотра записи этого типа.
+			'search_items'       => 'Искать события', // для поиска по этим типам записи
+			'not_found'          => 'Не найдено', // если в результате поиска ничего не было найдено
+			'not_found_in_trash' => 'Не найдено в корзине', // если не было найдено в корзине
+			'parent_item_colon'  => '', // для родителей (у древовидных типов)
+			'menu_name'          => 'События', // название меню
+		),
+		'description'         => 'События – это наши экскурсии, лекции и прочие мероприятия с датой.',
+		'public'              => true,
+		'publicly_queryable'  => true, // зависит от public
+		'exclude_from_search' => false, // зависит от public
+		'show_ui'             => true, // зависит от public
+		'show_in_menu'        => true, // показывать ли в меню адмнки
+		'show_in_admin_bar'   => true, // по умолчанию значение show_in_menu
+		'show_in_nav_menus'   => true, // зависит от public
+		'show_in_rest'        => true, // добавить в REST API. C WP 4.7
+		'rest_base'           => null, // $post_type. C WP 4.7
+		'menu_position'       => 4,
+		'menu_icon'           => 'dashicons-calendar-alt', 
+		//'capability_type'   => 'post',
+		//'capabilities'      => 'post', // массив дополнительных прав для этого типа записи
+		//'map_meta_cap'      => null, // Ставим true чтобы включить дефолтный обработчик специальных прав
+		'hierarchical'        => false,
+		'supports'            => array('title','author','thumbnail','excerpt'), // 'title','editor','author','thumbnail','excerpt','trackbacks','custom-fields','comments','revisions','page-attributes','post-formats'
+		'taxonomies'          => array('category'),
+		'has_archive'         => true,
+		'rewrite'             => true,
+		'query_var'           => true,
+	) );
+
+	// post_type => guidebook
+	register_post_type('guidebook', array(
+		'label'  => null,
+		'labels' => array(
+			'name'               => 'Путеводитель', // основное название для типа записи
+			'singular_name'      => 'Статья ПВ', // название для одной записи этого типа
+			'add_new'            => 'Добавить статью в ПВ', // для добавления новой записи
+			'add_new_item'       => 'Добавление статьи в ПВ', // заголовка у вновь создаваемой записи в админ-панели.
+			'edit_item'          => 'Редактировать статью ПВ', // для редактирования типа записи
+			'new_item'           => 'Новая статья ПВ', // текст новой записи
+			'view_item'          => 'Смотреть статью ПВ', // для просмотра записи этого типа.
+			'search_items'       => 'Искать статьи в ПВ', // для поиска по этим типам записи
+			'not_found'          => 'Не найдено', // если в результате поиска ничего не было найдено
+			'not_found_in_trash' => 'Не найдено в корзине', // если не было найдено в корзине
+			'parent_item_colon'  => '', // для родителей (у древовидных типов)
+			'menu_name'          => 'Путеводитель', // название меню
+		),
+		'description'         => 'Путеводитель по Орлу от краеведов.',
+		'public'              => true,
+		'publicly_queryable'  => true, // зависит от public
+		'exclude_from_search' => false, // зависит от public
+		'show_ui'             => true, // зависит от public
+		'show_in_menu'        => true, // показывать ли в меню адмнки
+		'show_in_admin_bar'   => true, // по умолчанию значение show_in_menu
+		'show_in_nav_menus'   => true, // зависит от public
+		'show_in_rest'        => true, // добавить в REST API. C WP 4.7
+		'rest_base'           => null, // $post_type. C WP 4.7
+		'menu_position'       => 5,
+		'menu_icon'           => 'dashicons-book-alt', 
+		//'capability_type'   => 'post',
+		//'capabilities'      => 'post', // массив дополнительных прав для этого типа записи
+		//'map_meta_cap'      => null, // Ставим true чтобы включить дефолтный обработчик специальных прав
+		'hierarchical'        => false,
+		'supports'            => array('title','author','thumbnail'), // 'title','editor','author','thumbnail','excerpt','trackbacks','custom-fields','comments','revisions','page-attributes','post-formats'
+		'taxonomies'          => array('sections'),
+		'has_archive'         => false,
+		'rewrite'             => true,
+		'query_var'           => true,
+	) );
+
+	// taxonomies => sections 
+	// Достопримечательности - sights, Люди - persons 
+	register_taxonomy('sections', array('guidebook'), array(
+		'label'                 => '', // определяется параметром $labels->name 
+		'labels'                => array(
+			'name'              => 'Разделы',
+			'singular_name'     => 'Раздел',
+			'search_items'      => 'Поиск разделов',
+			'all_items'         => 'Все разделы',
+			'view_item '        => 'Смотреть раздел',
+			'parent_item'       => 'Родительский раздел',
+			'parent_item_colon' => 'Родительский раздел:',
+			'edit_item'         => 'Редактировать раздел',
+			'update_item'       => 'Обновить раздел',
+			'add_new_item'      => 'Добавить раздел',
+			'new_item_name'     => 'Новое название раздела',
+			'menu_name'         => 'Разделы',
+		),
+		'description'           => 'Разделы Путеводителя', // описание таксономии 
+		'public'                => true,
+		'publicly_queryable'    => null, // равен аргументу public
+		'show_in_nav_menus'     => true, // равен аргументу public
+		'show_ui'               => true, // равен аргументу public
+		'show_in_menu'          => true, // равен аргументу show_ui
+		'show_tagcloud'         => true, // равен аргументу show_ui
+		'show_in_rest'          => null, // добавить в REST API
+		'rest_base'             => null, // $taxonomy
+		'hierarchical'          => true, // true - таксономия будет древовидная (как категории). false - будет не древовидная (как метки)
+		//'update_count_callback' => '_update_post_term_count',
+		'rewrite'               => array( 'slug' => 'guidebook_' ),
+		//'query_var'             => $taxonomy, // название параметра запроса
+		'capabilities'          => array(),
+		'meta_box_cb'           => null, // callback функция. Отвечает за html код метабокса (с версии 3.8): post_categories_meta_box или post_tags_meta_box. Если указать false, то метабокс будет отключен вообще
+		'show_admin_column'     => false, // Позволить или нет авто-создание колонки таксономии в таблице ассоциированного типа записи. (с версии 3.5)
+		'_builtin'              => false,
+		'show_in_quick_edit'    => null, // по умолчанию значение show_ui
+	) );
+}
+
+// Меняем порядок вывода записей для архива типа записи 'events'
+add_action('pre_get_posts', 'events_orderby_meta', 1 );
+function events_orderby_meta( $query ) {
+	// Выходим, если это админ-панель или не основной запрос
+	if( is_admin() || ! $query->is_main_query() )
+		return;
+
+	if( $query->is_post_type_archive('events') ){
+		// $query->set( 'posts_per_page', 5 ); // default=10
+		$query->set( 'orderby', 	'meta_value' );
+		$query->set( 'meta_key', 	'event_info_event_date' );
+		$query->set( 'post__not_in', [312] ); // exclude="312"
+	}
+}
+
+// Меняем порядок вывода записей для архивов таксономии 'sections'
+add_action('pre_get_posts', 'sections_orderby_meta', 1 );
+function sections_orderby_meta( $query ) {
+	// Выходим, если это админ-панель или не основной запрос
+	if( is_admin() || ! $query->is_main_query() )
+		return;
+
+	if( $query->is_tax('sections') ){
+		$query->set( 'posts_per_page', 12 ); // default=10 
+		// $query->set( 'orderby',  'meta_value_num' ); 
+		$query->set( 'orderby',  array( 'meta_value_num' => 'DESC', 'title' => 'ASC' ) ); 
+		$query->set( 'meta_key', 'gba_rating' ); // 1...10
+		// $query->set( 'order', 	 'DESC' ); 		// от большего к меньшему, 10 -> 1 
+	}
+}
+
+// Включаем поиск для записей типа 'events'
+add_action('pre_get_posts', 'get_posts_search_filter');
+function get_posts_search_filter( $query ){
+	if ( ! is_admin() && $query->is_main_query() && $query->is_search ) {
+		$query->set('post_type', array('post', 'events') );
+	}
+}
 
 
 // [annocards post_type="post" cat_name="blog" tag_name="promo" section_title="Приходите" read_more="Подробнее..." date="future" exclude="312" size="medium"] 
@@ -560,48 +738,6 @@ function markup_event_date( $post_id = null ){
 	return $event_date;
 }
 
-add_action( 'init', 'register_post_types' );
-
-function register_post_types(){
-	register_post_type('events', array(
-		'label'  => null,
-		'labels' => array(
-			'name'               => 'События', // основное название для типа записи
-			'singular_name'      => 'Событие', // название для одной записи этого типа
-			'add_new'            => 'Добавить событие', // для добавления новой записи
-			'add_new_item'       => 'Добавление события', // заголовка у вновь создаваемой записи в админ-панели.
-			'edit_item'          => 'Редактировать событие', // для редактирования типа записи
-			'new_item'           => 'Новое событие', // текст новой записи
-			'view_item'          => 'Смотреть событие', // для просмотра записи этого типа.
-			'search_items'       => 'Искать события', // для поиска по этим типам записи
-			'not_found'          => 'Не найдено', // если в результате поиска ничего не было найдено
-			'not_found_in_trash' => 'Не найдено в корзине', // если не было найдено в корзине
-			'parent_item_colon'  => '', // для родителей (у древовидных типов)
-			'menu_name'          => 'События', // название меню
-		),
-		'description'         => 'События – это наши экскурсии, лекции и прочие мероприятия с датой.',
-		'public'              => true,
-		'publicly_queryable'  => true, // зависит от public
-		'exclude_from_search' => false, // зависит от public
-		'show_ui'             => true, // зависит от public
-		'show_in_menu'        => true, // показывать ли в меню адмнки
-		'show_in_admin_bar'   => true, // по умолчанию значение show_in_menu
-		'show_in_nav_menus'   => true, // зависит от public
-		'show_in_rest'        => true, // добавить в REST API. C WP 4.7
-		'rest_base'           => null, // $post_type. C WP 4.7
-		'menu_position'       => 4,
-		'menu_icon'           => 'dashicons-calendar-alt', 
-		//'capability_type'   => 'post',
-		//'capabilities'      => 'post', // массив дополнительных прав для этого типа записи
-		//'map_meta_cap'      => null, // Ставим true чтобы включить дефолтный обработчик специальных прав
-		'hierarchical'        => false,
-		'supports'            => array('title','author','thumbnail','excerpt'), // 'title','editor','author','thumbnail','excerpt','trackbacks','custom-fields','comments','revisions','page-attributes','post-formats'
-		'taxonomies'          => array('category'),
-		'has_archive'         => true,
-		'rewrite'             => true,
-		'query_var'           => true,
-	) );
-}
 
 //отключение всех архивов start
 // function wph_disable_all_archives($false) {
@@ -815,8 +951,9 @@ function get_lazy_attachment_image( $attachment_id, $size = 'thumbnail', $icon =
 /*
 	get_attachment_picture() is mod of standart wp_get_attachment_image() 
 */
-function get_attachment_picture( $attachment_id, $size = 'thumbnail', $icon = false, $attr = '', $lazy = true ) {
+function get_attachment_picture( $attachment_id, $size='thumbnail', $icon=false, $attr='', $lazy=true, $placeholder=false ) {
 	$html = '';
+	global $PLACEHOLDER_URL;
 	// $image 		= wp_get_attachment_image_src( $attachment_id, $size, $icon );
 	// anti image_constrain_size_for_editor() to $content_width 
 	$is_image = wp_attachment_is_image( $attachment_id );
@@ -850,7 +987,7 @@ function get_attachment_picture( $attachment_id, $size = 'thumbnail', $icon = fa
 			$def_attr = wp_parse_args( $attr, $default_attr );
 
 			$default_attr = array_merge( $default_attr, array(
-				'src'		=> '/wp-content/themes/excursions/assets/include/placeholder_3x2.png', // for validation 
+				'src'		=> $PLACEHOLDER_URL, // for validation 
 				'data-src' 	=> $src,
 			));
 		}
@@ -885,10 +1022,12 @@ function get_attachment_picture( $attachment_id, $size = 'thumbnail', $icon = fa
 
 		$html = '<picture>';
 
-		$srcset = generate_image_srcset( $image_meta, $image_baseurl, true );
-		if( $srcset ){
-			$srcset_html = $lazy ? 'data-srcset="'.$srcset.'"' : 'srcset="'.$srcset.'"';
-			$html .= '<source type="image/webp" '.$srcset_html.' '.$sizes_html.'>';
+		if( $WEBP_ON ){
+			$srcset = generate_image_srcset( $image_meta, $image_baseurl, true );
+			if( $srcset ){
+				$srcset_html = $lazy ? 'data-srcset="'.$srcset.'"' : 'srcset="'.$srcset.'"';
+				$html .= '<source type="image/webp" '.$srcset_html.' '.$sizes_html.'>';
+			}
 		}
 
 		$srcset = generate_image_srcset( $image_meta, $image_baseurl );
@@ -914,8 +1053,9 @@ function get_attachment_picture( $attachment_id, $size = 'thumbnail', $icon = fa
 			}
 			$html .= ' /></noscript>';
 		}
-		
-		// $html .= '</picture>';
+	}
+	elseif($placeholder){
+		$html = '<img src="'.$PLACEHOLDER_URL.'" alt="Картинки нет" />';
 	}
 
 	return $html;
@@ -1009,24 +1149,30 @@ function image_func( $atts ){
 	return $echo;
 }
 
-// [gallery class="post-gallery" item="gallery-item" fancybox="gallery" lazy=0 size="medium_large"] 
+// [gallery class=post-gallery item=gallery-item fancybox=gallery lazy=1 size=large nums=null(1,2,4) figcaption=image_description(parent_href) mini=false] 
 add_shortcode( 'gallery', 'gallery_func' );
 
 function gallery_func( $atts ){
 	// белый список параметров и значения по умолчанию
 	$atts = shortcode_atts( array(
-		'class' 	=> 'post-gallery',
-		'item' 		=> 'gallery-item',
-		'fancybox' 	=> 'gallery',
-		'lazy' 		=> true,
-		'size' 		=> 'large',
+		'class' 		=> null,
+		'item' 			=> 'gallery-item',
+		'fancybox' 		=> 'gallery',
+		'lazy' 			=> true,
+		'size' 			=> 'large',
+		'nums' 			=> null,
+		'figcaption' 	=> 'image_description',
+		'mini' 			=> false,
 	), $atts );
 
-	$class 		= $atts['class'];
-	$item 		= $atts['item'];
-	$fancybox 	= $atts['gallery'];
-	$lazy 		= $atts['lazy'];
-	$size 		= $atts['size'];
+	$class 			= $atts['class'];
+	$item 			= $atts['item'];
+	$fancybox 		= $atts['gallery'];
+	$lazy 			= $atts['lazy'];
+	$size 			= $atts['size'];
+	$nums 			= $atts['nums'];
+	$figcaption 	= $atts['figcaption'];
+	$mini 			= $atts['mini'];
 
 	$echo = '';
 
@@ -1034,9 +1180,22 @@ function gallery_func( $atts ){
 	//Get the images ids from the post_metadata
 	$images = acf_photo_gallery( 'gallery_gal', $post->ID );
 	if( count($images) ):
+		if( !$class ){
+			$class = $mini ? 'pre-gallery' : 'post-gallery';
+		}
+		$bootstrap = $mini ? ' col-12 col-sm-6 col-md-6 col-lg-4' : ' col-12';
+		
 		$images_counter = 0;
-		$echo .= '<div class="row '.$class.'">';
+		if($nums){
+			$nums_arr = explode(',', $nums);
+			// print_r($nums_arr);
+		}
+
+		$echo .= '<div class="row '.$class.' nums-'.$nums.'">';
 		foreach( $images as $image ):
+			// if( $number>0 && $number != ++$images_counter ) continue;
+			if( $nums && !in_array( ++$images_counter, $nums_arr ) ) continue;
+
 			$id 			= $image['id']; // The attachment id of the media
 			$title 			= $image['title']; //The title
 			$description 	= $image['caption']; //The caption (Description!)
@@ -1044,14 +1203,22 @@ function gallery_func( $atts ){
 
 			if( $title ) $attr = array( 'title' => $title);
 
-			$echo .= '<div class="'.$item.' col-12">';
+			$echo .= '<div class="'.$item.$bootstrap.'">';
 			$echo .= '<figure><a data-fancybox="'.$fancybox.'" href="'.$full_image_url.'" data-caption="'.$title.'">';
 			// Get picture item. 1st two ($images_counter == 0 || 1) are not lazy 
 			// $echo .= get_lazy_attachment_image( $id, 'medium_large', false, $attr );
-			$echo .= get_attachment_picture( $id, $size, false, $attr, $images_counter > 1 );
-			$images_counter++;
+			$echo .= get_attachment_picture( $id, $size, false, $attr, $images_counter > 2 );
+			// $images_counter++;
 			$echo .= '</a>';
-			if( $description ) $echo .= '<figcaption>'.$description.'</figcaption>';
+			if( $figcaption == 'parent_href' ){
+				$post_parent_id = wp_get_post_parent_id( $id );
+				if( $post_parent_link = get_permalink( $post_parent_id ) ){
+					$description = '<a href="'.$post_parent_link.'">'.get_the_title( $post_parent_id ).'</a>';
+				}
+			}
+			if( ($figcaption == 'image_description' || $figcaption == 'parent_href') && $description ){
+				$echo .= '<figcaption>'.$description.'</figcaption>';
+			}
 			$echo .= '</figure></div>';
 
 		endforeach;
@@ -1064,33 +1231,11 @@ function gallery_func( $atts ){
 	return $echo;
 }
 
-// Меняем порядок вывода записей для архива типа записи 'events'
-add_action('pre_get_posts', 'events_orderby_meta', 1 );
-function events_orderby_meta( $query ) {
-	// Выходим, если это админ-панель или не основной запрос
-	if( is_admin() || ! $query->is_main_query() )
-		return;
-
-	if( $query->is_post_type_archive('events') ){
-		// $query->set( 'posts_per_page', 5 ); // default=10
-		$query->set( 'orderby', 'meta_value' );
-		$query->set( 'meta_key', 'event_info_event_date' );
-		$query->set( 'post__not_in', [312] ); // exclude="312"
-	}
-}
-
-// Включаем поиск для записей типа 'events'
-add_action('pre_get_posts', 'get_posts_search_filter');
-function get_posts_search_filter( $query ){
-	if ( ! is_admin() && $query->is_main_query() && $query->is_search ) {
-		$query->set('post_type', array('post', 'events') );
-	}
-}
-
 // Настраиваем страницам пагинации rel="canonical" на 1-ую стр. архива (для Yoast SEO) 
 function return_canon() {
-	// $canon_page = get_pagenum_link(1);
-	return get_pagenum_link(1);
+	$canon_page = is_page('guidebook') ? get_url_wo_pagenum() : get_pagenum_link();
+	
+	return $canon_page;
 }
 function canon_paged() {
 	if (is_paged()) {
@@ -1165,7 +1310,7 @@ function get_events() {
 		'meta_key' 	=> 'event_info_event_date',
 		'order'     => 'DESC',
 		'exclude' 	=> '312',
-		'numberposts' => 999, 
+		'numberposts' => -1, 
 	);
 	$myposts = get_posts( $args );
 
@@ -1203,6 +1348,140 @@ function get_events() {
 
 	wp_die(); // выход нужен для того, чтобы в ответе не было ничего лишнего, только то что возвращает функция
 }
+
+// подключаем AJAX обработчики, только когда в этом есть смысл
+if( wp_doing_ajax() ){
+	add_action('wp_ajax_get_sights', 'get_sights');
+	add_action('wp_ajax_nopriv_get_sights', 'get_sights');
+}
+function get_sights() {
+	// echo json_encode($_SERVER['REQUEST_URI']);
+	// wp_die();
+	$sights 	= array();
+	$myposts 	= get_guidebook_posts(null, -1); 
+
+	if( $myposts ){
+		global $post;
+		// foreach( $myposts as $counter => $post ){
+		foreach( $myposts as $post ){
+			setup_postdata( $post );
+			$post_id 	= get_the_ID();
+			$permalink 	= get_the_permalink();
+			$title 		= esc_html( get_the_title() );
+			$location 	= get_field('obj_info_geolocation');
+			// $thumb_url 	= wp_get_attachment_thumb_url( get_post_thumbnail_id() );
+			$thumb_url 	= get_the_post_thumbnail_url( $post_id, 'thumbnail' );
+			// if(!$thumb_url){
+			// 	global $PLACEHOLDER_URL;
+			// 	$thumb_url = $PLACEHOLDER_URL;
+			// }
+			
+			$sights[] = array(
+				'post_id' 	=> $post_id, 
+				'permalink' => $permalink,
+				'title' 	=> $title,
+				'lat' 		=> $location['lat'],
+				'lng' 		=> $location['lng'],
+				'thumb_url' => $thumb_url,
+			);
+		}
+		wp_reset_postdata();		
+	}
+
+	echo json_encode( $sights );
+
+	wp_die(); // выход нужен для того, чтобы в ответе не было ничего лишнего, только то что возвращает функция
+}
+
+function get_guidebook_posts( $term_slug='', $numberposts=0 ) {
+	$posts 			= array();
+	$tax_name 		= 'sections';
+	$term_slug_0 	= get_terms( array('taxonomy' => $tax_name) )[0]->slug; // 'sights'
+
+	if(!$term_slug){
+		$term_slug 	= $term_slug_0; // 'sights'
+	}
+	$check_filter 	= $term_slug == $term_slug_0;
+
+	if($term_slug){
+		$paged = 1;
+		$meta_query = array();
+
+		if($check_filter){
+			// $url 			= $_SERVER['REQUEST_URI'];
+			// $query_str = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
+			// $query = array();
+			// parse_str($query_str, $query);
+			// unset($query['pagenum']);
+
+			if(!$numberposts){
+				if(isset($_GET['numberposts_1'])){
+					$numberposts = 1;
+				}
+				if(isset($_GET['numberposts_2'])){
+					$numberposts = 2;
+				}				
+			}
+			if(isset($_GET['pagenum'])){
+				$paged = $_GET['pagenum'];
+			}
+			if(isset($_GET['cat_f'])){
+				$meta_query[] = array('key' => 'obj_info_protection_category', 'value' => 'f');
+			}
+		}
+
+		if($numberposts == -1){
+			$paged = 0;
+		}
+		
+		$args = array( 
+			'post_type' 	=> 'guidebook', 
+			$tax_name 		=> $term_slug,
+			'orderby' 		=> array( 'meta_value_num' => 'DESC', 'title' => 'ASC' ),
+			'meta_key' 		=> 'gba_rating',
+			// 'order'     	=> 'DESC',
+			'numberposts' 	=> $numberposts, 
+			'paged'			=> $paged,
+			'meta_query'	=> $meta_query,
+		);
+
+		$posts = get_posts( $args );
+	}
+		
+	return $posts;
+}
+
+function check_pagenum_in_uri(){
+	if(is_page('guidebook') && isset($_GET['pagenum'])){
+		$myposts = get_guidebook_posts();
+		// print_r($myposts);
+	
+		if( !$myposts || $_GET['pagenum'] == 1){
+
+			$url = get_url_wo_pagenum();
+			// print_r($url);
+			// header( $protocol.' 301 Moved Permanently' );
+			// header( 'Location: '.strtolower($_SERVER['REQUEST_URI']) );
+			header( 'Location: '.$url, true, 301 );
+			exit();
+		}
+	}
+}
+add_action( 'template_redirect', 'check_pagenum_in_uri' );
+
+function get_url_wo_pagenum(){
+	$string 		= $_SERVER['REQUEST_URI'];
+	$parts 			= parse_url($string);
+	$queryParams 	= array();
+	parse_str($parts['query'], $queryParams);
+	unset($queryParams['pagenum']);
+	$queryString 	= http_build_query($queryParams);
+	// $url 		= $_SERVER['HTTP_HOST'] . $parts['path'] . '?' . $queryString;
+	$url 			= home_url() . $parts['path'] . '?' . $queryString;
+
+	return $url;
+}
+
 
 /**
  * "ACF Photo Gallery Field" Plugin extension - add post_parent to attachment.
