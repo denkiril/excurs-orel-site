@@ -319,22 +319,27 @@ function NewObjList( objects_map, objects ){
     obj_list.querySelectorAll('li').forEach( function(item){
         // AddListenersToItem(item);
         item.addEventListener('click', function(e){
-            // console.log(this);
             // console.log('click');
-            e.preventDefault();
+            // console.log(this);
+            // console.log(e.target);
+            // e.preventDefault();
             // e.stopImmediatePropagation();
-            if(this.classList.contains('checkedItem')){
-                checkItemOff(this, true);
-            }
-            else{
-                checkItemOn(this, obj_list, objects);
+            if(!e.target.matches('a')){
+                if(this.classList.contains('checkedItem')){
+                    checkItemOff(this);
+                }
+                else{
+                    checkItemOn(this, obj_list, objects);
+                }
             }
         });
 
         if(screen.width > 768){
             item.addEventListener('mouseenter', function(){
                 // console.log('mouseenter');
-                checkItemOn(this, obj_list, objects);
+                if(!this.classList.contains('checkedItem')){
+                    checkItemOn(this, obj_list, objects);
+                }
             });
 
             item.addEventListener('keydown', function(e){
@@ -382,14 +387,17 @@ function NewObjList( objects_map, objects ){
             // });
             item.addEventListener('focus', function(){
                 // console.log('focus');
-                checkItemOn(this, obj_list, objects);
+                if(!this.classList.contains('checkedItem')){
+                    checkItemOn(this, obj_list, objects);
+                }
             });
         }
     });
 }
 
 function checkItemOn(item, list, objects){
-    list.querySelectorAll('.checkedItem').forEach( chItem => chItem.classList.remove('checkedItem'));
+    // if(item.classList.contains('checkedItem')) return;
+    list.querySelectorAll('.checkedItem').forEach( chItem => checkItemOff(chItem) );
     item.classList.add('checkedItem');
 
     const post_id = item.dataset.post_id;
@@ -416,7 +424,7 @@ function checkItemOn(item, list, objects){
     document.querySelector('#infoRef').textContent  = object.title;
 }
 
-function checkItemOff(item, uncheck=false){
+function checkItemOff(item, uncheck=true){
     const post_id = item.dataset.post_id;
     // Выборка геообъектов
     storage.search('properties.post_id = ' + post_id).each( function(mark){

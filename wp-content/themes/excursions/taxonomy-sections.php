@@ -14,7 +14,7 @@ get_header();
 
 	<?php if( have_posts() ): ?>
 
-	<div class="row anno-card">
+	<div class="row">
 		<?php while( have_posts() ):
 			the_post();
 			
@@ -22,7 +22,7 @@ get_header();
 			$title = esc_html( get_the_title() ); 
 			// $title = get_field('gba_rating').' '.$title;
 			?>		 
-				<div class="col-6 col-sm-6 col-md-4 col-lg-3">
+				<div class="anno-card col-6 col-sm-6 col-md-4 col-lg-3">
 					<?php 
 						// the_post_thumbnail('medium'); 
 						$thumb_id = get_post_thumbnail_id();

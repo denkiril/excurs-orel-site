@@ -43,7 +43,10 @@
 						$is_front_page = is_front_page();
 						
 						if( is_singular('guidebook') || is_tax('sections') ){
-							$guidebook_id 		= 697;
+							$guidebook_id 		= 789;
+							if(home_url() == 'http://excurs-orel'){
+								$guidebook_id 	= 697;
+							}
 							$alt_headertitle 	= get_post_meta( $guidebook_id, 'header-title', true ); 
 							$term_0 			= get_terms( array('taxonomy' => 'sections') )[0]; // 'sights'
 							$term 				= get_the_terms($post->ID, 'sections')[0];

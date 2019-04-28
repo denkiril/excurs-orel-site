@@ -159,7 +159,7 @@ $OKN_TXT = 'Реестр ОКН, расположенных на террито�
 	
 	<?php 
 	$gba_sources = get_field('gba_sources');
-	if( $gba_sources ):
+	if( $gba_sources || $obj_info['is_okn'] ):
 	?>
 		<div class="row info-block">
 			<div class="col">

@@ -1,6 +1,7 @@
 
 .gallery-item{
-    margin-bottom: 2em;
+    /* margin-bottom: 2em; */
+    margin-bottom: 1em;
 }
 .gallery-item figure{
     text-align: center;
@@ -33,6 +34,7 @@
     height: auto;
 }
 .pre-gallery figcaption{
+    width: 100%;
     font-size: 0.8em;
 }
 

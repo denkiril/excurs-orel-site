@@ -24,7 +24,7 @@ do_action( 'guidebook_map_scripts' );
 			<button class="OpenMap_btn" data-state="open">[ Показать на карте ]</button>
 		</div>
 		<div class="om_content">
-			<div class="om_block omb_topFilter">
+			<div class="om_block omb_topFilter" style="display: none;">
                 <form>
 					<?php 
 					$cat_f_checked 			= isset($_GET['cat_f']) ? 'checked' : '';
@@ -77,7 +77,7 @@ do_action( 'guidebook_map_scripts' );
 				?>
 				<div class="section-container">
 					<?=$annocard_title?>
-					<div class="row anno-card">
+					<div class="row">
 					<?php
 					foreach( $myposts as $post ):
 						setup_postdata( $post );
@@ -85,7 +85,7 @@ do_action( 'guidebook_map_scripts' );
 						$title = esc_html( get_the_title() );
 						// $title = get_field('gba_rating').' '.$title;
 						?>
-						<div class="col-6 col-sm-6 col-md-4 col-lg-3">
+						<div class="anno-card col-6 col-sm-6 col-md-4 col-lg-3">
 							<?php 
 								// the_post_thumbnail('medium'); 
 								$thumb_id = get_post_thumbnail_id();

@@ -125,9 +125,11 @@ $LINKS = array();
 $scripts = array();
 $consolelog = '';
 $SCRIPTS_VER = '20190423';
-$WEBP_ON = !(home_url() == 'http://excurs-orel/');
+$WEBP_ON = !(home_url() == 'http://excurs-orel');
+if(!$WEBP_ON) console_log('WEBP_OFF');
 $PLACEHOLDER_URL = get_template_directory_uri() . '/assets/img/placeholder_3x2.png';
 // $PLACEHOLDER_URL = '/wp-content/themes/excursions/assets/img/placeholder_3x2.png';
+
 
 function excursions_scripts() {
 	global $SCRIPTS_VER;
@@ -1022,6 +1024,7 @@ function get_attachment_picture( $attachment_id, $size='thumbnail', $icon=false,
 
 		$html = '<picture>';
 
+		global $WEBP_ON;
 		if( $WEBP_ON ){
 			$srcset = generate_image_srcset( $image_meta, $image_baseurl, true );
 			if( $srcset ){
@@ -1167,7 +1170,7 @@ function gallery_func( $atts ){
 
 	$class 			= $atts['class'];
 	$item 			= $atts['item'];
-	$fancybox 		= $atts['gallery'];
+	$fancybox 		= $atts['fancybox'];
 	$lazy 			= $atts['lazy'];
 	$size 			= $atts['size'];
 	$nums 			= $atts['nums'];
@@ -1191,7 +1194,7 @@ function gallery_func( $atts ){
 			// print_r($nums_arr);
 		}
 
-		$echo .= '<div class="row '.$class.' nums-'.$nums.'">';
+		$echo .= '<div class="row '.$class.'">'; //  nums-'.$nums.'
 		foreach( $images as $image ):
 			// if( $number>0 && $number != ++$images_counter ) continue;
 			if( $nums && !in_array( ++$images_counter, $nums_arr ) ) continue;
@@ -1212,7 +1215,8 @@ function gallery_func( $atts ){
 			$echo .= '</a>';
 			if( $figcaption == 'parent_href' ){
 				$post_parent_id = wp_get_post_parent_id( $id );
-				if( $post_parent_link = get_permalink( $post_parent_id ) ){
+				// Если картинка имеет родительский пост отличный от текущего, выводим на него ссылку в подписи 
+				if( $post_parent_id != $post->ID && $post_parent_link = get_permalink( $post_parent_id ) ){
 					$description = '<a href="'.$post_parent_link.'">'.get_the_title( $post_parent_id ).'</a>';
 				}
 			}
@@ -1245,28 +1249,34 @@ function canon_paged() {
 add_filter('wpseo_head','canon_paged');
 
 /**
- * Генерирует webp копии изображений сразу после загрузки изображения в медиабиблиотеку
- * - новые файлы сохраняет с именем name.ext.webp, например, thumb.jpg.webp
+ * Оптимизирует исходный файл и генерирует webp копии изображений сразу после загрузки изображения в медиабиблиотеку
+ * - новые файлы сохраняет с именем name.ext.webp, например, thumb.jpg.webp 
+ * Использует функции https://www.php.net/manual/ru/book.image.php 
  * 
- * -- на локальном сервере wepb получаются больше jpg. Надо будет дорабатывать. 
  */
-function gt_webp_generation($metadata) {
-    $uploads = wp_upload_dir(); // получает папку для загрузки медиафайлов
+function gd_image_optimization_and_webp_generation($metadata) {
+	$uploads = wp_upload_dir(); // получает папку для загрузки медиафайлов
+	$quality = 80; // imagewebp() default is 80, imagejpeg() ~75 
 
     $file = $uploads['basedir'] . '/' . $metadata['file']; // получает исходный файл
     $ext = wp_check_filetype($file); // получает расширение файла
-    
+	
+	if( !($ext['type'] == 'image/jpeg' || $ext['type'] == 'image/png') )
+		return $metadata; // работаем только с jpeg и png 
+
     if ( $ext['type'] == 'image/jpeg' ) { // в зависимости от расширения обрабатаывает файлы разными функциями
-        $image = imagecreatefromjpeg($file); // создает изображение из jpg
+		$image = imagecreatefromjpeg($file); // создает изображение из jpg
+		imagejpeg($image, $uploads['basedir'] . '/' . $metadata['file'], $quality); // оптимизирует исходное изображение
         
     } elseif ( $ext['type'] == 'image/png' ){
         $image = imagecreatefrompng($file); // создает изображение из png
         imagepalettetotruecolor($image); // восстанавливает цвета
         imagealphablending($image, false); // выключает режим сопряжения цветов
-        imagesavealpha($image, true); // сохраняет прозрачность
+		imagesavealpha($image, true); // сохраняет прозрачность
+		imagepng($image, $uploads['basedir'] . '/' . $metadata['file']); // оптимизирует исходное изображение, 0...9, #define Z_DEFLATED 8 
 
     }
-    imagewebp($image, $uploads['basedir'] . '/' . $metadata['file'] . '.webp', 90); // сохраняет файл в webp
+    imagewebp($image, $uploads['basedir'] . '/' . $metadata['file'] . '.webp', $quality); // сохраняет файл в webp
 
     foreach ($metadata['sizes'] as $size) { // перебирает все размеры файла и также сохраняет в webp
         $file = $uploads['url'] . '/' . $size['file'];
@@ -1282,13 +1292,13 @@ function gt_webp_generation($metadata) {
             imagesavealpha($image, true);
         }
         
-        imagewebp($image, $uploads['basedir'] . $uploads['subdir'] . '/' . $size['file'] . '.webp', 90);
+        imagewebp($image, $uploads['basedir'] . $uploads['subdir'] . '/' . $size['file'] . '.webp', $quality);
 
     }
 
     return $metadata;
 }
-// add_filter('wp_generate_attachment_metadata', 'gt_webp_generation');
+add_filter('wp_generate_attachment_metadata', 'gd_image_optimization_and_webp_generation');
 
 // подключаем AJAX обработчики, только когда в этом есть смысл
 if( wp_doing_ajax() ){
@@ -1476,8 +1486,11 @@ function get_url_wo_pagenum(){
 	parse_str($parts['query'], $queryParams);
 	unset($queryParams['pagenum']);
 	$queryString 	= http_build_query($queryParams);
+	if($queryString){
+		$queryString = '?' . $queryString;
+	}
 	// $url 		= $_SERVER['HTTP_HOST'] . $parts['path'] . '?' . $queryString;
-	$url 			= home_url() . $parts['path'] . '?' . $queryString;
+	$url 			= home_url() . $parts['path'] . $queryString;
 
 	return $url;
 }
@@ -1508,7 +1521,7 @@ function acf_photo_gallery_addPostParent( $post_id ){
 							$attachment_parent = get_post($attachment_id)->post_parent;
 							// Если у вложения нет post_parent, устанавливаем его равным id текущего поста 
 							// Без проверки $post_type работает некорректно 
-							if( ($post_type == 'events' || $post_type == 'post') &&  $attachment_parent == 0 ){
+							if( ($post_type == 'events' || $post_type == 'post' || $post_type == 'guidebook') &&  $attachment_parent == 0 ){
 								// Обновляем данные в БД
 								wp_update_post( array( 'ID' => $attachment_id, 'post_parent' => $post_id ) );
 							}
@@ -1529,6 +1542,7 @@ add_action( 'save_post', 'acf_photo_gallery_addPostParent' );
 function console_log( $str ){
 	global $consolelog;
 
+	// $consolelog .= esc_html($str) . '\n';
 	$consolelog .= $str . '\n';
 }
 
@@ -1537,7 +1551,7 @@ function echo_console_log(){
 
 	if( $consolelog ){
 		// echo '<script>console.log("echo_console_log");</script>'.PHP_EOL;
-		echo "<script>console.log($consolelog);</script>".PHP_EOL;
+		echo '<script>console.log("'.$consolelog.'");</script>'.PHP_EOL;
 	}
 }
 add_action( 'wp_footer', 'echo_console_log' );
