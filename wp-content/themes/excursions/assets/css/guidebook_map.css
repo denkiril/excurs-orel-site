@@ -35,6 +35,28 @@
     outline: none;
 }
 
+.obj_map[data-state="init"] .state_init,
+.obj_map[data-state="open"] .state_open,
+.obj_map[data-state="close"] .state_close{
+    display: inline;
+}
+.obj_map[data-state="init"] .state_open,
+.obj_map[data-state="init"] .state_close,
+.obj_map[data-state="open"] .state_init,
+.obj_map[data-state="open"] .state_close,
+.obj_map[data-state="close"] .state_init,
+.obj_map[data-state="close"] .state_open{
+    display: none;
+}
+
+.obj_map[data-state="init"] .om_content,
+.obj_map[data-state="close"] .om_content{
+    display: none;
+}
+.obj_map[data-state="open"] .om_content{
+    display: block;
+}
+
 .omb_topFilter{
     height: 30px;
     margin-bottom: 4px;

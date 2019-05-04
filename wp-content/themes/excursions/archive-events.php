@@ -15,9 +15,13 @@ get_header();
 	<?php if( have_posts() ):
 		do_action( 'events_map_scripts' ); ?>
 
-		<div class="events_map" style="display: none;">
+		<div class="events_map" data-state="init" style="display: none;">
 			<div class="events_block events_block_panel">
-				<button class="NewEventsMap_btn" data-state="open">[ Показать на карте ]</button>
+				<button class="NewEventsMap_btn">
+					<span class="state_init">[ Показать на карте ]</span>
+					<span class="state_open">[ Закрыть карту ]</span>
+					<span class="state_close">[ Открыть карту ]</span>
+				</button>
 			</div>
 		</div>
 

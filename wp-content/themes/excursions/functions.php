@@ -152,11 +152,14 @@ function excursions_scripts() {
 	wp_deregister_script( 'jquery' );
 	// <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 	wp_enqueue_script( 'jquery', '//code.jquery.com/jquery-3.3.1.min.js', array(), null, 'in_footer' );
+	// wp_register_script( 'promise-polyfill-js', '//cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js', array(), null, 'in_footer' );
+	wp_register_script( 'es6-polyfill-js', '//polyfill.io/v3/polyfill.min.js?features=fetch%2CPromise', array(), null, 'in_footer' );
+	// wp_register_script( 'es6-polyfill-js', '//polyfill.io/v3/polyfill.min.js?features=es6', array(), null, 'in_footer' );
 	// wp_enqueue_script( 'jquery', get_template_directory_uri() . '/assets/include/jquery-3.3.1.min.js', array(), false, 'in_footer' );
 	wp_enqueue_script( 'bootstrap-js', get_template_directory_uri() . '/assets/include/bootstrap.min.js', array('jquery'), null, 'in_footer' );
 	wp_register_script( 'slick-js', get_template_directory_uri() . '/assets/include/slick.min.js', array('jquery'), null, 'in_footer' );
 	wp_enqueue_script( 'script-es5', get_template_directory_uri() . '/assets/js/script-es5.js', array(), $SCRIPTS_VER, 'in_footer' );
-	wp_enqueue_script( 'script', get_template_directory_uri() . '/assets/js/script.js', array('jquery'), $SCRIPTS_VER, 'in_footer' );
+	wp_enqueue_script( 'script', get_template_directory_uri() . '/assets/js/script.js', array('jquery','es6-polyfill-js'), $SCRIPTS_VER, 'in_footer' );
 	// wp_register_script( 'googlemap-api?key=YOUR_API_KEY', '//maps.googleapis.com/maps/api/js', array(), false, 'in_footer' );
 	// wp_register_script( 'ymap-api?apikey=6ebdbbc2-3779-4216-9d88-129e006559bd&lang=ru_RU', '//api-maps.yandex.ru/2.1/', array(), false, 'in_footer' );
 	// wp_register_script( 'ymap-api', '//api-maps.yandex.ru/2.1/' );
@@ -469,7 +472,7 @@ function register_post_types(){
 		//'map_meta_cap'      => null, // Ставим true чтобы включить дефолтный обработчик специальных прав
 		'hierarchical'        => false,
 		'supports'            => array('title','author','thumbnail'), // 'title','editor','author','thumbnail','excerpt','trackbacks','custom-fields','comments','revisions','page-attributes','post-formats'
-		'taxonomies'          => array('sections'),
+		'taxonomies'          => array('category', 'sections'),
 		'has_archive'         => false,
 		'rewrite'             => true,
 		'query_var'           => true,
@@ -638,20 +641,22 @@ function annocards_func( $atts ){
 	return $echo;
 }
 
-// [newscards section_id="announcement" section_title="Актуальное" future_events="1" promo_posts="2" promo_events="3" read_more="Подробнее..." exclude="312" size="medium"] 
+// [newscards section_id=announcement section_title=Актуальное section_link='' future_events=1 promo_posts=2 promo_events=3 promo_gba=4 read_more=Подробнее... exclude=312 size=medium] 
 add_shortcode( 'newscards', 'newscards_func' );
 function newscards_func( $atts ){
 	// белый список параметров и значения по умолчанию
 	$atts = shortcode_atts( array(
 		'post_type'		=> array('post','events'),
-		'section_id' 	=> '',
+		'section_id' 	=> null,
 		'section_title' => null,
+		'section_link' 	=> null,
 		'cat_name' 		=> 'promo',
 		// 'date' 		=> 'future',
-		'future_events' => '0',
-		'promo_posts' 	=> '0',
-		'promo_events' 	=> '0',
-		'read_more' 	=> null,
+		'future_events' => null,
+		'promo_posts' 	=> null,
+		'promo_events' 	=> null,
+		'promo_gba' 	=> null,
+		'read_more' 	=> '[Перейти&nbsp;>>]',
 		'exclude' 		=> array(),
 		'size' 			=> 'medium_large',
 	), $atts );
@@ -665,40 +670,69 @@ function newscards_func( $atts ){
 	$future_events 	= $atts['future_events'];
 	$promo_posts 	= $atts['promo_posts'];
 	$promo_events	= $atts['promo_events'];
+	$promo_gba		= $atts['promo_gba'];
 	$read_more 		= $atts['read_more'];
 	$exclude 		= $atts['exclude'];
 	$size 			= $atts['size'];
+	$section_link 	= $atts['section_link'];
 
 	// $args = array( 'numberposts' => $numberposts, 'post_type' => $post_type, 'category_name' => $cat_name );
 	$myposts = array();
 	if( $future_events ){
 		$today = date('Ymd');
 		$compare = '>=';
-		$args_fe = array( 'post_type' => 'events', 'exclude' => $exclude, 'meta_query' => array( array('key' => 'event_info_event_date', 'compare' => $compare, 'value' => $today) ) );
-		$myposts = array_merge($myposts, get_posts( $args_fe ));
+		$args = array( 'post_type' => 'events', 'exclude' => $exclude, 'meta_query' => array( array('key' => 'event_info_event_date', 'compare' => $compare, 'value' => $today) ) );
+		$myposts = array_merge($myposts, get_posts($args));
 	}
 	if( $promo_posts ){
-		$args_pp = array( 'post_type' => 'post', 'exclude' => $exclude, 'category_name' => $cat_name );
-		$myposts = array_merge($myposts, get_posts( $args_pp ));
+		$args = array( 'post_type' => 'post', 'exclude' => $exclude, 'category_name' => $cat_name );
+		$myposts = array_merge($myposts, get_posts($args));
 	}
 	if( $promo_events ){
-		$args_pe = array( 'post_type' => 'events', 'exclude' => $exclude, 'category_name' => $cat_name );
-		$myposts = array_merge($myposts, get_posts( $args_pe ));
+		$args = array( 'post_type' => 'events', 'exclude' => $exclude, 'category_name' => $cat_name );
+		$myposts = array_merge($myposts, get_posts($args));
+	}
+	if( $promo_gba ){
+		$args = array( 'post_type' => 'guidebook', 'exclude' => $exclude, 'category_name' => $cat_name,
+			'orderby' => array('meta_value_num' => 'DESC', 'title' => 'ASC'), 'meta_key' => 'gba_rating' );
+		$myposts = array_merge($myposts, get_posts($args));
 	}
 
+	// $meta_query = array( 
+	// 	array(
+	// 		'key' 		=> 'event_info_event_date', 
+	// 		'compare' 	=> '>=', 
+	// 		'value' 	=> date('Ymd'),
+	// 		) 
+	// );
+	// $args = array( 
+	// 	'numberposts' 	=> $numberposts, 
+	// 	'post_type' 	=> $post_type, 
+	// 	'category_name' => $cat_name,
+	// 	'meta_query'	=> $meta_query,
+	// 	'exclude' 		=> $exclude,
+	// 	'orderby' 		=> array( 'meta_value_num' => 'DESC', 'title' => 'ASC' ),
+	// 	'meta_key' 		=> 'gba_rating',
+	// 	// 'order'     	=> 'DESC',
+	// );
+	// $myposts = get_posts( $args );
 	// print_r($args);
 	// $myposts = array_merge($myposts1, $myposts2, $myposts3);
-
 	// $attachments = new WP_Query;
 	// $myposts = $attachments->query( $args );
 
 	global $post;
 	$echo = '';
 
-	if ( $myposts ): 
+	if( $myposts ): 
 		if( $section_id ) $section_id = ' id="'.$section_id.'"';
-		$echo .= '<section'.$section_id.'><div class="row section-container"><div class="col">';
-		if( $section_title ) $echo .= '<h2>'.$section_title.'</h2>';
+		// $echo .= '<section'.$section_id.'><div class="row section-container"><div class="col">';
+		$echo .= '<section'.$section_id.'><div class="section-container">';
+		if($section_title){
+			if($section_link) $section_title = '<a href="'.$section_link.'">'.$section_title.'</a>';
+			$echo .= '<h2>'.$section_title.'</h2>';
+		}
+
 		$echo .= '<div class="row">';
 		foreach( $myposts as $post ):
 			setup_postdata( $post );
@@ -721,8 +755,8 @@ function newscards_func( $atts ){
 		endforeach;
 		wp_reset_postdata();
 
-		$echo .= '</div><!-- row -->';
-		$echo .= '</div></div></section>';
+		$echo .= '</div><!-- .row -->';
+		$echo .= '</div></section>';
 	endif;
 
 	return $echo;

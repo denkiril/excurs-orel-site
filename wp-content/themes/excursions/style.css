@@ -574,6 +574,7 @@ img[data-src]{
     text-align: left;
     text-transform: none;
     font-size: 1em;
+    font-weight: normal;
     margin: 0;
     margin-bottom: 0.8em;
 }

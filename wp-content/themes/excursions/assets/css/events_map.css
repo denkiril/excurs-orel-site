@@ -46,6 +46,29 @@
     font-weight: bolder;
     outline: none;
 }
+
+.events_map[data-state="init"] .state_init,
+.events_map[data-state="open"] .state_open,
+.events_map[data-state="close"] .state_close{
+    display: inline;
+}
+.events_map[data-state="init"] .state_open,
+.events_map[data-state="init"] .state_close,
+.events_map[data-state="open"] .state_init,
+.events_map[data-state="open"] .state_close,
+.events_map[data-state="close"] .state_init,
+.events_map[data-state="close"] .state_open{
+    display: none;
+}
+
+.events_map[data-state="init"] .events_map_content,
+.events_map[data-state="close"] .events_map_content{
+    display: none;
+}
+.events_map[data-state="open"] .events_map_content{
+    display: block;
+}
+
 .events_block_map{
     height: 300px;
     margin-bottom: 4px;

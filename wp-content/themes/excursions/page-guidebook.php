@@ -19,9 +19,13 @@ do_action( 'guidebook_map_scripts' );
 
 <main id="main" class="site-main page-guidebook">
 
-	<div class="obj_map">
+	<div class="obj_map" data-state="init">
 		<div class="om_block omb_panel" style="display: none;">
-			<button class="OpenMap_btn" data-state="open">[ Показать на карте ]</button>
+			<button class="OpenMap_btn">
+				<span class="state_init">[ Показать на карте ]</span>
+				<span class="state_open">[ Закрыть карту ]</span>
+				<span class="state_close">[ Открыть карту ]</span>
+			</button>
 		</div>
 		<div class="om_content">
 			<div class="om_block omb_topFilter" style="display: none;">
@@ -86,11 +90,13 @@ do_action( 'guidebook_map_scripts' );
 						// $title = get_field('gba_rating').' '.$title;
 						?>
 						<div class="anno-card col-6 col-sm-6 col-md-4 col-lg-3">
+							<a href="<?=$permalink?>" title="Ссылка на: <?=$title?>" tabindex="-1">
 							<?php 
 								// the_post_thumbnail('medium'); 
 								$thumb_id = get_post_thumbnail_id();
 								echo get_attachment_picture( $thumb_id, 'medium', false, null, true, true ); // medium_large 
 							?>
+							</a>
 							<h3 class="annocard-caption"><a href="<?=$permalink?>" title="Ссылка на: <?=$title?>"><?=$title?></a></h3>
 						</div>
 					<?php 
