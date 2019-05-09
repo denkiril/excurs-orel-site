@@ -1,3 +1,5 @@
+// require('@babel/polyfill');
+
 function lazyLoad() {
   [].forEach.call(document.querySelectorAll('[data-src]'), (img) => {
     // if(isInViewport(lazy[i])){

@@ -7,10 +7,10 @@ const OpenMapButton = document.querySelector('#OpenMap_btn');
 
 function acfMapInit() {
   function addMarker($marker, map) {
-    // var lat = $marker.attr('data-lat');
-    // var lng = $marker.attr('data-lng');
-    const { lat } = $marker.dataset;
-    const { lng } = $marker.dataset;
+    // const { lat } = $marker.dataset;
+    // const { lng } = $marker.dataset;
+    const lat = $marker.getAttribute('data-lat');
+    const lng = $marker.getAttribute('data-lng');
 
     // Создание геообъекта с типом точка (метка)
     const marker = new ymaps.Placemark(

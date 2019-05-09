@@ -1,4 +1,13 @@
 {
-  "presets": ["minify"],
-  "comments": false
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": "> 2%, ie 10, safari > 9",
+        "useBuiltIns": "usage"
+      }
+    ],
+    // "minify"
+  ],
+  // "comments": false
 }

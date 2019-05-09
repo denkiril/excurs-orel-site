@@ -2,4 +2,6 @@
 photo/*.jpg*
 # node.js
 node_modules/
+# builded
+wp-content/themes/excursions/assets/js/
 

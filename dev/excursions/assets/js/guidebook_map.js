@@ -141,7 +141,8 @@ function filterByTitle(value, objList) {
 }
 
 function checkItemOff(item, storage, clusterer, uncheck = true) {
-  const postId = item.dataset.post_id;
+  // const postId = item.dataset.post_id;
+  const postId = item.getAttribute('data-post_id');
   // Выборка геообъектов
   storage.search(`properties.postId = ${postId}`).each((mark) => {
     const geoObjectState = clusterer.getObjectState(mark);
@@ -169,7 +170,8 @@ function checkItemOn(item, list, objects, storage, clusterer) {
   [].forEach.call(list.querySelectorAll('.checkedItem'), chItem => checkItemOff(chItem, storage, clusterer));
   item.classList.add('checkedItem');
 
-  const postId = item.dataset.post_id;
+  // const postId = item.dataset.post_id;
+  const postId = item.getAttribute('data-post_id');
   // Выборка геообъектов
   storage.search(`properties.postId = ${postId}`).each((mark) => {
     const geoObjectState = clusterer.getObjectState(mark);
@@ -245,7 +247,7 @@ function NewObjList(objectsMap, objects, storage, clusterer) {
           // objList.querySelectorAll('img[data-src]').forEach( function(img){
           [].forEach.call(objList.querySelectorAll('img[data-src]'), (img) => {
             // img.src = img.dataset.src;
-            img.setAttribute('src', img.dataset.src);
+            img.setAttribute('src', img.getAttribute('data-src'));
             img.removeAttribute('data-src');
           });
           ombListImagesLoaded = true;
@@ -424,7 +426,8 @@ function changeObjMapState(objMap) {
   // if(!button) button = this;
   // console.log(this);
 
-  switch (objMap.dataset.state) {
+  // switch (objMap.dataset.state) {
+  switch (objMap.getAttribute('data-state')) {
     case 'init':
       NewObjMap(objMap);
       objMap.setAttribute('data-state', 'open');
@@ -448,7 +451,8 @@ function changeObjMapState(objMap) {
     default: break;
   }
 
-  if (objMap.dataset.state === 'open') {
+  // if (objMap.dataset.state === 'open') {
+  if (objMap.getAttribute('data-state') === 'open') {
     NavBlock.classList.remove('fixable');
   } else {
     NavBlock.classList.add('fixable');

@@ -112,8 +112,11 @@ function NewMap(embMap, events, clusterer) {
 
 function AddListenersToItem(item, storage, clusterer) {
   item.addEventListener('mouseenter', (e) => {
-    if (e.target.matches('[data-post_id]')) {
-      const postId = e.target.dataset.post_id;
+    // if (e.target.matches('[data-post_id]')) {
+    const postId = e.target.getAttribute('data-post_id');
+    if (postId) {
+      // const postId = e.target.dataset.post_id;
+      // const postId = e.target.getAttribute('data-post_id');
       // Выборка геообъектов
       storage.search(`properties.postId = ${postId}`).each((mark) => {
         const geoObjectState = clusterer.getObjectState(mark);
@@ -134,8 +137,10 @@ function AddListenersToItem(item, storage, clusterer) {
   // events_li.mouseleave( function(e){
   item.addEventListener('mouseleave', (e) => {
     // if(e.target.matches('.events_li')) {
-    if (e.target.matches('[data-post_id]')) {
-      const postId = e.target.dataset.post_id;
+    // if (e.target.matches('[data-post_id]')) {
+    const postId = e.target.getAttribute('data-post_id');
+    if (postId) {
+      // const postId = e.target.dataset.post_id;
       storage.search(`properties.postId = ${postId}`).each((mark) => {
         const geoObjectState = clusterer.getObjectState(mark);
         if (geoObjectState.isShown) {
@@ -162,8 +167,8 @@ function NewEventsList(embList, events, storage, clusterer) {
     // <li class="events_li" data-post_id="${event.post_id}">${event.title}</li>
     const eventsLi = document.createElement('li');
     eventsLi.className = 'events_li';
-    // eventsLi.setAttribute('data-post_id', event.post_id);
-    eventsLi.dataset.post_id = event.post_id;
+    eventsLi.setAttribute('data-post_id', event.post_id);
+    // eventsLi.dataset.post_id = event.post_id;
     eventsLi.innerHTML = event.title;
     eventsLi.insertAdjacentHTML('beforeend', hiddenlink);
     AddListenersToItem(eventsLi, storage, clusterer);
@@ -221,7 +226,8 @@ function NewEventsMap(eventsMap) {
 
 function ClickEventsMapBtn(map) {
   console.log('ClickEventsMapBtn');
-  switch (map.dataset.state) {
+  // switch (map.dataset.state) {
+  switch (map.getAttribute('data-state')) {
     case 'init':
       console.log('init');
       NewEventsMap(map);
@@ -239,7 +245,8 @@ function ClickEventsMapBtn(map) {
     default: break;
   }
 
-  if (map.dataset.state === 'open') {
+  // if (map.dataset.state === 'open') {
+  if (map.getAttribute('data-state') === 'open') {
     NavBlock.classList.remove('fixable');
   } else {
     NavBlock.classList.add('fixable');

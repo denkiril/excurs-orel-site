@@ -122,17 +122,21 @@ add_action( 'widgets_init', 'excursions_widgets_init' );
  */
 
 $LINKS = array();
-$scripts = array();
+// $SCRIPTS = array();
 $consolelog = '';
-$SCRIPTS_VER = '20190423';
+$SCRIPTS_VER = '20190508';
 $WEBP_ON = !(home_url() == 'http://excurs-orel');
 if(!$WEBP_ON) console_log('WEBP_OFF');
 $PLACEHOLDER_URL = get_template_directory_uri() . '/assets/img/placeholder_3x2.png';
 // $PLACEHOLDER_URL = '/wp-content/themes/excursions/assets/img/placeholder_3x2.png';
 
+// add_script( get_template_directory_uri().'/assets/include/cssrelpreload.js', false, 'nomodule' );
+// add_script('script');
+preload_link( get_template_directory_uri().'/assets/css/main-bottom.css', $SCRIPTS_VER );
 
 function excursions_scripts() {
 	global $SCRIPTS_VER;
+	$scripts_dirname = get_template_directory_uri() . '/assets/js/';
 	wp_enqueue_style( 'excursions-style', get_stylesheet_uri(), array(), $SCRIPTS_VER );
 	wp_enqueue_style( 'bootstrap-grid', get_template_directory_uri() . '/assets/include/bootstrap-grid.min.css', array(), null );
 
@@ -144,48 +148,85 @@ function excursions_scripts() {
 		wp_enqueue_script( 'comment-reply' );
 	}
 
+	wp_enqueue_script( 'script-js', $scripts_dirname.'script.js', array(), $SCRIPTS_VER, 'in_footer' );
+	wp_enqueue_script( 'script-legacy', $scripts_dirname.'script-legacy.js', array(), $SCRIPTS_VER, 'in_footer' );
+
 	if( is_singular('events') || is_singular('guidebook') ){
 		wp_enqueue_style( 'events', get_template_directory_uri() . '/assets/css/events.css', array(), $SCRIPTS_VER );
-		wp_enqueue_script( 'events-js', get_template_directory_uri() . '/assets/js/events.js', array('script'), $SCRIPTS_VER, 'in_footer' );
+		wp_enqueue_script( 'events-js', $scripts_dirname.'events.js', array('script-js'), $SCRIPTS_VER, 'in_footer' );
+		wp_enqueue_script( 'events-legacy', $scripts_dirname.'events-legacy.js', array('script-legacy'), $SCRIPTS_VER, 'in_footer' );
+		// add_script('events');
 	}
 
 	wp_deregister_script( 'jquery' );
 	// <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-	wp_enqueue_script( 'jquery', '//code.jquery.com/jquery-3.3.1.min.js', array(), null, 'in_footer' );
+	wp_register_script( 'jquery', '//code.jquery.com/jquery-3.3.1.min.js', array(), null, 'in_footer' );
+	wp_register_script( 'slick-js', get_template_directory_uri() . '/assets/include/slick.min.js', array('jquery'), null, 'in_footer' );
+	wp_register_script( 'widgets-js', $scripts_dirname.'widgets.js', array('slick-js'), $SCRIPTS_VER, 'in_footer' );
+	wp_register_script( 'widgets-legacy', $scripts_dirname.'widgets-legacy.js', array('slick-js'), $SCRIPTS_VER, 'in_footer' );
+
+	$PF_URL = 'https://polyfill.io/v3/polyfill.min.js?features=fetch%2CElement.prototype.matches%2CObject.keys%2CNodeList.prototype.forEach%2CArray.prototype.forEach';
+	// add_script( $PF_URL, false, 'nomodule' );
+	wp_enqueue_script( 'polyfills-js', $PF_URL, array(), null, 'in_footer' );
+	wp_enqueue_script( 'cssrelpreload-js', get_template_directory_uri() . '/assets/include/cssrelpreload.js', array(), null, 'in_footer' );
 	// wp_register_script( 'promise-polyfill-js', '//cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js', array(), null, 'in_footer' );
-	wp_register_script( 'es6-polyfill-js', '//polyfill.io/v3/polyfill.min.js?features=fetch%2CPromise', array(), null, 'in_footer' );
 	// wp_register_script( 'es6-polyfill-js', '//polyfill.io/v3/polyfill.min.js?features=es6', array(), null, 'in_footer' );
 	// wp_enqueue_script( 'jquery', get_template_directory_uri() . '/assets/include/jquery-3.3.1.min.js', array(), false, 'in_footer' );
-	wp_enqueue_script( 'bootstrap-js', get_template_directory_uri() . '/assets/include/bootstrap.min.js', array('jquery'), null, 'in_footer' );
-	wp_register_script( 'slick-js', get_template_directory_uri() . '/assets/include/slick.min.js', array('jquery'), null, 'in_footer' );
-	wp_enqueue_script( 'script-es5', get_template_directory_uri() . '/assets/js/script-es5.js', array(), $SCRIPTS_VER, 'in_footer' );
-	wp_enqueue_script( 'script', get_template_directory_uri() . '/assets/js/script.js', array('jquery','es6-polyfill-js'), $SCRIPTS_VER, 'in_footer' );
+	// wp_enqueue_script( 'bootstrap-js', get_template_directory_uri() . '/assets/include/bootstrap.min.js', array('jquery'), null, 'in_footer' );
+	// wp_enqueue_script( 'script-es5', get_template_directory_uri() . '/assets/js/script-es5.js', array(), $SCRIPTS_VER, 'in_footer' );
 	// wp_register_script( 'googlemap-api?key=YOUR_API_KEY', '//maps.googleapis.com/maps/api/js', array(), false, 'in_footer' );
 	// wp_register_script( 'ymap-api?apikey=6ebdbbc2-3779-4216-9d88-129e006559bd&lang=ru_RU', '//api-maps.yandex.ru/2.1/', array(), false, 'in_footer' );
 	// wp_register_script( 'ymap-api', '//api-maps.yandex.ru/2.1/' );
-	wp_register_script( 'acf-map-js', get_template_directory_uri() . '/assets/js/acf-map-yandex.js', array('script'), $SCRIPTS_VER, 'in_footer' );
-	wp_register_script( 'events_map-js', get_template_directory_uri() . '/assets/js/events_map.js', array('script'), $SCRIPTS_VER, 'in_footer' );
-	wp_register_script( 'guidebook_map-js', get_template_directory_uri() . '/assets/js/guidebook_map.js', array('script'), $SCRIPTS_VER, 'in_footer' );
-	// wp_register_script( 'yashare-js', '//yastatic.net/share2/share.js', array(), false, 'in_footer' );
+	wp_register_script( 'acf_map-js', $scripts_dirname.'acf_map.js', array('script-js'), $SCRIPTS_VER, 'in_footer' );
+	wp_register_script( 'acf_map-legacy', $scripts_dirname.'acf_map-legacy.js', array('script-legacy'), $SCRIPTS_VER, 'in_footer' );
+	wp_register_script( 'events_map-js', $scripts_dirname.'events_map.js', array('script-js'), $SCRIPTS_VER, 'in_footer' );
+	wp_register_script( 'events_map-legacy', $scripts_dirname.'events_map-legacy.js', array('script-legacy'), $SCRIPTS_VER, 'in_footer' );
+	wp_register_script( 'guidebook_map-js', $scripts_dirname.'guidebook_map.js', array('script-js'), $SCRIPTS_VER, 'in_footer' );
+	wp_register_script( 'guidebook_map-legacy', $scripts_dirname.'guidebook_map-legacy.js', array('script-legacy'), $SCRIPTS_VER, 'in_footer' );
+	
+	wp_register_script( 'yashare-js', '//yastatic.net/share2/share.js', array(), false, 'in_footer' );
 	wp_register_script( 'fancybox-js', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js', array('jquery'), null, 'in_footer' );
 	// wp_register_style( 'fancybox', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css' );
 	wp_register_style( 'slick-full', get_template_directory_uri() . '/assets/include/slick-full.css', array(), null );
 	wp_register_style( 'events_map', get_template_directory_uri() . '/assets/css/events_map.css', array(), $SCRIPTS_VER );
 	wp_register_style( 'guidebook_map', get_template_directory_uri() . '/assets/css/guidebook_map.css', array(), $SCRIPTS_VER );
-	wp_register_script( 'cssrelpreload-js', get_template_directory_uri() . '/assets/include/cssrelpreload.js', array(), null, 'in_footer' );
 }
 add_action( 'wp_enqueue_scripts', 'excursions_scripts' );
 
-// function styles_to_footer() {
-	// wp_enqueue_style( 'excursions-style', get_stylesheet_uri(), array(), $SCRIPTS_VER );
-	// wp_enqueue_style( 'bootstrap-grid', get_template_directory_uri() . '/assets/include/bootstrap-grid.min.css', array(), null );
-	// wp_enqueue_style( 'slick', get_template_directory_uri() . '/assets/include/slick.css' );
-    // wp_enqueue_style( 'slick-theme', get_template_directory_uri() . '/assets/include/slick-theme.css' );
-    // wp_enqueue_style( 'main-font?family=Ubuntu:300,400&amp;subset=cyrillic', '//fonts.googleapis.com/css' );
-// }
-// add_action( 'wp_footer', 'styles_to_footer' );
+function change_my_script( $tag, $handle, $src ) {
+	switch ( $handle ) {
+		case ( 'script-js' ):
+		case ( 'events-js' ):
+		case ( 'widgets-js' ):
+		case ( 'acf_map-js' ):
+		case ( 'events_map-js' ):
+		case ( 'guidebook_map-js' ):
+			$_tag = str_replace( "type='text/javascript'", "type='module'", $tag );
+			break;
 
-preload_link( get_template_directory_uri().'/assets/css/main-bottom.css', $SCRIPTS_VER );
+		case ( 'script-legacy' ):
+		case ( 'events-legacy' ):
+		case ( 'widgets-legacy' ):
+		case ( 'acf_map-legacy' ):
+		case ( 'events_map-legacy' ):
+		case ( 'guidebook_map-legacy' ):
+		case ( 'polyfills-js' ):
+		case ( 'cssrelpreload-js' ):
+			$_tag = str_replace( "type='text/javascript'", "nomodule", $tag );
+			break;
+
+		case ( 'yashare-js' ):
+			$_tag = str_replace( "type='text/javascript'", "async defer", $tag );
+			break;
+
+		default:
+			$_tag = $tag;
+	}
+
+	return $_tag;
+}
+add_filter( 'script_loader_tag', 'change_my_script', 10, 3 );
+
 
 function preload_link( $href, $ver=false, $type='style' ){
 	global $LINKS;
@@ -220,32 +261,70 @@ function preload_links(){
 			}
 		}
 
-		wp_enqueue_script( 'cssrelpreload-js' );
+		// wp_enqueue_script( 'cssrelpreload-js' );
 	}
 }
 add_action( 'wp_footer', 'preload_links' );
 
-function add_script( $script_href, $attr='' ){
-	global $scripts;
+// function add_script( $src, $ver=true, $attr='module' ){
+// 	global $SCRIPTS;
 
-	foreach( $scripts as $script ){
-		if( $script['href'] == $script_href ) return;
-	}
-	$scripts[] = array('href' => $script_href, 'attr' => $attr);
-}
+// 	foreach( $SCRIPTS as $script ){
+// 		if( $script['src'] == $src ) return;
+// 	}
+// 	$SCRIPTS[] = array('src' => $src, 'ver' => $ver, 'attr' => $attr);
+// }
 
-function add_scripts(){
-	global $scripts;
+// function add_top_scripts(){
+// 	global $SCRIPTS;
 
-	if( !empty($scripts) ){
-		foreach( $scripts as $script ){
-			// echo '<script async defer src="'.$href.'"></script>'.PHP_EOL;
-			echo '<script '.$script['attr'].' defer src="'.$script['href'].'"></script>'.PHP_EOL;
-		}
-	}
-}
-add_action( 'wp_footer', 'add_scripts' );
+// 	if( !empty($SCRIPTS) ){
+// 		foreach( $SCRIPTS as $script ){
+// 			if( $script['attr'] == 'nomodule' ){
+// 				// echo '<script '.$script['attr'].' src="'.$script['src'].'"></script>'.PHP_EOL;
+// 				echo '<script nomodule src="'.$script['src'].'"></script>'.PHP_EOL;
+// 				// удалить $script из $SCRIPTS 
+// 			}
+// 		}
+// 	}
+// }
+// add_action( 'wp_footer', 'add_top_scripts', 5 );
 
+// function add_scripts(){
+// 	global $SCRIPTS;
+// 	global $SCRIPTS_VER;
+// 	$scripts_dirname = get_template_directory_uri() . '/assets/js/';
+
+// 	if( !empty($SCRIPTS) ){
+// 		foreach( $SCRIPTS as $script ){
+// 			// echo '<script async defer src="'.$href.'"></script>'.PHP_EOL;
+// 			if( $script['attr'] == 'nomodule' ){
+// 				continue;
+// 			}
+// 			elseif( $script['attr'] == 'async' ){
+// 				echo '<script async defer src="'.$script['src'].'"></script>'.PHP_EOL;
+// 			}
+// 			else{
+// 				$src_parts 	= pathinfo( $script['src'] );
+// 				$dir_uri 	= ($src_parts['dirname'] && $src_parts['dirname'] != '.') ? $src_parts['dirname'] : $scripts_dirname;
+// 				$filename 	= $src_parts['filename'];
+// 				$ver 		= $script['ver'] ? '?ver='.$SCRIPTS_VER : '';
+// 				$script_url = $dir_uri . $filename . '.js' . $ver;
+				
+// 				if( $script['attr'] == 'module' ){
+// 					$script_legacy_url = $dir_uri . $filename . '-legacy.js' . $ver;
+	
+// 					echo '<script type="module" src="'.$script_url.'"></script>'.PHP_EOL;
+// 					echo '<script nomodule src="'.$script_legacy_url.'"></script>'.PHP_EOL;
+// 				}
+// 				else{
+// 					echo '<script defer src="'.$script_url.'"></script>'.PHP_EOL;
+// 				}
+// 			}
+// 		}
+// 	}
+// }
+// add_action( 'wp_footer', 'add_scripts', 20 );
 
 // if( $gallery ) do_action( 'add_gallery_scripts' );
 add_action( 'add_gallery_scripts', 'add_gallery_scripts_func', 10, 0);
@@ -262,7 +341,9 @@ function add_gallery_scripts_func() {
 // add_action( 'add_carousel_scripts', 'add_carousel_scripts_func', 10, 0);
 function add_carousel_scripts() {
 	// global $SCRIPTS_VER;
-	wp_enqueue_script( 'slick-js' );
+	wp_enqueue_script( 'widgets-js' );
+	wp_enqueue_script( 'widgets-legacy' );
+	// add_script('widgets');
 	wp_enqueue_style( 'slick-full' );
 	// preload_link( get_template_directory_uri().'/assets/include/slick-full.css' ); -- markup flash in Firefox 
 	// <link rel="preload" as="font" type="font/woff" href="$theme_path/assets/include/fonts/slick.woff" crossorigin>
@@ -279,39 +360,39 @@ function events_map_scripts_func() {
 	// add_script('//api-maps.yandex.ru/2.1/?lang=ru_RU');
 	wp_enqueue_style( 'events_map' );
 	wp_enqueue_script( 'events_map-js' );
-	wp_localize_script( 'events_map-js', 'myajax', 
-		array(
-			'url' => admin_url('admin-ajax.php')
-		)
-	);  
+	wp_localize_script( 'events_map-js', 'myajax', array( 'url' => admin_url('admin-ajax.php') ) );
+	wp_enqueue_script( 'events_map-legacy' );
+	wp_localize_script( 'events_map-legacy', 'myajax', array( 'url' => admin_url('admin-ajax.php') ) );
 }
 
 add_action( 'guidebook_map_scripts', 'guidebook_map_scripts_func', 10, 0);
 function guidebook_map_scripts_func() {
 	wp_enqueue_style( 'guidebook_map' );
 	wp_enqueue_script( 'guidebook_map-js' );
-	wp_localize_script( 'guidebook_map-js', 'myajax', 
-		array(
-			'url' => admin_url('admin-ajax.php')
-		)
-	);  
+	wp_localize_script( 'guidebook_map-js', 'myajax', array( 'url' => admin_url('admin-ajax.php') ) );
+	wp_enqueue_script( 'guidebook_map-legacy' );
+	wp_localize_script( 'guidebook_map-legacy', 'myajax', array( 'url' => admin_url('admin-ajax.php') ) );
 }
 
 // if( $show_map ) do_action( 'event_map_scripts' );
 add_action( 'event_map_scripts', 'event_map_scripts_func', 10, 0);
 function event_map_scripts_func() {
 	// wp_enqueue_script( 'ymap-api?apikey=6ebdbbc2-3779-4216-9d88-129e006559bd&lang=ru_RU', '//api-maps.yandex.ru/2.1/', array(), false, 'in_footer' );
-	wp_enqueue_script( 'acf-map-js' );
+	wp_enqueue_script( 'acf_map-js' );
+	wp_enqueue_script( 'acf_map-legacy' );
 	// add_script('//api-maps.yandex.ru/2.1/?lang=ru_RU');
-	// add_script( get_template_directory_uri().'/assets/js/acf-map-yandex.js' );
+	// add_script( get_template_directory_uri().'/assets/js/acf_map.js' );
 }
 
 // do_action( 'add_social_scripts' );
 // add_action( 'add_social_scripts', 'add_social_scripts_func', 10, 2);
-function add_social_scripts_func( $vk=true, $fb=true ) {
-	if($vk) add_script( '//vk.com/js/api/openapi.js?160', 'async' );
+function add_social_scripts() {
+	wp_enqueue_script( 'widgets-js' );
+	wp_enqueue_script( 'widgets-legacy' );
+	// add_script('widgets');
+	// if($vk) add_script( '//vk.com/js/api/openapi.js?160', 'async' );
 	// $('<script async defer src="https://connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v3.2&appId=330469164341166&autoLogAppEvents=1"></script>').insertAfter('#fb-root');
-	if($fb) add_script( '//connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v3.2&appId=330469164341166&autoLogAppEvents=1', 'async' );
+	// if($fb) add_script( '//connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v3.2&appId=330469164341166&autoLogAppEvents=1', 'async' );
 }
 
 // do_action( 'add_social_scripts' );
@@ -334,7 +415,8 @@ function add_social_scripts_func( $vk=true, $fb=true ) {
 // do_action( 'add_share_scripts' );
 add_action( 'add_share_scripts', 'add_share_scripts_func', 10, 0);
 function add_share_scripts_func() {
-	add_script( '//yastatic.net/share2/share.js', 'async' );
+	// add_script( '//yastatic.net/share2/share.js', false, 'async' );
+	wp_enqueue_script('yashare-js');
 }
 
 // function test_styleadd() {
@@ -353,7 +435,7 @@ remove_action( 'wp_enqueue_scripts', 'wpcf7_do_enqueue_scripts', 10, 0 );
 // if( $show_form ) do_action( 'add_wpcf7_scripts' );
 add_action( 'add_wpcf7_scripts', 'add_wpcf7_scripts_func', 10, 0);
 function add_wpcf7_scripts_func() {
-	add_action( 'wp_footer', 'wpcf7_do_enqueue_scripts' );
+	add_action( 'wp_footer', 'wpcf7_do_enqueue_scripts', 20 );
 }
 
 // block-library
@@ -837,8 +919,6 @@ function socwidgets_func( $atts ){
 	$no_cover 		= $atts['no_cover'];
 	$fb 			= $atts['fb'];
 
-	// add_social_scripts_func( $vk_id, $fb );
-
 	$echo = '<section id="soc-section"><div class="row section-container"><div class="col">';
 	if( $section_title ){
 		$echo .= '<h2>'.$section_title.'</h2>';
@@ -859,6 +939,8 @@ function socwidgets_func( $atts ){
 	$echo .= '</div>';
 	// $echo .= '<noscript><p><a href="https://vk.com/excurs_orel" target="_blank">ВКонтакте</a></p><p><a href="https://www.facebook.com/groups/excursorel" target="_blank">Фейсбук</a></p></noscript>';
 	$echo .= '</div></div></section>';
+
+	add_social_scripts();
 
 	return $echo;
 }
@@ -1588,6 +1670,6 @@ function echo_console_log(){
 		echo '<script>console.log("'.$consolelog.'");</script>'.PHP_EOL;
 	}
 }
-add_action( 'wp_footer', 'echo_console_log' );
-add_action( 'admin_footer', 'echo_console_log' );
+add_action( 'wp_footer', 'echo_console_log', 20 );
+add_action( 'admin_footer', 'echo_console_log', 15 );
 
