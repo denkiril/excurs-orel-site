@@ -1,14 +1,22 @@
 const path = require('path');
+const webpack = require('webpack');
+const merge = require('webpack-merge');
+
+const PATHS = {
+  src: path.join(__dirname, './dev/excursions/assets/js/'),
+  dist: path.join(__dirname, '/public_html/wp-content/themes/excursions/'),
+  assets: 'assets/',
+};
 
 const baseConfig = {
-  devtool: 'source-map',
+  // devtool: 'source-map',
   entry: {
-    script: './dev/excursions/assets/js/script.js',
-    widgets: './dev/excursions/assets/js/widgets.js',
-    guidebook_map: './dev/excursions/assets/js/guidebook_map.js',
-    events_map: './dev/excursions/assets/js/events_map.js',
-    events: './dev/excursions/assets/js/events.js',
-    acf_map: './dev/excursions/assets/js/acf_map.js',
+    script: `${PATHS.src}script.js`,
+    widgets: `${PATHS.src}widgets.js`,
+    guidebook_map: `${PATHS.src}guidebook_map.js`,
+    events_map: `${PATHS.src}events_map.js`,
+    events: `${PATHS.src}events.js`,
+    acf_map: `${PATHS.src}acf_map.js`,
   },
 };
 
@@ -32,11 +40,11 @@ const configureBabelLoader = targetsAny => ({
   },
 });
 
-const modernConfig = Object.assign({}, baseConfig, {
+let modernConfig = Object.assign({}, baseConfig, {
   output: {
-    path: path.join(__dirname, '/wp-content/themes/excursions/assets/js'),
-    filename: '[name].js',
-    // publicPath: '/build/',
+    path: PATHS.dist,
+    filename: `${PATHS.assets}js/[name].js`,
+    publicPath: '/',
   },
   module: {
     rules: [
@@ -47,41 +55,65 @@ const modernConfig = Object.assign({}, baseConfig, {
   },
 });
 
-const legacyConfig = Object.assign({}, baseConfig, {
+let legacyConfig = Object.assign({}, baseConfig, {
   output: {
-    path: path.join(__dirname, '/wp-content/themes/excursions/assets/js'),
-    filename: '[name]-legacy.js',
-    // publicPath: '/build/',
+    path: PATHS.dist,
+    filename: `${PATHS.assets}js/[name]-legacy.js`,
+    publicPath: '/',
   },
   module: {
     rules: [
       configureBabelLoader(
         '> 2%, ie 10, safari > 9',
       ),
-      // {
-      //   test: /\.js/,
-      //   exclude: /node_modules/,
-      //   use: [
-      //     {
-      //       loader: 'babel-loader',
-      //       options: {
-      //         presets: [
-      //           [
-      //             '@babel/preset-env',
-      //             {
-      //               targets: '> 2%, ie 10, safari > 9',
-      //               useBuiltIns: 'usage',
-      //             },
-      //           ],
-      //         ],
-      //       },
-      //     },
-      //   ],
-      // },
     ],
   },
 });
 
-module.exports = [
-  modernConfig, legacyConfig,
-];
+const devWebpackConfig = {
+  // DEV config
+  // mode: 'development',
+  devtool: 'cheap-module-eval-source-map',
+  plugins: [
+    new webpack.SourceMapDevToolPlugin({
+      filename: 'map/[file].map',
+    }),
+  ],
+};
+
+const prodWebpackConfig = {
+  module: {
+    rules: [{
+      test: /\.js$/,
+      exclude: /node_modules/,
+      use: {
+        loader: 'babel-loader',
+        options: {
+          plugins: [
+            // '@babel/plugin-syntax-dynamic-import',
+            ['transform-remove-console', { exclude: ['error', 'warn'] }],
+          ],
+        },
+      },
+    },
+    ],
+  },
+};
+
+// module.exports = [
+//   modernConfig, legacyConfig,
+// ];
+
+module.exports = (env, argv) => {
+  if (argv.mode === 'development') {
+    modernConfig = merge(modernConfig, devWebpackConfig);
+    legacyConfig = merge(legacyConfig, devWebpackConfig);
+  }
+
+  if (argv.mode === 'production') {
+    modernConfig = merge(modernConfig, prodWebpackConfig);
+    legacyConfig = merge(legacyConfig, prodWebpackConfig);
+  }
+
+  return [modernConfig, legacyConfig];
+};

@@ -1,7 +1,7 @@
 # игнорировать все .jpg* (в т.ч. .jpg.webp) в каталоге photo/ 
-photo/*.jpg*
+public_html/photo/*.jpg*
 # node.js
 node_modules/
 # builded
-wp-content/themes/excursions/assets/js/
+public_html/wp-content/themes/excursions/assets/js/
 
