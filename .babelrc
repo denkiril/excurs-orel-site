@@ -9,5 +9,11 @@
     ],
     // "minify"
   ],
-  // "comments": false
+  // "plugins": ["transform-remove-console"],
+  "env": {
+    "production": {
+      "plugins": ["transform-remove-console"],
+      "comments": false,
+    }
+  }
 }

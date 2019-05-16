@@ -124,7 +124,7 @@ add_action( 'widgets_init', 'excursions_widgets_init' );
 $LINKS = array();
 // $SCRIPTS = array();
 $consolelog = '';
-$SCRIPTS_VER = '20190508';
+$SCRIPTS_VER = '20190517';
 $WEBP_ON = !(home_url() == 'http://excurs-orel');
 if(!$WEBP_ON) console_log('WEBP_OFF');
 $PLACEHOLDER_URL = get_template_directory_uri() . '/assets/img/placeholder_3x2.png';
@@ -132,7 +132,7 @@ $PLACEHOLDER_URL = get_template_directory_uri() . '/assets/img/placeholder_3x2.p
 
 // add_script( get_template_directory_uri().'/assets/include/cssrelpreload.js', false, 'nomodule' );
 // add_script('script');
-preload_link( get_template_directory_uri().'/assets/css/main-bottom.css', $SCRIPTS_VER );
+preload_link( get_template_directory_uri().'/assets/css/main_bottom.css', $SCRIPTS_VER );
 
 function excursions_scripts() {
 	global $SCRIPTS_VER;

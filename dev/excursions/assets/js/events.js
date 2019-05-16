@@ -1,3 +1,5 @@
+import '../css/events.css';
+
 const ShowVideoBtn = document.querySelector('#ShowVideo_btn');
 
 const regBtn = document.querySelector('#reg_btn');

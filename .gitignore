@@ -3,5 +3,6 @@ public_html/photo/*.jpg*
 # node.js
 node_modules/
 # builded
-public_html/wp-content/themes/excursions/assets/js/
+public_html/wp-content/themes/excursions/assets/
+public_html/wp-content/themes/excursions/map/
 

@@ -4,18 +4,21 @@
   "description": "excurs-orel.ru",
   "main": "index.js",
   "scripts": {
+    "start": "node index",
     "www": "webpack --config webpack.config.js",
-    "dev": "webpack --mode=development",
-    "prod": "webpack --mode=production",
+    "dev": "webpack --mode=development && node index",
+    "prod": "NODE_ENV=production webpack --mode=production && node index",
+    "mv": "move /dev/excursions/assets/css/style.css /public_html/wp-content/themes/excursions/",
     "build": "webpack --config webpack.build.conf.js",
     "watch": "babel dev/excursions/assets/js --out-dir public_html/wp-content/themes/excursions/assets/js -w",
-    "bbb": "babel dev/excursions/assets/js/get_script.js -d public_html/wp-content/themes/excursions/assets/js/"
+    "bbb": "NODE_ENV=production babel dev/excursions/assets/js/events_map.js -d public_html/wp-content/themes/excursions/assets/js/"
   },
+  "browserslist": "> 2%, ie 10, safari > 9",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denkiril/excurs-orel-site.git"
   },
-  "author": "",
+  "author": "Denis Kiriliuk",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/denkiril/excurs-orel-site/issues"
@@ -29,17 +32,25 @@
     "babel-loader": "^8.0.5",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "babel-preset-minify": "^0.5.0",
+    "css-loader": "^2.1.1",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-babel": "^5.3.0",
     "eslint-plugin-import": "^2.17.2",
+    "mini-css-extract-plugin": "^0.6.0",
+    "postcss-loader": "^3.0.0",
+    "style-loader": "^0.23.1",
+    "webpack": "^4.30.0",
     "webpack-cli": "^3.3.2",
     "webpack-dev-server": "^3.3.1"
   },
   "dependencies": {
     "@babel/polyfill": "^7.4.4",
+    "autoprefixer": "^9.5.1",
     "core-js": "^2.6.5",
-    "webpack": "^4.30.0",
+    "css-mqpacker": "^7.0.0",
+    "cssnano": "^4.1.10",
+    "postcss-inline-svg": "^3.1.1",
     "webpack-merge": "^4.2.1"
   }
 }

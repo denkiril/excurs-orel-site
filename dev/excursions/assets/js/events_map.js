@@ -1,4 +1,5 @@
-// let noEventsMap = true;
+import '../css/events_map.css';
+
 const baseColor = '#005281'; // 015a8d
 const activeColor = '#bc3134'; // ffd649
 /* global NavBlock */

@@ -1,4 +1,6 @@
-// let noObjMap = true;
+import '../css/guidebook_map.css';
+
+
 let ombListImagesLoaded = false;
 const baseColor = '#005281'; // 015a8d
 const activeColor = '#bc3134'; // ffd649

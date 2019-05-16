@@ -1,5 +1,3 @@
-// require('@babel/polyfill');
-
 const NavBlock 		= document.querySelector('#nav-block'); // ID шапки
 const NavBlockTop 	= NavBlock.getBoundingClientRect().top + window.pageYOffset;
 const Menu 			= document.querySelector('#menu');
