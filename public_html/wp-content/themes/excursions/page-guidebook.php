@@ -66,6 +66,7 @@ do_action( 'guidebook_map_scripts' );
 				}
 			}
 			$myposts = get_guidebook_posts( $term->slug, $numberposts );
+			// print_r2($myposts);
 
 			if( $myposts ):
 				$term_link = get_term_link( (int)$term->term_id );
@@ -111,7 +112,6 @@ do_action( 'guidebook_map_scripts' );
 						// the_posts_pagination();
 						$all_posts = get_guidebook_posts(null, -1);
 						$total = ceil(count($all_posts)/$numberposts);
-						// print_r(count($all_posts).' / ');
 						// print_r($numberposts.' = ');
 						// print_r($total);
 						// print_r('ceil = '.ceil($total));

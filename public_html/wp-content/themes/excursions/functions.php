@@ -124,7 +124,8 @@ add_action( 'widgets_init', 'excursions_widgets_init' );
 $LINKS = array();
 // $SCRIPTS = array();
 $consolelog = '';
-$SCRIPTS_VER = '20190517';
+$SCRIPTS_VER = '20190522';
+$STYLES_VER = '20190517';
 $WEBP_ON = !(home_url() == 'http://excurs-orel');
 if(!$WEBP_ON) console_log('WEBP_OFF');
 $PLACEHOLDER_URL = get_template_directory_uri() . '/assets/img/placeholder_3x2.png';
@@ -136,8 +137,9 @@ preload_link( get_template_directory_uri().'/assets/css/main_bottom.css', $SCRIP
 
 function excursions_scripts() {
 	global $SCRIPTS_VER;
+	global $STYLES_VER;
 	$scripts_dirname = get_template_directory_uri() . '/assets/js/';
-	wp_enqueue_style( 'excursions-style', get_stylesheet_uri(), array(), $SCRIPTS_VER );
+	wp_enqueue_style( 'excursions-style', get_stylesheet_uri(), array(), $STYLES_VER );
 	wp_enqueue_style( 'bootstrap-grid', get_template_directory_uri() . '/assets/include/bootstrap-grid.min.css', array(), null );
 
 	wp_enqueue_script( 'excursions-navigation', get_template_directory_uri() . '/js/navigation.js', array(), '20151215', true );
@@ -152,7 +154,7 @@ function excursions_scripts() {
 	wp_enqueue_script( 'script-legacy', $scripts_dirname.'script-legacy.js', array(), $SCRIPTS_VER, 'in_footer' );
 
 	if( is_singular('events') || is_singular('guidebook') ){
-		wp_enqueue_style( 'events', get_template_directory_uri() . '/assets/css/events.css', array(), $SCRIPTS_VER );
+		wp_enqueue_style( 'events', get_template_directory_uri() . '/assets/css/events.css', array(), $STYLES_VER );
 		wp_enqueue_script( 'events-js', $scripts_dirname.'events.js', array('script-js'), $SCRIPTS_VER, 'in_footer' );
 		wp_enqueue_script( 'events-legacy', $scripts_dirname.'events-legacy.js', array('script-legacy'), $SCRIPTS_VER, 'in_footer' );
 		// add_script('events');
@@ -188,8 +190,8 @@ function excursions_scripts() {
 	wp_register_script( 'fancybox-js', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js', array('jquery'), null, 'in_footer' );
 	// wp_register_style( 'fancybox', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css' );
 	wp_register_style( 'slick-full', get_template_directory_uri() . '/assets/include/slick-full.css', array(), null );
-	wp_register_style( 'events_map', get_template_directory_uri() . '/assets/css/events_map.css', array(), $SCRIPTS_VER );
-	wp_register_style( 'guidebook_map', get_template_directory_uri() . '/assets/css/guidebook_map.css', array(), $SCRIPTS_VER );
+	wp_register_style( 'events_map', get_template_directory_uri() . '/assets/css/events_map.css', array(), $STYLES_VER );
+	wp_register_style( 'guidebook_map', get_template_directory_uri() . '/assets/css/guidebook_map.css', array(), $STYLES_VER );
 }
 add_action( 'wp_enqueue_scripts', 'excursions_scripts' );
 
@@ -329,12 +331,12 @@ add_action( 'wp_footer', 'preload_links' );
 // if( $gallery ) do_action( 'add_gallery_scripts' );
 add_action( 'add_gallery_scripts', 'add_gallery_scripts_func', 10, 0);
 function add_gallery_scripts_func() {
-	global $SCRIPTS_VER;
+	global $STYLES_VER;
 	wp_enqueue_script( 'fancybox-js' );
 	// wp_enqueue_style( 'fancybox' );
 	// wp_enqueue_style( 'gallery' );
 	preload_link( '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css' );
-	preload_link( get_template_directory_uri().'/assets/css/gallery.css', $SCRIPTS_VER );
+	preload_link( get_template_directory_uri().'/assets/css/gallery.css', $STYLES_VER );
 }
 
 // do_action( 'add_carousel_scripts' );
@@ -1556,9 +1558,9 @@ function get_guidebook_posts( $term_slug='', $numberposts=0 ) {
 			}
 		}
 
-		if($numberposts == -1){
-			$paged = 0;
-		}
+		// if($numberposts == -1){
+		// 	$paged = 0;
+		// }
 		
 		$args = array( 
 			'post_type' 	=> 'guidebook', 
@@ -1566,12 +1568,29 @@ function get_guidebook_posts( $term_slug='', $numberposts=0 ) {
 			'orderby' 		=> array( 'meta_value_num' => 'DESC', 'title' => 'ASC' ),
 			'meta_key' 		=> 'gba_rating',
 			// 'order'     	=> 'DESC',
-			'numberposts' 	=> $numberposts, 
-			'paged'			=> $paged,
+			// 'numberposts' 	=> $numberposts, 
+			'numberposts' 	=> -1, 
+			// 'paged'			=> $paged,
 			'meta_query'	=> $meta_query,
 		);
 
 		$posts = get_posts( $args );
+		// посты с category_name = promo поднимаем вверх 
+		$promo_posts = [];
+		foreach( $posts as $counter => $post ){
+			if(in_category('promo', $post->ID)){
+				$promo_posts[] = $post;
+				unset( $posts[$counter] );
+				// array_splice($posts, $counter, 1);
+			}
+		}
+
+		$posts = array_merge( $promo_posts, $posts );
+
+		if($numberposts > 0){
+			$posts = array_slice($posts, $numberposts*($paged-1), $numberposts);
+		}
+
 	}
 		
 	return $posts;
@@ -1673,3 +1692,8 @@ function echo_console_log(){
 add_action( 'wp_footer', 'echo_console_log', 20 );
 add_action( 'admin_footer', 'echo_console_log', 15 );
 
+function print_r2($val){
+	echo '<pre>';
+	print_r($val);
+	echo  '</pre>';
+}

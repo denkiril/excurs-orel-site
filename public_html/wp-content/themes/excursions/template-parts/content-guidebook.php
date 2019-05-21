@@ -11,8 +11,10 @@
 
 <?php
 
-$OKN_URL = 'https://orel-region.ru/index.php?head=6&part=73&unit=401&op=8&in=168';
-$OKN_TXT = 'Реестр ОКН, расположенных на территории Орловской области';
+// $OKN_URL = 'https://orel-region.ru/index.php?head=6&part=73&unit=401&op=8&in=168';
+$OKN_URL = 'https://opendata.mkrf.ru/opendata/7705851331-egrkn';
+// $OKN_TXT = 'Реестр ОКН, расположенных на территории Орловской области';
+$OKN_TXT = 'Сведения из Единого госреестра ОКН (сайт Минкультуры России)';
 
 ?>
 
@@ -172,7 +174,9 @@ $OKN_TXT = 'Реестр ОКН, расположенных на террито�
 						$sublines = explode('=', $line, 2);
 						$text = esc_html( trim($sublines[0]) );
 						$url = esc_html( trim($sublines[1]) );
-						if( $ret = parse_url($url) ){
+						// print_r("url=".$url);
+						if( $url ){
+							$ret = parse_url($url);
 							if( !isset($ret['scheme']) ){
 								$url = "http://{$url}";
 							}

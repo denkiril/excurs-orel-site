@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index",
-    "www": "webpack --config webpack.config.js",
+    "www": "webpack --config webpack.config.js --watch",
     "dev": "webpack --mode=development && node index",
     "prod": "NODE_ENV=production webpack --mode=production && node index",
     "mv": "move /dev/excursions/assets/css/style.css /public_html/wp-content/themes/excursions/",
@@ -51,6 +51,7 @@
     "css-mqpacker": "^7.0.0",
     "cssnano": "^4.1.10",
     "postcss-inline-svg": "^3.1.1",
+    "url-search-params": "^1.1.0",
     "webpack-merge": "^4.2.1"
   }
 }

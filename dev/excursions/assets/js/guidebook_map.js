@@ -1,5 +1,6 @@
 import '../css/guidebook_map.css';
 
+const URLSearchParams = require('url-search-params');
 
 let ombListImagesLoaded = false;
 const baseColor = '#005281'; // 015a8d
@@ -223,13 +224,17 @@ function NewObjList(objectsMap, objects, storage, clusterer) {
   embList.appendChild(objList);
 
   objList.addEventListener('keydown', (e) => {
-    // console.log('obj_list keydown');
+    console.log('obj_list keydown');
     let item;
     switch (e.key) {
       case 'ArrowDown':
       case 'Enter':
         e.preventDefault();
         item = objList.querySelector('li');
+        if (item.style.display === 'none') {
+          do (item = item.nextElementSibling);
+          while (item != null && item.style.display === 'none');
+        }
         if (item) {
           item.setAttribute('tabindex', 0);
           item.focus();
@@ -320,8 +325,18 @@ function NewObjList(objectsMap, objects, storage, clusterer) {
             break;
 
           case 'Enter':
-            anItem = objList;
-            focus = true;
+            // anItem = objList;
+            if (anItem.matches('li')) {
+              anItem = anItem.querySelector('a');
+              if (anItem) {
+                anItem.focus();
+              }
+              e.stopPropagation();
+            } else if (anItem.matches('a')) {
+              // document.location.href = anItem.href;
+              e.stopPropagation();
+            }
+            // focus = true;
             break;
 
           default: break;
@@ -477,7 +492,10 @@ function initGBMap() {
     }
 
     if (window.screen.width > 768) {
-      changeObjMapState(objMap);
+      const searchParams = new URLSearchParams(window.location.search);
+      if (!searchParams.has('pagenum')) {
+        changeObjMapState(objMap);
+      }
     }
     // else if (omContent) {
     //   omContent.style.display = 'none';

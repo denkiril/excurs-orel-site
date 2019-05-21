@@ -5,4 +5,6 @@ node_modules/
 # builded
 public_html/wp-content/themes/excursions/assets/
 public_html/wp-content/themes/excursions/map/
+# gitignore
+dev/gitignore/
 
