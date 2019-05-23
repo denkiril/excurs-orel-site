@@ -124,8 +124,8 @@ add_action( 'widgets_init', 'excursions_widgets_init' );
 $LINKS = array();
 // $SCRIPTS = array();
 $consolelog = '';
-$SCRIPTS_VER = '20190522';
-$STYLES_VER = '20190517';
+$SCRIPTS_VER = '20190523';
+$STYLES_VER = '20190523';
 $WEBP_ON = !(home_url() == 'http://excurs-orel');
 if(!$WEBP_ON) console_log('WEBP_OFF');
 $PLACEHOLDER_URL = get_template_directory_uri() . '/assets/img/placeholder_3x2.png';
@@ -133,14 +133,14 @@ $PLACEHOLDER_URL = get_template_directory_uri() . '/assets/img/placeholder_3x2.p
 
 // add_script( get_template_directory_uri().'/assets/include/cssrelpreload.js', false, 'nomodule' );
 // add_script('script');
-preload_link( get_template_directory_uri().'/assets/css/main_bottom.css', $SCRIPTS_VER );
+preload_link( get_template_directory_uri().'/assets/css/main_bottom.css', $STYLES_VER );
 
 function excursions_scripts() {
 	global $SCRIPTS_VER;
 	global $STYLES_VER;
 	$scripts_dirname = get_template_directory_uri() . '/assets/js/';
 	wp_enqueue_style( 'excursions-style', get_stylesheet_uri(), array(), $STYLES_VER );
-	wp_enqueue_style( 'bootstrap-grid', get_template_directory_uri() . '/assets/include/bootstrap-grid.min.css', array(), null );
+	// wp_enqueue_style( 'bootstrap-grid', get_template_directory_uri() . '/assets/include/bootstrap-grid.min.css', array(), null );
 
 	wp_enqueue_script( 'excursions-navigation', get_template_directory_uri() . '/js/navigation.js', array(), '20151215', true );
 
@@ -213,11 +213,11 @@ function change_my_script( $tag, $handle, $src ) {
 		case ( 'events_map-legacy' ):
 		case ( 'guidebook_map-legacy' ):
 		case ( 'polyfills-js' ):
-		case ( 'cssrelpreload-js' ):
-			$_tag = str_replace( "type='text/javascript'", "nomodule", $tag );
-			break;
-
+		$_tag = str_replace( "type='text/javascript'", "nomodule", $tag );
+		break;
+		
 		case ( 'yashare-js' ):
+		case ( 'cssrelpreload-js' ):
 			$_tag = str_replace( "type='text/javascript'", "async defer", $tag );
 			break;
 
@@ -1270,7 +1270,34 @@ function image_func( $atts ){
 	return $echo;
 }
 
-// [gallery class=post-gallery item=gallery-item fancybox=gallery lazy=1 size=large nums=null(1,2,4) figcaption=image_description(parent_href) mini=false] 
+function markup_post_permalink($post_id, $text, $permalink=true){
+	$post_id = (int) $post_id;
+
+	if($permalink && $post_id > 0){
+		$post_link = get_permalink($post_id);
+		if( $post_link ){
+			$text = '<a href="'.$post_link.'" title="'.get_the_title( $post_id ).'">'.$text.'</a>';
+		}
+	}
+
+	return $text;
+}
+
+/**
+ * Parse wiki-style refs in image description field 
+ */
+function image_description_parse($str, $permalink=true){
+	$text = $str;
+	$matches = [];
+	$count = preg_match_all('/\\[post=(\\d+)\\|([^\\]]*)\\]/u', $str, $matches);
+	for($i = 0; $i < $count; $i++){
+		$text = str_replace($matches[0][$i], markup_post_permalink($matches[1][$i], $matches[2][$i], $permalink), $text);
+	}
+
+	return $text;
+}
+
+// [gallery class=post-gallery item=gallery-item fancybox=gallery lazy=1 size=large nums=null(1,2,4) figcaption=image_description(parent_href) mini=false permalink=true] 
 add_shortcode( 'gallery', 'gallery_func' );
 
 function gallery_func( $atts ){
@@ -1284,6 +1311,7 @@ function gallery_func( $atts ){
 		'nums' 			=> null,
 		'figcaption' 	=> 'image_description',
 		'mini' 			=> false,
+		'permalink' 	=> true,
 	), $atts );
 
 	$class 			= $atts['class'];
@@ -1294,6 +1322,7 @@ function gallery_func( $atts ){
 	$nums 			= $atts['nums'];
 	$figcaption 	= $atts['figcaption'];
 	$mini 			= $atts['mini'];
+	$permalink 		= $atts['permalink'];
 
 	$echo = '';
 
@@ -1319,7 +1348,7 @@ function gallery_func( $atts ){
 
 			$id 			= $image['id']; // The attachment id of the media
 			$title 			= $image['title']; //The title
-			$description 	= $image['caption']; //The caption (Description!)
+			$description 	= image_description_parse( $image['caption'], $permalink ); //The caption (Description!)
 			$full_image_url = $image['full_image_url']; //Full size image url
 
 			if( $title ) $attr = array( 'title' => $title);

@@ -57,6 +57,7 @@ do_action( 'guidebook_map_scripts' );
 		$term_counter = 0;
 		foreach( $terms as $term ):
 			$numberposts = 12;
+			// $numberposts = 4; // for dev
 			if($term_counter == 0){
 				if(isset($_GET['numberposts_1'])){
 					$numberposts = 1;

@@ -70,9 +70,10 @@ $OKN_TXT = 'Сведения из Единого госреестра ОКН (с
 			{
 				$label = '<span class="ei_label">Тип объекта:</span> ';
 				switch( $obj_info['okn_type'] ){
-					case 'a': $okn_type = 'Памятник археологии'; 							break;
-					case 'g': $okn_type = 'Памятник архитектуры и градостроительства'; 		break;
-					case 'i': $okn_type = 'Памятник истории и монументального искусства'; 	break;
+					case 'a': $okn_type = 'Памятник археологии'; 						break;
+					case 'g': $okn_type = 'Памятник архитектуры и градостроительства'; 	break;
+					case 'h': $okn_type = 'Памятник истории'; 							break;
+					case 'i': $okn_type = 'Памятник искусства'; 						break;
 				}
 				$echo .= $label . $okn_type . '<br />';
 			}

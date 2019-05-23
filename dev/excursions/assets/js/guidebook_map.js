@@ -1,6 +1,6 @@
 import '../css/guidebook_map.css';
 
-const URLSearchParams = require('url-search-params');
+// const URLSearchParams = require('url-search-params');
 
 let ombListImagesLoaded = false;
 const baseColor = '#005281'; // 015a8d
@@ -213,7 +213,7 @@ function NewObjList(objectsMap, objects, storage, clusterer) {
     const markup = `
             <li ${nothumbClass} data-post_id="${object.post_id}" tabindex="-1">
                 <span class="li_title">${object.title}</span>
-                <span><a class="hiddenlink" href="${object.permalink}" title="Ссылка на ${object.title}">[>>]</a></span>
+                <a class="hiddenlink" href="${object.permalink}" title="Ссылка на ${object.title}">[>>]</a>
                 <img data-src="${imgUrl}" />
             </li>`;
 
@@ -492,8 +492,10 @@ function initGBMap() {
     }
 
     if (window.screen.width > 768) {
-      const searchParams = new URLSearchParams(window.location.search);
-      if (!searchParams.has('pagenum')) {
+      const searchStr = window.location.search;
+      // const searchParams = new URLSearchParams(window.location.search);
+      // if (!searchParams.has('pagenum')) {
+      if (!searchStr.includes('pagenum=')) {
         changeObjMapState(objMap);
       }
     }
