@@ -118,6 +118,11 @@ $OKN_TXT = 'Сведения из Единого госреестра ОКН (с
 				$label = '<span class="ei_label">Год постановки на охрану:</span> ';
 				$echo .= $label . esc_html( $obj_info['registry_date'] ) . '<br />';
 			}
+			if( $obj_info['okn_id'] )
+			{
+				$label = '<span class="ei_label">Номер в реестре ОКН:</span> ';
+				$echo .= $label . esc_html( $obj_info['okn_id'] ) . '<br />';
+			}
 			if( $obj_info['more_info'] )
 			{
 				$more_lines = explode(PHP_EOL, $obj_info['more_info']);

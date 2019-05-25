@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index",
-    "www": "webpack --config webpack.config.js --watch",
+    "www": "webpack --config webpack.config.js --mode=development --watch",
     "dev": "webpack --mode=development && node index",
     "prod": "NODE_ENV=production webpack --mode=production && node index",
     "mv": "move /dev/excursions/assets/css/style.css /public_html/wp-content/themes/excursions/",

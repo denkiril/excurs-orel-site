@@ -124,7 +124,7 @@ add_action( 'widgets_init', 'excursions_widgets_init' );
 $LINKS = array();
 // $SCRIPTS = array();
 $consolelog = '';
-$SCRIPTS_VER = '20190523';
+$SCRIPTS_VER = '20190525';
 $STYLES_VER = '20190523';
 $WEBP_ON = !(home_url() == 'http://excurs-orel');
 if(!$WEBP_ON) console_log('WEBP_OFF');
@@ -163,9 +163,10 @@ function excursions_scripts() {
 	wp_deregister_script( 'jquery' );
 	// <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 	wp_register_script( 'jquery', '//code.jquery.com/jquery-3.3.1.min.js', array(), null, 'in_footer' );
-	wp_register_script( 'slick-js', get_template_directory_uri() . '/assets/include/slick.min.js', array('jquery'), null, 'in_footer' );
-	wp_register_script( 'widgets-js', $scripts_dirname.'widgets.js', array('slick-js'), $SCRIPTS_VER, 'in_footer' );
-	wp_register_script( 'widgets-legacy', $scripts_dirname.'widgets-legacy.js', array('slick-js'), $SCRIPTS_VER, 'in_footer' );
+	// wp_register_script( 'slick-js', get_template_directory_uri() . '/assets/include/slick.min.js', array('jquery'), null, 'in_footer' );
+	wp_register_script( 'glide-js', get_template_directory_uri() . '/assets/include/glide.min.js', array(), null, 'in_footer' );
+	wp_register_script( 'widgets-js', $scripts_dirname.'widgets.js', array('glide-js'), $SCRIPTS_VER, 'in_footer' );
+	wp_register_script( 'widgets-legacy', $scripts_dirname.'widgets-legacy.js', array('glide-js'), $SCRIPTS_VER, 'in_footer' );
 
 	$PF_URL = 'https://polyfill.io/v3/polyfill.min.js?features=fetch%2CElement.prototype.matches%2CObject.keys%2CNodeList.prototype.forEach%2CArray.prototype.forEach';
 	// add_script( $PF_URL, false, 'nomodule' );
@@ -189,7 +190,9 @@ function excursions_scripts() {
 	wp_register_script( 'yashare-js', '//yastatic.net/share2/share.js', array(), false, 'in_footer' );
 	wp_register_script( 'fancybox-js', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js', array('jquery'), null, 'in_footer' );
 	// wp_register_style( 'fancybox', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css' );
-	wp_register_style( 'slick-full', get_template_directory_uri() . '/assets/include/slick-full.css', array(), null );
+	// wp_register_style( 'slick-full', get_template_directory_uri() . '/assets/include/slick-full.css', array(), null );
+	wp_register_style( 'glide-core', get_template_directory_uri() . '/assets/include/glide.core.min.css', array(), null );
+	wp_register_style( 'glide-theme', get_template_directory_uri() . '/assets/include/glide.theme.min.css', array(), null );
 	wp_register_style( 'events_map', get_template_directory_uri() . '/assets/css/events_map.css', array(), $STYLES_VER );
 	wp_register_style( 'guidebook_map', get_template_directory_uri() . '/assets/css/guidebook_map.css', array(), $STYLES_VER );
 }
@@ -345,11 +348,13 @@ function add_carousel_scripts() {
 	// global $SCRIPTS_VER;
 	wp_enqueue_script( 'widgets-js' );
 	wp_enqueue_script( 'widgets-legacy' );
+	wp_enqueue_style( 'glide-core' );
+	wp_enqueue_style( 'glide-theme' );
 	// add_script('widgets');
-	wp_enqueue_style( 'slick-full' );
+	// wp_enqueue_style( 'slick-full' );
 	// preload_link( get_template_directory_uri().'/assets/include/slick-full.css' ); -- markup flash in Firefox 
 	// <link rel="preload" as="font" type="font/woff" href="$theme_path/assets/include/fonts/slick.woff" crossorigin>
-	preload_link( get_template_directory_uri().'/assets/include/fonts/slick.woff', false, 'font' );
+	// preload_link( get_template_directory_uri().'/assets/include/fonts/slick.woff', false, 'font' );
 }
 
 // if( '.events_map' ) do_action( 'events_map_scripts' );
@@ -947,21 +952,76 @@ function socwidgets_func( $atts ){
 	return $echo;
 }
 
-// [carousel class="carousel" hrefs=1 size="medium_large"]
+// function carousel_func( $atts ){
+// 	// белый список параметров и значения по умолчанию
+// 	$atts = shortcode_atts( array(
+// 		'class' => 'carousel',
+// 		'hrefs' => false,
+// 		'size' 	=> 'medium_large',
+// 	), $atts );
+
+// 	$class 		= $atts['class'];
+// 	$class_item = $class.'-item';
+// 	$hrefs 		= $atts['hrefs'];
+// 	$size 		= $atts['size'];
+
+// 	$echo = '';
+
+// 	global $post;
+// 	//Get the images ids from the post_metadata
+// 	$images = acf_photo_gallery( 'carousel_gal', $post->ID );
+// 	if( count($images) ):
+// 		$images_counter = 0;
+// 		$echo .= '<div class="'.$class.'">';
+// 		foreach( $images as $image ):
+// 			$id = $image['id']; // The attachment id of the media
+// 			$title = $image['title']; //The title
+// 			// $description = $image['caption']; //The caption (Description!)
+// 			// $full_image_url= $image['full_image_url']; //Full size image url
+// 			$post_id = wp_get_post_parent_id( $id ); // get_post($id)->post_parent 
+// 			$post_link = get_permalink( $post_id ); 
+// 			$attr = $hrefs ? null : array( 'title' => $title);
+
+// 			$echo .= '<div class="'.$class_item.'">';
+// 			if( $hrefs && $post_link )
+// 				$echo .= '<a href="'.$post_link.'" title="'.get_the_title( $post_id ).'">';
+
+// 			// Get picture item. 1st ($images_counter == 0) is not lazy 
+// 			// if( $images_counter == 0 ) $echo .= wp_get_attachment_image( $id, 'medium_large', false, $attr );
+// 			// else $echo .= get_lazy_attachment_image( $id, 'medium_large', false, $attr );
+// 			$echo .= get_attachment_picture( $id, $size, false, $attr, $images_counter > 0 );
+// 			$images_counter++;
+
+// 			if( $hrefs && $post_link ) $echo .= '</a>';
+// 			$echo .= '</div>';
+
+// 		endforeach;
+// 		$echo .= '</div> <!-- .'.$class.' -->';
+
+// 		add_carousel_scripts();
+
+// 	endif;
+
+// 	return $echo;
+// }
+
+// [carousel class="carousel" hrefs=1 size="medium_large" container="col-md-10 col-lg-6 carousel-container"]
 add_shortcode( 'carousel', 'carousel_func' );
 
 function carousel_func( $atts ){
 	// белый список параметров и значения по умолчанию
 	$atts = shortcode_atts( array(
-		'class' => 'carousel',
-		'hrefs' => false,
-		'size' 	=> 'medium_large',
+		'class' 	=> 'carousel',
+		'hrefs' 	=> false,
+		'size' 		=> 'medium_large',
+		'container' => 'carousel-container',
 	), $atts );
 
 	$class 		= $atts['class'];
 	$class_item = $class.'-item';
 	$hrefs 		= $atts['hrefs'];
 	$size 		= $atts['size'];
+	$container 	= $atts['container'];
 
 	$echo = '';
 
@@ -970,8 +1030,12 @@ function carousel_func( $atts ){
 	$images = acf_photo_gallery( 'carousel_gal', $post->ID );
 	if( count($images) ):
 		$images_counter = 0;
-		$echo .= '<div class="'.$class.'">';
-		foreach( $images as $image ):
+		if( $container ){
+			$echo .= '<div class="'.$container.'">';
+		}
+		$echo .= '<div class="glide '.$class.'">';
+		$echo .= '<div class="glide__track" data-glide-el="track"><ul class="glide__slides">';
+		foreach( $images as $image ){
 			$id = $image['id']; // The attachment id of the media
 			$title = $image['title']; //The title
 			// $description = $image['caption']; //The caption (Description!)
@@ -980,10 +1044,10 @@ function carousel_func( $atts ){
 			$post_link = get_permalink( $post_id ); 
 			$attr = $hrefs ? null : array( 'title' => $title);
 
-			$echo .= '<div class="'.$class_item.'">';
-			if( $hrefs && $post_link )
+			$echo .= '<li class="glide__slide">';
+			if( $hrefs && $post_link ){
 				$echo .= '<a href="'.$post_link.'" title="'.get_the_title( $post_id ).'">';
-
+			}
 			// Get picture item. 1st ($images_counter == 0) is not lazy 
 			// if( $images_counter == 0 ) $echo .= wp_get_attachment_image( $id, 'medium_large', false, $attr );
 			// else $echo .= get_lazy_attachment_image( $id, 'medium_large', false, $attr );
@@ -991,10 +1055,21 @@ function carousel_func( $atts ){
 			$images_counter++;
 
 			if( $hrefs && $post_link ) $echo .= '</a>';
-			$echo .= '</div>';
+			$echo .= '</li>';
 
-		endforeach;
-		$echo .= '</div> <!-- .'.$class.' -->';
+		}
+		$echo .= '</ul></div>';
+		// bullets
+		$echo .= '<div class="glide__bullets" data-glide-el="controls[nav]">';
+		foreach( $images as $counter => $image ){
+			$echo .= '<button class="glide__bullet" data-glide-dir="='.$counter.'"></button>';
+		}
+		$echo .= '</div>';
+
+		$echo .= '</div> <!-- .glide .'.$class.' -->';
+		if( $container ){
+			$echo .= '</div> <!-- .'.$container.' -->';
+		}
 
 		add_carousel_scripts();
 

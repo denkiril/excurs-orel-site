@@ -3,9 +3,11 @@ const fbSdkUrl 		= 'https://connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v3
 const SocialSection = document.querySelector('#soc-section');
 const vkGroups 		= document.querySelector('#vk_groups');
 const fbRoot 		= document.querySelector('#fb-root');
+const glideEl 	= document.querySelector('.glide');
 /* global VK */
 /* global getScript */
 /* global registerListener */
+/* global Glide */
 
 function socialInit() {
   // if(SocialSection && screen.width > 768){
@@ -43,16 +45,25 @@ function socialInit() {
 
 registerListener('load', socialInit, (SocialSection && window.screen.width > 768)); // social widgets only for big screens
 
-$(document).ready(() => {
-  // Слайдер-карусель
-  if ($('.carousel').length) { // anti "$(...).slick is not a function"
-    $('.carousel').slick({
-      arrows: false,
-      dots: true,
-      autoplay: (window.screen.width > 768),
-      autoplaySpeed: 5000,
-      lazyLoad: 'ondemand',
-      // lazyLoad: 'progressive'
-    });
-  }
-});
+// $(document).ready(() => {
+//   // Слайдер-карусель
+//   if ($('.carousel').length) { // anti "$(...).slick is not a function"
+//     $('.carousel').slick({
+//       arrows: false,
+//       dots: true,
+//       autoplay: (window.screen.width > 768),
+//       autoplaySpeed: 5000,
+//       lazyLoad: 'ondemand',
+//       // lazyLoad: 'progressive'
+//     });
+//   }
+// });
+
+if (glideEl) {
+  const glide = new Glide('.glide', {
+    type: 'carousel',
+    autoplay: (window.screen.width > 768) ? 5000 : false,
+  });
+
+  glide.mount();
+}
