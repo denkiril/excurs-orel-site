@@ -34,17 +34,18 @@ $OKN_TXT = 'Сведения из Единого госреестра ОКН (с
 			// $full_image_url = get_the_post_thumbnail_url(); 
 			$full_image_url = wp_get_attachment_image_url( $thumb_id, 'full' ); 
 			$title = get_the_title($thumb_id); 
-			$gallery = true; ?>
-			<a data-fancybox="gallery" href="<?=$full_image_url?>">
-			<?php
-				$attr = array( 'class' => "events-image", 'title' => $title );
+			$gallery = true; 
+			echo markup_fancy_figure($thumb_id, 'gallery', $full_image_url, null, 'medium_large', false, $title, 'events-image');
+			
+				// <a data-fancybox="gallery" href="<=$full_image_url>">
+				// $attr = array( 'class' => "events-image", 'title' => $title );
 				// the_post_thumbnail('medium_large', array( 'class' => "events-image", 'title' => $title )); 
-				echo get_attachment_picture( $thumb_id, 'medium_large', false, $attr, false );
-			?>
-			</a>
-		<?php endif; ?>
-
-		<?php the_field('gba_intro'); ?>
+				// echo get_attachment_picture( $thumb_id, 'medium_large', false, $attr, false );
+				// </a>
+		endif; 
+		
+		the_field('gba_intro');
+		?>
 
 		</div>
 	</div> <!-- row -->

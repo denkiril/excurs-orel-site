@@ -29,17 +29,12 @@
 					// $full_image_url = get_the_post_thumbnail_url(); 
 					$full_image_url = wp_get_attachment_image_url( $thumb_id, 'full' ); 
 					$title = get_the_title($thumb_id); 
-					$gallery = true; ?>
-					<a data-fancybox="gallery" href="<?=$full_image_url?>">
-					<?php
-						$attr = array( 'class' => "events-image", 'title' => $title );
-						// the_post_thumbnail('medium_large', array( 'class' => "events-image", 'title' => $title )); 
-						echo get_attachment_picture( $thumb_id, 'medium_large', false, $attr, false );
-					?>
-					</a>
-				<?php endif; ?>
+					$gallery = true; 
+					echo markup_fancy_figure($thumb_id, 'gallery', $full_image_url, null, 'medium_large', false, $title, 'events-image');
+				endif;
 
-				<?php the_field('event_description'); ?>
+				the_field('event_description');
+				?>
 
 			</div>
 		</div> <!-- row -->
@@ -48,6 +43,11 @@
 		$location = $event_info['event_place_map'];
 		$show_map = $event_info['show_map'] && !empty($location);
 		$col_sfx = $show_map ? '-lg-6' : '';
+		// get raw date
+		$ev_date = get_field('event_info_event_date', false, false);
+		$today = date('Ymd');
+		// get_field('dev_show_offer'); -- Показывать оффер, даже если событие уже прошло
+		$show_offer = get_field('dev_show_offer') ? true : ($ev_date >= $today);
 		?>
 		<div class="event-info row">
 			<div class="col<?=$col_sfx?>">
@@ -58,6 +58,9 @@
 				{
 					$label = $event_info['event_date_label'] ? '<span class="ei_label">' . esc_html( $event_info['event_date_label'] ) . '</span> ' : '';
 					$event_date_html = markup_event_date();
+					if( $show_offer ){
+						$event_date_html = '<span class="attention">'.$event_date_html.'</span>';
+					}
 					$echo .= $label . $event_date_html . '<br />';
 				}
 				if( $event_info['show_event_time'] && $event_info['event_time'] )
@@ -107,11 +110,6 @@
 		<?php if( $event_info_is || $show_map ) echo '<hr />'; ?>
 
 		<?php /* show_offer start */
-		// get raw date
-		$ev_date = get_field('event_info_event_date', false, false);
-		$today = date('Ymd');
-		// get_field('dev_show_offer'); -- Показывать оффер, даже если событие уже прошло
-		$show_offer = get_field('dev_show_offer') ? true : ($ev_date >= $today);
 		if( $show_offer ): ?>
 		<div class="row">
 			<div class="col">
@@ -154,45 +152,12 @@
 		<?php endif; /* show_offer end */ ?>
 
 		<?php
-		// the_content();
+		$pre_gallery = do_shortcode('[gallery acf_field=pre-gallery size=medium_large mini=true]');
+		if($pre_gallery){
+			$gallery = true;
+			echo $pre_gallery;
+		}
 
-		//Get the images ids from the post_metadata
-		$images = acf_photo_gallery('pre-gallery', $post->ID);
-		//Check if return array has anything in it
-		if( count($images) ): 
-			$gallery = true; ?>
-			<div class="pre-gallery row">
-				<?php //Cool, we got some data so now let's loop over it
-				foreach($images as $image):
-					$id = $image['id']; // The attachment id of the media
-					$title = $image['title']; //The title
-					$description = image_description_parse( $image['caption'] ); //The caption (Description!)
-					$full_image_url= $image['full_image_url']; //Full size image url
-					// $full_image_url = acf_photo_gallery_resize_image($full_image_url, 262, 160); //Resized size to 262px width by 160px height image url
-					// $thumbnail_image_url= $image['thumbnail_image_url']; //Get the thumbnail size image url 150px by 150px
-					// $url= $image['url']; //Goto any link when clicked
-					// $target= $image['target']; //Open normal or new tab
-					// $alt = get_field('photo_gallery_alt', $id); //Get the alt which is a extra field (See below how to add extra fields)
-					// $class = get_field('photo_gallery_class', $id); //Get the class which is a extra field (See below how to add extra fields)
-					// $alt = get_post_meta( $id, '_wp_attachment_image_alt', true );
-					?>
-					<div class="gallery-item col-12 col-sm-6 col-md-6 col-lg-4">
-						<figure>
-							<a data-fancybox="gallery" href="<?=$full_image_url?>" data-caption="<?=$title?>">
-							<?php 
-								$attr = array( 'title' => $title);
-								echo get_attachment_picture( $id, 'medium_large', false, $attr, false );
-								// echo wp_get_attachment_image( $id, 'medium_large', false, array( 'title' => $title) ); 
-							?>
-							</a>
-							<?php if( $description ) echo '<figcaption>' . $description . '</figcaption>'; ?>
-						</figure>
-					</div>
-				<?php endforeach; ?>
-			</div> <!-- pre-gallery row -->
-		<?php endif; ?>
-
-		<?php 
 		$show_rules = get_field('rules_show_rules');
 		$alt_text = get_field('rules_alt_text');
 		if( $show_offer && ($show_rules || $alt_text) ): ?>
@@ -228,41 +193,13 @@
 			<?php endif; ?>
 
 			<?php 
-			$images = acf_photo_gallery('post-gallery', $post->ID);
-			if( count($images) ): 
-			$gallery = true; ?>
-			<div class="row">
-				<?php 
-				foreach($images as $image):
-					$id = $image['id']; // The attachment id of the media
-					$title = $image['title']; //The title
-					$description = image_description_parse( $image['caption'] ); //The caption (Description!)
-					$full_image_url= $image['full_image_url']; //Full size image url
-					// $full_image_url = acf_photo_gallery_resize_image($full_image_url, 262, 160); //Resized size to 262px width by 160px height image url
-					// $thumbnail_image_url= $image['thumbnail_image_url']; //Get the thumbnail size image url 150px by 150px
-					// $url= $image['url']; //Goto any link when clicked
-					// $target= $image['target']; //Open normal or new tab
-					// $alt = get_field('photo_gallery_alt', $id); //Get the alt which is a extra field (See below how to add extra fields)
-					// $class = get_field('photo_gallery_class', $id); //Get the class which is a extra field (See below how to add extra fields)
-					// $alt = get_post_meta( $id, '_wp_attachment_image_alt', true );
-					?>
-					<div class="gallery-item col-12">
-						<figure>
-							<a data-fancybox="gallery" href="<?=$full_image_url?>" data-caption="<?=$title?>">
-							<?php 
-							$attr = array( 'title' => $title);
-							echo get_attachment_picture( $id, 'large', false, $attr, 'lazy' );
-							// wp_get_attachment_image( $id, 'medium_large', false, array( 'title' => $title ) ); 
-							?>
-							</a>
-							<?php if( $description ) echo '<figcaption>' . $description . '</figcaption>'; ?>
-						</figure>
-					</div>
-				<?php endforeach; ?>
-			</div> <!-- row -->
-			<?php endif; ?>
+			$post_gallery = do_shortcode('[gallery acf_field=post-gallery ]');
+			if($post_gallery){
+				$gallery = true;
+				echo $post_gallery;
+			}
 
-			<?php if( $report['post-text'] ): ?>
+			if( $report['post-text'] ): ?>
 			<div class="report-text row">
 				<div class="col">
 					<?=$report['post-text']?>

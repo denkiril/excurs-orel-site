@@ -124,8 +124,8 @@ add_action( 'widgets_init', 'excursions_widgets_init' );
 $LINKS = array();
 // $SCRIPTS = array();
 $consolelog = '';
-$SCRIPTS_VER = '20190525';
-$STYLES_VER = '20190523';
+$SCRIPTS_VER = '20190529';
+$STYLES_VER = '20190529';
 $WEBP_ON = !(home_url() == 'http://excurs-orel');
 if(!$WEBP_ON) console_log('WEBP_OFF');
 $PLACEHOLDER_URL = get_template_directory_uri() . '/assets/img/placeholder_3x2.png';
@@ -350,6 +350,8 @@ function add_carousel_scripts() {
 	wp_enqueue_script( 'widgets-legacy' );
 	wp_enqueue_style( 'glide-core' );
 	wp_enqueue_style( 'glide-theme' );
+	// preload_link( get_template_directory_uri() . '/assets/include/glide.core.min.css' );
+	// preload_link( get_template_directory_uri() . '/assets/include/glide.theme.min.css' );
 	// add_script('widgets');
 	// wp_enqueue_style( 'slick-full' );
 	// preload_link( get_template_directory_uri().'/assets/include/slick-full.css' ); -- markup flash in Firefox 
@@ -701,7 +703,11 @@ function annocards_func( $atts ){
 			setup_postdata( $post );
 			$permalink = get_the_permalink(); 
 			$title = esc_html( get_the_title() );
-			if( $post->post_type == 'events') $event_date = markup_event_date( $post->id );
+			if( $post->post_type == 'events') {
+				$event_date = markup_event_date( $post->id );
+				if( $future_events ) 
+					$event_date = '<span class="attention">'.$event_date.'</span>';
+			}
 
 			// $post_thumbnail = ($post_counter++ == 1) ? get_the_post_thumbnail(null, 'medium') : get_attachment_picture( get_post_thumbnail_id(), 'medium' );
 			$post_thumbnail = get_attachment_picture( get_post_thumbnail_id(), $size );
@@ -710,7 +716,6 @@ function annocards_func( $atts ){
 			$echo .= $post_thumbnail;
 			$echo .= '</a></div><div class="col-12 col-md-8"><h3 class="annocard-title"><a href="' . $permalink . '" title="Ссылка на: '; 
 			$echo .= $title . '">' . $title . '</a></h3>';
-			// if( $event_date ) $echo .= '<time>'.$event_date.'</time> ';
 			$echo .= '<p>'.$event_date.get_the_excerpt();
 			if( $read_more ) $echo .= ' <a href="' . $permalink . '" tabindex="-1">' . $read_more . '</a>';
 			$echo .= '</p></div></div>';
@@ -766,11 +771,13 @@ function newscards_func( $atts ){
 	$section_link 	= $atts['section_link'];
 
 	// $args = array( 'numberposts' => $numberposts, 'post_type' => $post_type, 'category_name' => $cat_name );
+	$today = date('Ymd');
 	$myposts = array();
+
 	if( $future_events ){
-		$today = date('Ymd');
-		$compare = '>=';
-		$args = array( 'post_type' => 'events', 'exclude' => $exclude, 'meta_query' => array( array('key' => 'event_info_event_date', 'compare' => $compare, 'value' => $today) ) );
+		$args = array( 'post_type' => 'events', 'exclude' => $exclude, 'meta_query' => array(
+			array('key' => 'event_info_event_date', 'compare' => '>=', 'value' => $today)
+			) );
 		$myposts = array_merge($myposts, get_posts($args));
 	}
 	if( $promo_posts ){
@@ -825,11 +832,12 @@ function newscards_func( $atts ){
 		$echo .= '<div class="row">';
 		foreach( $myposts as $post ):
 			setup_postdata( $post );
-			$permalink = get_the_permalink(); 
-			$title = esc_html( get_the_title() );
+			$permalink 		= get_the_permalink(); 
+			$title 			= esc_html( get_the_title() );
+			$show_attention = get_field('event_info_event_date', false, false) >= $today;
 			$newscard_title = esc_html( get_field('newscard-title') );
 			if( empty($newscard_title) ){
-				if( $post->post_type == 'events') $event_date = markup_event_date( $post->id );
+				$event_date = ( $post->post_type == 'events') ? markup_event_date( $post->id ) : '';
 				$newscard_title = $event_date.$title;
 			}
 			// $post_thumbnail = get_the_post_thumbnail(null, 'medium');
@@ -837,7 +845,9 @@ function newscards_func( $atts ){
 
 			$echo .= '<div class="newscard-container col-md-6 col-lg-4"><div class="newscard"><a href="'.$permalink.'" title="Ссылка на: '.$title.'">'; 
 			$echo .= $post_thumbnail;
-			$echo .= '</a><h3 class="newscard-title">'.$newscard_title.'</h3>';
+			$echo .= '</a>';
+			if( $show_attention ) $echo .= '<p class="attention">Не пропустите!</p>';
+			$echo .= '<h3 class="newscard-title">'.$newscard_title.'</h3>';
 			// $echo .= get_the_excerpt();
 			if( $read_more ) $echo .= ' <a href="'.$permalink.'" title="Ссылка на: '.$title.'" tabindex="-1">'.$read_more.'</a>';
 			$echo .= '</div></div>';
@@ -1059,6 +1069,10 @@ function carousel_func( $atts ){
 
 		}
 		$echo .= '</ul></div>';
+		// controls
+		$echo .= '<div class="glide__arrows" data-glide-el="controls">
+			<button class="glide__arrow glide__arrow--left" data-glide-dir="<">&lt;</button>
+			<button class="glide__arrow glide__arrow--right" data-glide-dir=">">&gt;</button></div>';
 		// bullets
 		$echo .= '<div class="glide__bullets" data-glide-el="controls[nav]">';
 		foreach( $images as $counter => $image ){
@@ -1372,12 +1386,43 @@ function image_description_parse($str, $permalink=true){
 	return $text;
 }
 
-// [gallery class=post-gallery item=gallery-item fancybox=gallery lazy=1 size=large nums=null(1,2,4) figcaption=image_description(parent_href) mini=false permalink=true] 
+function markup_fancy_figure($id, $fancybox, $full_image_url, $fancy_caption, $size='thumbnail', $lazy=false, $title=null, $img_class=null, $figcaption_html=null){
+	$fancy_hint = '(Нажмите, чтобы увеличить)';
+	$title_attr = $title;
+	if($fancybox){
+		$title_attr .= ' '.$fancy_hint;
+	}
+	if($fancy_caption){
+		$fancy_caption = ' data-caption="'.$fancy_caption.'"';
+	}
+	$attr = [];
+	if($title_attr){
+		$attr['title'] = $title_attr;
+	}
+	if($img_class){
+		$attr['class'] = $img_class;
+	}
+
+	$echo = '<figure><a data-fancybox="'.$fancybox.'" href="'.$full_image_url.'"'.$fancy_caption.'>';
+	// $echo .= get_lazy_attachment_image( $id, 'medium_large', false, $attr );
+	$echo .= get_attachment_picture( $id, $size, false, $attr, $lazy );
+	$echo .= '</a>';
+
+	if( $figcaption_html ){
+		$echo .= '<figcaption>'.$figcaption_html.'</figcaption>';
+	}
+	$echo .= '</figure>';
+
+	return $echo;
+}
+
+// [gallery acf_field=gallery_gal class=post-gallery item=gallery-item fancybox=gallery lazy=1 size=large nums=null(1,2,4) figcaption=image_description(parent_href) mini=false permalink=true] 
 add_shortcode( 'gallery', 'gallery_func' );
 
 function gallery_func( $atts ){
 	// белый список параметров и значения по умолчанию
 	$atts = shortcode_atts( array(
+		'acf_field' 	=> 'gallery_gal',
 		'class' 		=> null,
 		'item' 			=> 'gallery-item',
 		'fancybox' 		=> 'gallery',
@@ -1389,6 +1434,7 @@ function gallery_func( $atts ){
 		'permalink' 	=> true,
 	), $atts );
 
+	$acf_field 		= $atts['acf_field'];
 	$class 			= $atts['class'];
 	$item 			= $atts['item'];
 	$fancybox 		= $atts['fancybox'];
@@ -1403,7 +1449,7 @@ function gallery_func( $atts ){
 
 	global $post;
 	//Get the images ids from the post_metadata
-	$images = acf_photo_gallery( 'gallery_gal', $post->ID );
+	$images = acf_photo_gallery( $acf_field, $post->ID );
 	if( count($images) ):
 		if( !$class ){
 			$class = $mini ? 'pre-gallery' : 'post-gallery';
@@ -1423,29 +1469,25 @@ function gallery_func( $atts ){
 
 			$id 			= $image['id']; // The attachment id of the media
 			$title 			= $image['title']; //The title
-			$description 	= image_description_parse( $image['caption'], $permalink ); //The caption (Description!)
 			$full_image_url = $image['full_image_url']; //Full size image url
 
-			if( $title ) $attr = array( 'title' => $title);
-
-			$echo .= '<div class="'.$item.$bootstrap.'">';
-			$echo .= '<figure><a data-fancybox="'.$fancybox.'" href="'.$full_image_url.'" data-caption="'.$title.'">';
-			// Get picture item. 1st two ($images_counter == 0 || 1) are not lazy 
-			// $echo .= get_lazy_attachment_image( $id, 'medium_large', false, $attr );
-			$echo .= get_attachment_picture( $id, $size, false, $attr, $images_counter > 2 );
-			// $images_counter++;
-			$echo .= '</a>';
+			$figcaption_html = '';
 			if( $figcaption == 'parent_href' ){
 				$post_parent_id = wp_get_post_parent_id( $id );
 				// Если картинка имеет родительский пост отличный от текущего, выводим на него ссылку в подписи 
 				if( $post_parent_id != $post->ID && $post_parent_link = get_permalink( $post_parent_id ) ){
-					$description = '<a href="'.$post_parent_link.'">'.get_the_title( $post_parent_id ).'</a>';
+					$figcaption_html = '<a href="'.$post_parent_link.'">'.get_the_title( $post_parent_id ).'</a>';
 				}
 			}
-			if( ($figcaption == 'image_description' || $figcaption == 'parent_href') && $description ){
-				$echo .= '<figcaption>'.$description.'</figcaption>';
+			// Иначе берем подпись из БД и парсим ее
+			if(!$figcaption_html && ($figcaption == 'image_description' || $figcaption == 'parent_href')){
+				$figcaption_html = image_description_parse( $image['caption'], $permalink ); //The caption (Description!)
 			}
-			$echo .= '</figure></div>';
+
+			$echo .= '<div class="'.$item.$bootstrap.'">';
+			// Get picture item in markup_figure() func. 1st two ($images_counter == 0 || 1) are not lazy 
+			$echo .= markup_fancy_figure($id, $fancybox, $full_image_url, $title, $size, $images_counter > 2, $title, null, $figcaption_html);
+			$echo .= '</div>';
 
 		endforeach;
 		$echo .= '</div> <!-- row '.$class.' -->';

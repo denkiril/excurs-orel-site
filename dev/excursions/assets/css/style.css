@@ -654,3 +654,31 @@ figure{
     background-color: #fff;
     padding: 0 4px;
 }
+
+.b-up {
+    display: none;
+    width: 32px;
+    height: 32px;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    /* margin: 22px 0 0 22px; */
+    /* opacity: 0; */
+    z-index: 5;
+    cursor: pointer;
+    fill: #3F3F3F;
+}
+.b-up:hover {
+    /* fill: #c33; */
+    fill: #000;
+}
+/* @media (max-width: 768px) {
+    .b-up{
+        display: none;
+    }
+} */
+.b-up__icon {
+    display: block;
+    width: 100%;
+    height: 100%;
+}

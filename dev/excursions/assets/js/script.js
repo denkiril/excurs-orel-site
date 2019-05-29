@@ -1,7 +1,8 @@
-const NavBlock 		= document.querySelector('#nav-block'); // ID шапки
-const NavBlockTop 	= NavBlock.getBoundingClientRect().top + window.pageYOffset;
-const Menu 			= document.querySelector('#menu');
-const NavMenu 		= document.querySelector('.nav-menu');
+const NavBlock = document.querySelector('#nav-block'); // ID шапки
+const NavBlockTop = NavBlock.getBoundingClientRect().top + window.pageYOffset;
+const Menu = document.querySelector('#menu');
+const NavMenu = document.querySelector('.nav-menu');
+const Up = document.querySelector('#up');
 
 let NavMenuHeight;
 let menuStateOpen = false;
@@ -43,6 +44,13 @@ function init() {
   // Блок, работающий на JS, показываем только если работает JS
   const sb = document.getElementById('soc-buttons');
   if (sb) sb.style.display = 'block';
+
+  // if (window.screen.width > 768 && Up) {
+  //   Up.addEventListener('click', () => {
+  //     document.body.scrollTop = 0; // For Safari
+  //     document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+  //   });
+  // }
 }
 
 function setNavMenu() {
@@ -54,10 +62,11 @@ function setNavMenu() {
   }
 }
 
-
-function resizeNavBlock() {
+function watchResize() {
   if (window.screen.width > 768) {
     NavBlock.classList.remove('fixed');
+  } else if (Up) {
+    Up.style.display = 'none';
   }
 
   // if(NavBlock.classList.contains('menu_state_open')){}
@@ -66,9 +75,11 @@ function resizeNavBlock() {
   setNavMenu();
 }
 
-function scrollNavBlock() {
+function watchScroll() {
+  const scrollTop = window.pageYOffset;
+  // console.log(`scrollTop = ${scrollTop}\n`);
+
   if (window.screen.width <= 768) {
-    const scrollTop = window.pageYOffset;
     if (NavBlock.classList.contains('fixable') && scrollTop > NavBlockTop) {
       NavBlock.classList.add('fixed');
     } else {
@@ -80,13 +91,17 @@ function scrollNavBlock() {
       NavBlock.classList.remove('menu_state_open');
       NavMenu.style.height = '0px';
     }
+  } else if (scrollTop > 500) {
+    Up.style.display = 'block';
+  } else {
+    Up.style.display = 'none';
   }
 }
 
 registerListener('load', init);
 registerListener('load', setNavMenu);
-registerListener('scroll', scrollNavBlock);
-registerListener('resize', resizeNavBlock);
+registerListener('scroll', watchScroll);
+registerListener('resize', watchResize);
 
 // Меню-гамбургер для адаптивной версии --- slideToggle
 Menu.addEventListener('click', () => {
@@ -125,3 +140,49 @@ function lazyLoad() {
 }
 
 window.addEventListener('load', lazyLoad);
+
+function scrollIt(destination, duration = 350) {
+  const start = window.pageYOffset;
+  const startTime = 'now' in window.performance ? performance.now() : new Date().getTime();
+  const { body } = document;
+  const dele = document.documentElement;
+
+  // eslint-disable-next-line max-len
+  const dHeight = Math.max(body.scrollHeight, body.offsetHeight, dele.clientHeight, dele.scrollHeight, dele.offsetHeight);
+  const wHeight = window.innerHeight || dele.clientHeight || document.getElementsByTagName('body')[0].clientHeight;
+  const dOffset = typeof destination === 'number' ? destination : destination.offsetTop;
+  const dOffsetScroll = Math.round(dHeight - dOffset < wHeight ? dHeight - wHeight : dOffset);
+
+  if ('requestAnimationFrame' in window === false) {
+    window.scroll(0, dOffsetScroll);
+    return;
+  }
+
+  function scroll() {
+    const now = 'now' in window.performance ? performance.now() : new Date().getTime();
+    const time = Math.min(1, ((now - startTime) / duration));
+    const timeFunction = time;
+    window.scroll(0, Math.ceil((timeFunction * (dOffsetScroll - start)) + start));
+
+    // window.pageYOffset === dOffsetScroll || requestAnimationFrame(scroll);
+    if (window.pageYOffset !== dOffsetScroll) { requestAnimationFrame(scroll); }
+  }
+
+  scroll();
+}
+
+document.querySelectorAll('a').forEach((el) => {
+  el.addEventListener('click', (e) => {
+    // console.log(e.target);
+    console.log(e.currentTarget);
+    const href = e.currentTarget.getAttribute('href');
+    if (href && href.match(/^#/)) {
+      e.preventDefault();
+      if (href.match(/^#$/)) {
+        scrollIt(0);
+      } else {
+        scrollIt(document.querySelector(href));
+      }
+    }
+  });
+});
