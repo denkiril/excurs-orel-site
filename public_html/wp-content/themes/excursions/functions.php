@@ -735,7 +735,7 @@ function annocards_func( $atts ){
 	return $echo;
 }
 
-// [newscards section_id=announcement section_title=Актуальное section_link='' future_events=1 promo_posts=2 promo_events=3 promo_gba=4 read_more=Подробнее... exclude=312 size=medium] 
+// [newscards section_id=announcement section_title=Актуальное section_link='' future_events=1 actual_events=1 promo_posts=2 promo_events=3 promo_gba=4 read_more=Подробнее... exclude=312 size=medium] 
 add_shortcode( 'newscards', 'newscards_func' );
 function newscards_func( $atts ){
 	// белый список параметров и значения по умолчанию
@@ -747,6 +747,7 @@ function newscards_func( $atts ){
 		'cat_name' 		=> 'promo',
 		// 'date' 		=> 'future',
 		'future_events' => null,
+		'actual_events' => null,
 		'promo_posts' 	=> null,
 		'promo_events' 	=> null,
 		'promo_gba' 	=> null,
@@ -762,6 +763,7 @@ function newscards_func( $atts ){
 	$cat_name 		= $atts['cat_name'];
 	$date 			= $atts['date'];
 	$future_events 	= $atts['future_events'];
+	$actual_events 	= $atts['actual_events'];
 	$promo_posts 	= $atts['promo_posts'];
 	$promo_events	= $atts['promo_events'];
 	$promo_gba		= $atts['promo_gba'];
@@ -778,6 +780,22 @@ function newscards_func( $atts ){
 		$args = array( 'post_type' => 'events', 'exclude' => $exclude, 'meta_query' => array(
 			array('key' => 'event_info_event_date', 'compare' => '>=', 'value' => $today)
 			) );
+		$myposts = array_merge($myposts, get_posts($args));
+	}
+	if( $actual_events ){
+		$args = array( 
+			'post_type' 	=> 'events', 
+			'exclude' 		=> $exclude, 
+			'meta_query'	=> array(
+				// 'relation' => 'AND',
+				array('key' => 'event_info_event_date', 'compare' => '<', 'value' => $today),
+				array('key' => 'event_info_event_date', 'compare' => '>=', 'value' => $today-30),
+			),
+			'orderby' 		=> 'meta_value',
+			'order'     	=> 'DESC',
+			'meta_key' 		=> 'event_info_event_date',
+			'numberposts' 	=> 3,
+		);
 		$myposts = array_merge($myposts, get_posts($args));
 	}
 	if( $promo_posts ){

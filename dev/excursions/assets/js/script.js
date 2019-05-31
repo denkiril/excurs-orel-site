@@ -171,7 +171,8 @@ function scrollIt(destination, duration = 350) {
   scroll();
 }
 
-document.querySelectorAll('a').forEach((el) => {
+// document.querySelectorAll('a').forEach((el) => {
+[].forEach.call(document.querySelectorAll('a'), (el) => {
   el.addEventListener('click', (e) => {
     // console.log(e.target);
     console.log(e.currentTarget);
