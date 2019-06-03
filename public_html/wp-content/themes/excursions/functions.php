@@ -127,6 +127,7 @@ $consolelog = '';
 $SCRIPTS_VER = '20190529';
 $STYLES_VER = '20190529';
 $WEBP_ON = !(home_url() == 'http://excurs-orel');
+// $WEBP_ON = true;
 if(!$WEBP_ON) console_log('WEBP_OFF');
 $PLACEHOLDER_URL = get_template_directory_uri() . '/assets/img/placeholder_3x2.png';
 // $PLACEHOLDER_URL = '/wp-content/themes/excursions/assets/img/placeholder_3x2.png';
@@ -783,13 +784,17 @@ function newscards_func( $atts ){
 		$myposts = array_merge($myposts, get_posts($args));
 	}
 	if( $actual_events ){
+		$date = new DateTime($today);
+		$date->modify('-1 month');
+		$actual_date = $date->format('Ymd');
+		// $lastmonth = mktime(0, 0, 0, date("m")-1, date("d"), date("Y"));
 		$args = array( 
 			'post_type' 	=> 'events', 
 			'exclude' 		=> $exclude, 
 			'meta_query'	=> array(
 				// 'relation' => 'AND',
 				array('key' => 'event_info_event_date', 'compare' => '<', 'value' => $today),
-				array('key' => 'event_info_event_date', 'compare' => '>=', 'value' => $today-30),
+				array('key' => 'event_info_event_date', 'compare' => '>=', 'value' => $actual_date),
 			),
 			'orderby' 		=> 'meta_value',
 			'order'     	=> 'DESC',
@@ -840,6 +845,7 @@ function newscards_func( $atts ){
 
 	if( $myposts ): 
 		if( $section_id ) $section_id = ' id="'.$section_id.'"';
+		// $echo .= '<p>'.$today.' '.$actual_date.'</p>';
 		// $echo .= '<section'.$section_id.'><div class="row section-container"><div class="col">';
 		$echo .= '<section'.$section_id.'><div class="section-container">';
 		if($section_title){
@@ -1390,6 +1396,33 @@ function markup_post_permalink($post_id, $text, $permalink=true){
 	return $text;
 }
 
+function markup_url_permalink($url, $text, $permalink=true){
+	if($permalink && $url){
+		$ret = parse_url($url);
+		if( !isset($ret['scheme']) ){
+			$url = "http://{$url}";
+		}
+		$text = '<a href="'.$url.'" target="_blank" rel="noopener noreferrer">'.$text.'</a>';
+	}
+
+	return $text;
+}
+
+function markup_url_text($url_text, $permalink=true){
+	if($permalink && $url_text){
+		$ret = parse_url($url_text);
+		if( !isset($ret['scheme']) ){
+			$url = "http://{$url_text}";
+		}
+		else{
+			$url = $url_text;
+		}
+		$url_text = '<a href="'.$url.'" target="_blank" rel="noopener noreferrer">'.$url_text.'</a>';
+	}
+
+	return $url_text;
+}
+
 /**
  * Parse wiki-style refs in image description field 
  */
@@ -1399,6 +1432,28 @@ function image_description_parse($str, $permalink=true){
 	$count = preg_match_all('/\\[post=(\\d+)\\|([^\\]]*)\\]/u', $str, $matches);
 	for($i = 0; $i < $count; $i++){
 		$text = str_replace($matches[0][$i], markup_post_permalink($matches[1][$i], $matches[2][$i], $permalink), $text);
+	}
+	$count = 0;
+	$count = preg_match_all('/\\[url=([^\\|]*)\\|([^\\]]*)\\]/u', $str, $matches);
+	for($i = 0; $i < $count; $i++){
+		$text = str_replace($matches[0][$i], markup_url_permalink($matches[1][$i], $matches[2][$i], $permalink), $text);
+	}
+	$count = 0;
+	// $count = preg_match_all('/^(https?|ftp)://[^\s/$.?#].[^\s]*$/u', $str, $matches);
+	// $count = preg_match_all('/(https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.[^\s]{2,}|www\\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.[^\s]{2,}|https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9]+\\.[^\s]{2,}|www\\.[a-zA-Z0-9]+\\.[^\s]{2,})/', $str, $matches);
+	// $count = preg_match_all('/(https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.[^\s]{2,}|www\\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.[^\s]{2,}|https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9]+\\.[^\s]{2,}|www\\.[a-zA-Z0-9]+\\.[^\s]{2,})|[a-zA-Z0-9]+\\.[^\s]{2,})/', $str, $matches);
+	// $count = preg_match_all('', $str, $matches);
+	// $count = preg_match_all('/(^https?:\\/\\/)*([a-Z0-9-_]+)(\\.[ru|com])(\\S+]?/u', $str, $matches);
+	// $count = preg_match_all('/([a-Z0-9-_]+)\\.(ru|com)(\\S+)?/u', $str, $matches);
+	// $count = preg_match_all("/^(?:http(s)?:\\/\\/)?[\\w.-]+(?:\\.[\\w\\.-]+)+[\\w\\-\\._~:/?#[\\]@!\\$&\\'\\(\\)\\*\\+,;=.]+$/", $str, $matches);
+	// $count = preg_match_all('/[^|\\s][http(s)?:\\/\\/]?(\\S+\\.[ru|com](\\S+)?)/u', $str, $matches);
+	// for($i = 0; $i < $count; $i++){
+	// 	$text = str_replace($matches[0][$i], markup_url_permalink($matches[0][$i], $matches[1][$i], $permalink), $text);
+	// }
+	// $count = 0;
+	$count = preg_match_all('/\\S+\\.(ru|com)(\\S+)?/u', $str, $matches);
+	for($i = 0; $i < $count; $i++){
+		$text = str_replace($matches[0][$i], markup_url_text($matches[0][$i], $permalink), $text);
 	}
 
 	return $text;
@@ -1541,45 +1596,78 @@ function gd_image_optimization_and_webp_generation($metadata) {
 	$quality = 80; // imagewebp() default is 80, imagejpeg() ~75 
 
     $file = $uploads['basedir'] . '/' . $metadata['file']; // получает исходный файл
-    $ext = wp_check_filetype($file); // получает расширение файла
+	$ext = wp_check_filetype($file); // получает расширение файла
+	$filesize = filesize($file); // размер файла в байтах
+	$temp = 'php://memory/temp.jpeg';
 	
-	if( !($ext['type'] == 'image/jpeg' || $ext['type'] == 'image/png') )
+	if ( !(($ext['type'] == 'image/jpeg' || $ext['type'] == 'image/png') && $filesize) )
 		return $metadata; // работаем только с jpeg и png 
 
+	// оптимизируем (уменьшаем качество и вес) исходное изображение
     if ( $ext['type'] == 'image/jpeg' ) { // в зависимости от расширения обрабатаывает файлы разными функциями
 		$image = imagecreatefromjpeg($file); // создает изображение из jpg
-		imagejpeg($image, $uploads['basedir'] . '/' . $metadata['file'], $quality); // оптимизирует исходное изображение
-        
-    } elseif ( $ext['type'] == 'image/png' ){
-        $image = imagecreatefrompng($file); // создает изображение из png
-        imagepalettetotruecolor($image); // восстанавливает цвета
-        imagealphablending($image, false); // выключает режим сопряжения цветов
-		imagesavealpha($image, true); // сохраняет прозрачность
-		imagepng($image, $uploads['basedir'] . '/' . $metadata['file']); // оптимизирует исходное изображение, 0...9, #define Z_DEFLATED 8 
+		if ($image) {
+			imagejpeg($image, $temp, $quality); // сохраняем оптим. изображение в оперативную память
+			$new_file_size = filesize($temp);
+			if (is_int($new_file_size) && $new_file_size < $filesize) {
+				// imagejpeg($image, $uploads['basedir'] . '/' . $metadata['file'], $quality); // оптимизирует исходное изображение
+				imagejpeg($image, $file, $quality); // сохраняем оптим. изображение на место исходного
+			}
+		}
+    } elseif ( $ext['type'] == 'image/png' ) {
+		$image = imagecreatefrompng($file); // создает изображение из png
+		if ($image) {
+			imagepalettetotruecolor($image); // восстанавливает цвета
+			imagealphablending($image, false); // выключает режим сопряжения цветов
+			imagesavealpha($image, true); // сохраняет прозрачность
+			imagepng($image, $temp); // оптимизируем, 0...9, #define Z_DEFLATED 8 - сохр. в оперативную память
+			$new_file_size = filesize($temp);
+			if ($new_file_size && $new_file_size < $filesize) {
+				// imagepng($image, $uploads['basedir'] . '/' . $metadata['file']);
+				imagepng($image, $file); // сохраняем оптим. изображение на место исходного
+			}
+		}
+	}
 
-    }
-    imagewebp($image, $uploads['basedir'] . '/' . $metadata['file'] . '.webp', $quality); // сохраняет файл в webp
+	// делаем webp-версию исх. изображения
+	if ($image) {
+		// imagewebp($image, $uploads['basedir'] . '/' . $metadata['file'] . '.webp', $quality);
+		imagewebp($image, $file . '.webp', $quality);
+	}
 
-    foreach ($metadata['sizes'] as $size) { // перебирает все размеры файла и также сохраняет в webp
-        $file = $uploads['url'] . '/' . $size['file'];
+	// перебирает все размеры файла и также сохраняет в webp
+    foreach ($metadata['sizes'] as $size_name => $size) {
+        // $file = $uploads['url'] . '/' . $size['file'];
+		$file = $uploads['basedir'] . $uploads['subdir'] . '/' . $size['file'];
+		$sizes_file_size = filesize($file);
+		
+		// если вес к.-л. (меньшего) размера больше исходного файла, удаляем этот размер
+		if ($sizes_file_size && $sizes_file_size > $filesize) {
+			unlink($file);
+			unset($metadata['sizes'][$size_name]);
+			continue;
+		}
+		
         $ext = $size['mime-type'];
-
         if ( $ext == 'image/jpeg' ) {
             $image = imagecreatefromjpeg($file); 
             
-        } elseif ( $ext == 'image/png' ){
+        } elseif ( $ext == 'image/png' ) {
             $image = imagecreatefrompng($file);
             imagepalettetotruecolor($image);
             imagealphablending($image, false);
             imagesavealpha($image, true);
-        }
-        
-        imagewebp($image, $uploads['basedir'] . $uploads['subdir'] . '/' . $size['file'] . '.webp', $quality);
-
+		}
+		
+        if ($image) {
+			// imagewebp($image, $uploads['basedir'] . $uploads['subdir'] . '/' . $size['file'] . '.webp', $quality);
+			imagewebp($image, $file . '.webp', $quality);
+		}
     }
 
     return $metadata;
 }
+
 add_filter('wp_generate_attachment_metadata', 'gd_image_optimization_and_webp_generation');
 
 // подключаем AJAX обработчики, только когда в этом есть смысл
