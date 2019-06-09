@@ -61,7 +61,7 @@ registerListener('load', socialInit, (SocialSection && window.screen.width > 768
 
 if (glideEl) {
   const glide = new Glide('.glide', {
-    type: 'carousel',
+    // type: 'carousel',
     autoplay: (window.screen.width > 768) ? 5000 : false,
   });
 

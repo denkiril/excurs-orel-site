@@ -817,6 +817,21 @@ function newscards_func( $atts ){
 		$myposts = array_merge($myposts, get_posts($args));
 	}
 
+	// убираем из $myposts дубли
+	global $post;
+	$posts_ids = [];
+	foreach ($myposts as $counter => $post) {
+		setup_postdata($post);
+		$post_id = get_the_ID();
+		if (array_search($post_id, $posts_ids) === false) {
+			$posts_ids[] = $post_id;
+		} else {
+			unset( $myposts[$counter] );
+		}
+	}
+	wp_reset_postdata();
+	// print_r($posts_ids);
+
 	// $meta_query = array( 
 	// 	array(
 	// 		'key' 		=> 'event_info_event_date', 
@@ -840,7 +855,6 @@ function newscards_func( $atts ){
 	// $attachments = new WP_Query;
 	// $myposts = $attachments->query( $args );
 
-	global $post;
 	$echo = '';
 
 	if( $myposts ): 
@@ -1598,7 +1612,7 @@ function gd_image_optimization_and_webp_generation($metadata) {
     $file = $uploads['basedir'] . '/' . $metadata['file']; // получает исходный файл
 	$ext = wp_check_filetype($file); // получает расширение файла
 	$filesize = filesize($file); // размер файла в байтах
-	$temp = 'php://memory/temp.jpeg';
+	// $temp = 'php://memory/temp.jpeg';
 	
 	if ( !(($ext['type'] == 'image/jpeg' || $ext['type'] == 'image/png') && $filesize) )
 		return $metadata; // работаем только с jpeg и png 
@@ -1607,9 +1621,13 @@ function gd_image_optimization_and_webp_generation($metadata) {
     if ( $ext['type'] == 'image/jpeg' ) { // в зависимости от расширения обрабатаывает файлы разными функциями
 		$image = imagecreatefromjpeg($file); // создает изображение из jpg
 		if ($image) {
-			imagejpeg($image, $temp, $quality); // сохраняем оптим. изображение в оперативную память
-			$new_file_size = filesize($temp);
-			if (is_int($new_file_size) && $new_file_size < $filesize) {
+			// imagejpeg($image, $temp, $quality); // сохраняем оптим. изображение в оперативную память
+			// $new_file_size = filesize($temp);
+			ob_start();
+			imagejpeg($image, null, $quality); // сохраняем оптим. изображение в оперативную память
+			$new_file_size = ob_get_length();
+			ob_end_clean();
+			if ($new_file_size < $filesize) {
 				// imagejpeg($image, $uploads['basedir'] . '/' . $metadata['file'], $quality); // оптимизирует исходное изображение
 				imagejpeg($image, $file, $quality); // сохраняем оптим. изображение на место исходного
 			}
@@ -1620,9 +1638,12 @@ function gd_image_optimization_and_webp_generation($metadata) {
 			imagepalettetotruecolor($image); // восстанавливает цвета
 			imagealphablending($image, false); // выключает режим сопряжения цветов
 			imagesavealpha($image, true); // сохраняет прозрачность
-			imagepng($image, $temp); // оптимизируем, 0...9, #define Z_DEFLATED 8 - сохр. в оперативную память
-			$new_file_size = filesize($temp);
-			if ($new_file_size && $new_file_size < $filesize) {
+			
+			ob_start();
+			imagepng($image); // оптимизируем, 0...9, #define Z_DEFLATED 8 - сохр. в оперативную память
+			$new_file_size = ob_get_length();
+			ob_end_clean();
+			if ($new_file_size < $filesize) {
 				// imagepng($image, $uploads['basedir'] . '/' . $metadata['file']);
 				imagepng($image, $file); // сохраняем оптим. изображение на место исходного
 			}
