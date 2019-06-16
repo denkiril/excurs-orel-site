@@ -212,10 +212,17 @@
 
 		/* video */
 		// $video = get_field('video'); 
-		$yt_link = get_field('video_youtube');
-		$vk_link = get_field('video_vk');
-		if( $yt_link || $yt_link ): 
-			$col_sfx = ($yt_link && $yt_link) ? '-lg-6' : '';
+		if ($yt_links = trim(get_field('video_youtube'))) {
+			$yt_links = explode(PHP_EOL, $yt_links);
+		}
+		if ($vk_links = trim(get_field('video_vk'))) {
+			$vk_links = explode(PHP_EOL, $vk_links);
+		}
+		$links_count = 0;
+		$links_count = is_array($yt_links) ? $links_count + count($yt_links) : $links_count;
+		$links_count = is_array($vk_links) ? $links_count + count($vk_links) : $links_count;
+		if ($links_count) :
+			$col_sfx = $links_count > 1 ? '-lg-6' : '';
 			?>
 			<div class="video-gallery">
 				<div class="row">
@@ -230,25 +237,32 @@
 				// https://youtu.be/MOOqSGOXua0 
 				// https://www.youtube.com/watch?v=MOOqSGOXua0&feature=youtu.be&ab_channel=AlekseyBorisov 
 				// src="https://www.youtube.com/embed/MOOqSGOXua0?rel=0"
-				if( $yt_link ): 
-					$ytarray 	 = explode("/", $yt_link);
-					$ytendstring = end($ytarray);
-					$ytendarray  = explode("?v=", $ytendstring);
-					$ytendstring = end($ytendarray);
-					$ytendarray  = explode("&", $ytendstring);
-					$ytcode 	 = $ytendarray[0]; 
-					?> 
-					<div class="col<?=$col_sfx?> video-container">
-						<iframe data-iframe_src="https://www.youtube.com/embed/<?=$ytcode?>" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-					</div>
-				<?php endif; ?>
+				if (is_array($yt_links)) :
+					foreach ($yt_links as $yt_link) :
+						$ytarray 	 = explode("/", $yt_link);
+						$ytendstring = end($ytarray);
+						$ytendarray  = explode("?v=", $ytendstring);
+						$ytendstring = end($ytendarray);
+						$ytendarray  = explode("&", $ytendstring);
+						$ytcode 	 = $ytendarray[0]; 
+						?>
 
-				<?php 
-				if( $vk_link ): ?>
+						<div class="col<?=$col_sfx?> video-container">
+							<iframe data-iframe_src="https://www.youtube.com/embed/<?=$ytcode?>" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+						</div>
+
+					<?php endforeach;
+				endif;
+
+				if (is_array($vk_links)) :
+					foreach ($vk_links as $vk_link) :?>
+				
 					<div class="col<?=$col_sfx?> video-container">
 						<iframe data-iframe_src="<?=$vk_link?>" allowfullscreen></iframe>
 					</div>
-				<?php endif; ?>
+
+					<?php endforeach;
+				endif; ?>
 				</div> <!-- row -->
 
 			</div><!-- .video-gallery -->

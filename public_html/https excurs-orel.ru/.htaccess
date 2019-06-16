@@ -15,7 +15,9 @@ php_value error_reporting -1;
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule . strtolower.php [L]
 
-    # http -> https - in /excurs-orel.ru/
+    # http -> https
+    RewriteCond %{SERVER_PORT} !^443$
+    RewriteRule .* https://%{SERVER_NAME}%{REQUEST_URI} [R=301,L]
 
 </IfModule>
 

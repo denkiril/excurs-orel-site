@@ -650,6 +650,7 @@ function get_posts_search_filter( $query ){
 
 
 // [annocards post_type="post" cat_name="blog" tag_name="promo" section_title="Приходите" read_more="Подробнее..." date="future" exclude="312" size="medium"] 
+// [annocards ids=1,2,3 section_title="См. также" read_more="Подробнее..."]
 add_shortcode( 'annocards', 'annocards_func' );
 function annocards_func( $atts ){
 	// белый список параметров и значения по умолчанию
@@ -662,6 +663,7 @@ function annocards_func( $atts ){
 		'date' 			=> '',
 		'exclude' 		=> '312',
 		'size' 			=> 'medium_large',
+		'ids' 			=> null,
 	), $atts );
 
 	$post_type 		= $atts['post_type'];
@@ -672,28 +674,44 @@ function annocards_func( $atts ){
 	$date 			= $atts['date'];
 	$exclude 		= $atts['exclude'];
 	$size 			= $atts['size'];
+	$ids 			= $atts['ids'];
 
 	$echo = '';
 
 	global $post;
-	$args = array( 'post_type' => $post_type, 'category_name' => $cat_name, 'tag' => $tag_name, 'exclude' => $exclude );
 
-	if( $post_type == 'events'):
-		$args += array( 
-			'orderby'    => 'event_info_event_date', 
-			'order'      => 'DESC',
-		);
+	if ($ids) {
+		$ids_arr = [];
+		$ids = explode(',', $ids);
+		foreach ($ids as $id) {
+			if ($id_int = (int) trim($id)) {
+				$ids_arr[] = $id_int;
+			}
+		}
+		if (is_array($ids_arr)) {
+			$args = array( 'post__in' => $ids_arr );
+		}
 
-		if( $date ):
-			$today = date('Ymd');
-			if($date == 'past') $past_events = true;
-			else $future_events = true;
-			$compare = $past_events ? '<' : '>=';
+	} else {
+		$args = array( 'post_type' => $post_type, 'category_name' => $cat_name, 'tag' => $tag_name, 'exclude' => $exclude );
+	
+		if ($post_type == 'events') {
 			$args += array( 
-				'meta_query' => array( array('key' => 'event_info_event_date', 'compare' => $compare, 'value' => $today) )
+				'orderby'    => 'event_info_event_date', 
+				'order'      => 'DESC',
 			);
-		endif;
-	endif;
+	
+			if ($date) {
+				$today = date('Ymd');
+				if ($date == 'past') $past_events = true;
+				else $future_events = true;
+				$compare = $past_events ? '<' : '>=';
+				$args += array( 
+					'meta_query' => array( array('key' => 'event_info_event_date', 'compare' => $compare, 'value' => $today) )
+				);
+			}
+		}
+	}
 
 	$myposts = get_posts( $args );
 	if( $myposts ): 
@@ -1493,6 +1511,7 @@ function markup_fancy_figure($id, $fancybox, $full_image_url, $fancy_caption, $s
 	$echo = '<figure><a data-fancybox="'.$fancybox.'" href="'.$full_image_url.'"'.$fancy_caption.'>';
 	// $echo .= get_lazy_attachment_image( $id, 'medium_large', false, $attr );
 	$echo .= get_attachment_picture( $id, $size, false, $attr, $lazy );
+	// $echo .= awpwp_get_attachment_picture( $id, $size, false, $attr, $lazy );
 	$echo .= '</a>';
 
 	if( $figcaption_html ){
