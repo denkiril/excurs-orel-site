@@ -439,13 +439,23 @@ function add_share_scripts_func() {
 
 // contact-form-7
 // \wp-content\plugins\contact-form-7\includes\controller.php :
+// /wp-content/plugins/contact-form-7/includes/js/scripts.js
 // add_action( 'wp_enqueue_scripts', 'wpcf7_do_enqueue_scripts', 10, 0 );
-remove_action( 'wp_enqueue_scripts', 'wpcf7_do_enqueue_scripts', 10, 0 );
+remove_action('wp_enqueue_scripts', 'wpcf7_do_enqueue_scripts', 10, 0);
 
 // if( $show_form ) do_action( 'add_wpcf7_scripts' );
-add_action( 'add_wpcf7_scripts', 'add_wpcf7_scripts_func', 10, 0);
+add_action('add_wpcf7_scripts', 'add_wpcf7_scripts_func', 10, 0);
 function add_wpcf7_scripts_func() {
-	add_action( 'wp_footer', 'wpcf7_do_enqueue_scripts', 20 );
+	// add_action( 'wp_footer', 'wpcf7_do_enqueue_scripts', 20 );
+	// add_action('wp_enqueue_scripts', 'wpcf7_do_enqueue_scripts', 20, 0);
+	// function wpcf7_do_enqueue_scripts() :
+	if ( wpcf7_load_js() ) {
+		wpcf7_enqueue_scripts();
+	}
+
+	if ( wpcf7_load_css() ) {
+		wpcf7_enqueue_styles();
+	}
 }
 
 // block-library

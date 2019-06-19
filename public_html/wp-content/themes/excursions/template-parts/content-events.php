@@ -138,11 +138,13 @@
 					<?php endif;
 					echo '</ul>';
 
-					if( $offer['show_form'] ): 
-						do_action( 'add_wpcf7_scripts' ); ?>
+					if( $offer['show_form'] ): ?>
 						<div id="reg_form" style="display: none">
 							<button id="close_btn">&#10060;</button>
-							<?= do_shortcode('[contact-form-7 id="285" title="RegForm-1" event-title="' . $event_title . '"]'); ?>
+							<?php 
+							echo do_shortcode('[contact-form-7 id="285" title="RegForm-1" event-title="' . $event_title . '"]');
+							do_action('add_wpcf7_scripts');
+							?>
 						</div>
 					<?php endif; /* show_form end */ ?>
 
