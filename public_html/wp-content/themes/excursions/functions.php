@@ -804,49 +804,93 @@ function newscards_func( $atts ){
 	// $args = array( 'numberposts' => $numberposts, 'post_type' => $post_type, 'category_name' => $cat_name );
 	$today = date('Ymd');
 	$myposts = array();
+	global $post;
+	$events_args = array(
+		'post_type' 	=> 'events', 
+		'exclude' 		=> $exclude,
+		'orderby' 		=> 'meta_value',
+		'order'     	=> 'DESC',
+		'meta_key' 		=> 'event_info_event_date',
+	);
 
-	if( $future_events ){
-		$args = array( 'post_type' => 'events', 'exclude' => $exclude, 'meta_query' => array(
-			array('key' => 'event_info_event_date', 'compare' => '>=', 'value' => $today)
-			) );
-		$myposts = array_merge($myposts, get_posts($args));
+	if ($future_events || $actual_events) {
+		$events_posts = get_posts($events_args);
 	}
-	if( $actual_events ){
+
+	if ($future_events && !empty($events_posts)) {
+		// $args = array( 'post_type' => 'events', 'exclude' => $exclude, 'meta_query' => array(
+			// 	array('key' => 'event_info_event_date', 'compare' => '>=', 'value' => $today)
+			// 	) );
+		$ev_posts = array();
+		foreach ($events_posts as $counter => $post) {
+			setup_postdata($post);
+			$event_date = get_field('event_info_event_date', false, false);
+			if ($event_date >= $today) {
+				$ev_posts[] = $post;
+				unset( $events_posts[$counter] );
+			}
+		}
+		wp_reset_postdata();
+		$myposts = array_merge($myposts, $ev_posts);
+		// $myposts = array_merge($myposts, get_posts($args));
+	}
+	if ($actual_events && !empty($events_posts)) {
 		$date = new DateTime($today);
 		$date->modify('-1 month');
 		$actual_date = $date->format('Ymd');
-		// $lastmonth = mktime(0, 0, 0, date("m")-1, date("d"), date("Y"));
-		$args = array( 
-			'post_type' 	=> 'events', 
-			'exclude' 		=> $exclude, 
-			'meta_query'	=> array(
-				// 'relation' => 'AND',
-				array('key' => 'event_info_event_date', 'compare' => '<', 'value' => $today),
-				array('key' => 'event_info_event_date', 'compare' => '>=', 'value' => $actual_date),
-			),
-			'orderby' 		=> 'meta_value',
-			'order'     	=> 'DESC',
-			'meta_key' 		=> 'event_info_event_date',
-			'numberposts' 	=> 3,
-		);
-		$myposts = array_merge($myposts, get_posts($args));
+		// $args = array( 
+		// 	'post_type' 	=> 'events', 
+		// 	'exclude' 		=> $exclude, 
+		// 	'meta_query'	=> array(
+		// 		// 'relation' => 'AND',
+		// 		array('key' => 'event_info_event_date', 'compare' => '<', 'value' => $today),
+		// 		array('key' => 'event_info_event_date', 'compare' => '>=', 'value' => $actual_date),
+		// 	),
+		// 	'orderby' 		=> 'meta_value',
+		// 	'order'     	=> 'DESC',
+		// 	'meta_key' 		=> 'event_info_event_date',
+		// 	'numberposts' 	=> 3,
+		// );
+		// $myposts = array_merge($myposts, get_posts($args));
+		$ev_posts = array();
+		$numberposts = 0;
+		foreach ($events_posts as $counter => $post) {
+			setup_postdata($post);
+			$event_date = get_field('event_info_event_date', false, false);
+			if ($event_date > $actual_date) {
+				$ev_posts[] = $post;
+				unset( $events_posts[$counter] );
+				
+				if (++$numberposts > 2) break;
+			}
+		}
+		wp_reset_postdata();
+		$myposts = array_merge($myposts, $ev_posts);
 	}
-	if( $promo_posts ){
+	if ($promo_posts) {
 		$args = array( 'post_type' => 'post', 'exclude' => $exclude, 'category_name' => $cat_name );
 		$myposts = array_merge($myposts, get_posts($args));
 	}
-	if( $promo_events ){
-		$args = array( 'post_type' => 'events', 'exclude' => $exclude, 'category_name' => $cat_name );
+	if ($promo_events) {
+		// $args = array( 
+		// 	'post_type' 	=> 'events', 
+		// 	'exclude' 		=> $exclude, 
+		// 	'category_name' => $cat_name,
+		// 	'orderby' 		=> 'meta_value',
+		// 	'order'     	=> 'DESC',
+		// 	'meta_key' 		=> 'event_info_event_date', 
+		// );
+		$args = $events_args;
+		$args['category_name'] = $cat_name;
 		$myposts = array_merge($myposts, get_posts($args));
 	}
-	if( $promo_gba ){
+	if ($promo_gba) {
 		$args = array( 'post_type' => 'guidebook', 'exclude' => $exclude, 'category_name' => $cat_name,
 			'orderby' => array('meta_value_num' => 'DESC', 'title' => 'ASC'), 'meta_key' => 'gba_rating' );
 		$myposts = array_merge($myposts, get_posts($args));
 	}
 
 	// убираем из $myposts дубли
-	global $post;
 	$posts_ids = [];
 	foreach ($myposts as $counter => $post) {
 		setup_postdata($post);
@@ -859,29 +903,6 @@ function newscards_func( $atts ){
 	}
 	wp_reset_postdata();
 	// print_r($posts_ids);
-
-	// $meta_query = array( 
-	// 	array(
-	// 		'key' 		=> 'event_info_event_date', 
-	// 		'compare' 	=> '>=', 
-	// 		'value' 	=> date('Ymd'),
-	// 		) 
-	// );
-	// $args = array( 
-	// 	'numberposts' 	=> $numberposts, 
-	// 	'post_type' 	=> $post_type, 
-	// 	'category_name' => $cat_name,
-	// 	'meta_query'	=> $meta_query,
-	// 	'exclude' 		=> $exclude,
-	// 	'orderby' 		=> array( 'meta_value_num' => 'DESC', 'title' => 'ASC' ),
-	// 	'meta_key' 		=> 'gba_rating',
-	// 	// 'order'     	=> 'DESC',
-	// );
-	// $myposts = get_posts( $args );
-	// print_r($args);
-	// $myposts = array_merge($myposts1, $myposts2, $myposts3);
-	// $attachments = new WP_Query;
-	// $myposts = $attachments->query( $args );
 
 	$echo = '';
 
@@ -1602,7 +1623,8 @@ function gallery_func( $atts ){
 
 			$echo .= '<div class="'.$item.$bootstrap.'">';
 			// Get picture item in markup_figure() func. 1st two ($images_counter == 0 || 1) are not lazy 
-			$echo .= markup_fancy_figure($id, $fancybox, $full_image_url, $title, $size, $images_counter > 2, $title, null, $figcaption_html);
+			$print_lazy = $lazy && $images_counter > 2;
+			$echo .= markup_fancy_figure($id, $fancybox, $full_image_url, $title, $size, $print_lazy, $title, null, $figcaption_html);
 			$echo .= '</div>';
 
 		endforeach;

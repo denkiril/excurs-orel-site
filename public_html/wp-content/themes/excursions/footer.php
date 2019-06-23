@@ -11,8 +11,27 @@
 
 ?>
 
-	<!-- <script src="//yastatic.net/es5-shims/0.0.2/es5-shims.min.js"></script> -->
-	<!-- <script src="//yastatic.net/share2/share.js"></script> -->
+	<!-- Yandex.RTB R-A-414612-1 -->
+	<div id="yandex_rtb_R-A-414612-1" style="padding: 20px 0 40px 0;"></div>
+	<script type="text/javascript">
+		(function(w, d, n, s, t) {
+			w[n] = w[n] || [];
+			w[n].push(function() {
+				Ya.Context.AdvManager.render({
+					blockId: "R-A-414612-1",
+					renderTo: "yandex_rtb_R-A-414612-1",
+					async: true
+				});
+			});
+			t = d.getElementsByTagName("script")[0];
+			s = d.createElement("script");
+			s.type = "text/javascript";
+			s.src = "//an.yandex.ru/system/context.js";
+			s.async = true;
+			t.parentNode.insertBefore(s, t);
+		})(this, this.document, "yandexContextAsyncCallbacks");
+	</script>
+
 	<?php if( !(is_404() || is_search() || is_page('search')) ): ?> 
 	<div id="soc-buttons">
 		<span>Поделиться: </span>
