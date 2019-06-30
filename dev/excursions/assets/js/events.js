@@ -5,6 +5,7 @@ const ShowVideoBtn = document.querySelector('#ShowVideo_btn');
 const regBtn = document.querySelector('#reg_btn');
 const closeBtn = document.querySelector('#close_btn');
 const regForm = document.querySelector('#reg_form');
+/* global isInViewport */
 
 // $('#regBtn').click(function() { $(this).hide(); $("#reg_form").slideDown(); })
 if (regBtn) {
@@ -23,18 +24,6 @@ if (closeBtn) {
 
 // ShowVideo
 let lazy = [];
-
-function isInViewport(el) {
-  const rect = el.getBoundingClientRect();
-  // console.log(rect);
-
-  return (
-    rect.bottom >= 0
-        && rect.right >= 0
-        && rect.top <= (window.innerHeight || document.documentElement.clientHeight)
-        && rect.left <= (window.innerWidth || document.documentElement.clientWidth)
-  );
-}
 
 function iframeLazyLoad() {
   // console.log('iframeLoad ' + lazy.length);
@@ -92,5 +81,4 @@ function initShowVideo() {
   }
 }
 
-// registerListener('load', initShowVideo);
 window.addEventListener('load', initShowVideo);

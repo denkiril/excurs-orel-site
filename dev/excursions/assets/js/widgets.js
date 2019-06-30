@@ -6,10 +6,10 @@ const fbRoot 		= document.querySelector('#fb-root');
 const glideEl 	= document.querySelector('.glide');
 /* global VK */
 /* global getScript */
-/* global registerListener */
 /* global Glide */
+/* global isInViewport */
 
-function socialInit() {
+function socialMount() {
   // if(SocialSection && screen.width > 768){
   if (vkGroups) {
     // const mode 		= vk_groups.dataset.mode 	 || 3; 		//? vk_groups.dataset.mode 	  : 3;
@@ -38,12 +38,34 @@ function socialInit() {
     getScript(fbSdkUrl);
   }
 
-  if (vkGroups || fbRoot) {
-    SocialSection.style.display = 'block';
+  // if (vkGroups || fbRoot) SocialSection.style.display = 'block';
+}
+
+function socialLazyLoad() {
+  // console.log('socialLazyLoad');
+  let inViewport = false;
+  if (isInViewport(SocialSection)) {
+    socialMount();
+    window.removeEventListener('scroll', socialLazyLoad);
+    console.log('remove socialLazyLoad');
+    inViewport = true;
+  }
+
+  return inViewport;
+}
+
+function socialInit() {
+  if (!socialLazyLoad()) {
+    console.log('add socialLazyLoad');
+    window.addEventListener('scroll', socialLazyLoad);
   }
 }
 
-registerListener('load', socialInit, (SocialSection && window.screen.width > 768)); // social widgets only for big screens
+// social widgets only for big screens
+if (SocialSection && window.screen.width > 768) {
+  SocialSection.style.display = 'block';
+  window.addEventListener('load', socialInit);
+}
 
 // $(document).ready(() => {
 //   // Слайдер-карусель

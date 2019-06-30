@@ -124,6 +124,25 @@ $OKN_TXT = 'Сведения из Единого госреестра ОКН (с
 				$label = '<span class="ei_label">Номер в реестре ОКН:</span> ';
 				$echo .= $label . esc_html( $obj_info['okn_id'] ) . '<br />';
 			}
+			if( $obj_info['founding_date'] )
+			{
+				$label = '<span class="ei_label">Дата основания:</span> ';
+				$echo .= $label . esc_html( $obj_info['founding_date'] ) . '<br />';
+			}
+			$site_url = esc_html( trim($obj_info['site']) );
+			if( $site_url )
+			{
+				$label = '<span class="ei_label">Официальный сайт:</span> ';
+				$url = $site_url;
+				$ret = parse_url($url);
+				if( !isset($ret['scheme']) ){
+					$url = "http://{$url}";
+				} else {
+					// $site_url = preg_replace("(^https?://)", "", $site_url );
+					$site_url = $ret['host'] . $ret['path'];
+				}
+				$echo .= $label . '<a href="'.$url.'" target="_blank" rel="noopener noreferrer">'.$site_url.'</a><br />';
+			}
 			if( $obj_info['more_info'] )
 			{
 				$more_lines = explode(PHP_EOL, $obj_info['more_info']);

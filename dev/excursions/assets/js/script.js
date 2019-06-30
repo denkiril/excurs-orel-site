@@ -3,10 +3,12 @@ const NavBlockTop = NavBlock.getBoundingClientRect().top + window.pageYOffset;
 const Menu = document.querySelector('#menu');
 const NavMenu = document.querySelector('.nav-menu');
 const Up = document.querySelector('#up');
+const yandexRtb = document.querySelector('#yandex_rtb_R-A-414612-1');
 
 let NavMenuHeight;
 let menuStateOpen = false;
 
+/* global Ya */
 /* exported ymapsApiUrl */
 // eslint-disable-next-line no-unused-vars
 const ymapsApiUrl 	= 'https://api-maps.yandex.ru/2.1/?lang=ru_RU';
@@ -29,16 +31,19 @@ function getScript(src) {
 
 window.getScript = getScript;
 
-function registerListener(event, func, condition = true) {
-  if (condition) {
-    // if (window.addEventListener) {
-    window.addEventListener(event, func);
-    // } else {
-    // 		window.attachEvent('on' + event, func)
-  }
+function isInViewport(el) {
+  const rect = el.getBoundingClientRect();
+  // console.log(rect);
+
+  return (
+    rect.bottom >= 0
+    && rect.right >= 0
+    && rect.top <= (window.innerHeight || document.documentElement.clientHeight)
+    && rect.left <= (window.innerWidth || document.documentElement.clientWidth)
+  );
 }
 
-window.registerListener = registerListener;
+window.isInViewport = isInViewport;
 
 function init() {
   // Блок, работающий на JS, показываем только если работает JS
@@ -98,10 +103,10 @@ function watchScroll() {
   }
 }
 
-registerListener('load', init);
-registerListener('load', setNavMenu);
-registerListener('scroll', watchScroll);
-registerListener('resize', watchResize);
+window.addEventListener('load', init);
+window.addEventListener('load', setNavMenu);
+window.addEventListener('scroll', watchScroll);
+window.addEventListener('resize', watchResize);
 
 // Меню-гамбургер для адаптивной версии --- slideToggle
 Menu.addEventListener('click', () => {
@@ -187,3 +192,73 @@ function scrollIt(destination, duration = 350) {
     }
   });
 });
+
+// <script type="text/javascript">
+// (function(w, d, n, s, t) {
+//   w[n] = w[n] || [];
+//   w[n].push(function() {
+//     Ya.Context.AdvManager.render({
+//       blockId: "R-A-414612-1",
+//       renderTo: "yandex_rtb_R-A-414612-1",
+//       async: true
+//     });
+//   });
+//   t = d.getElementsByTagName("script")[0];
+//   s = d.createElement("script");
+//   s.type = "text/javascript";
+//   s.src = "//an.yandex.ru/system/context.js";
+//   s.async = true;
+//   t.parentNode.insertBefore(s, t);
+// })(this, this.document, "yandexContextAsyncCallbacks");
+// </script>
+
+function yandexRtbMount() {
+  const n = 'yandexContextAsyncCallbacks';
+  window[n] = window[n] || [];
+  window[n].push(() => {
+    Ya.Context.AdvManager.render({
+      blockId: 'R-A-414612-1',
+      renderTo: 'yandex_rtb_R-A-414612-1',
+      async: true,
+    });
+  });
+
+  getScript('//an.yandex.ru/system/context.js');
+
+  // getScript('//an.yandex.ru/system/context.js').then(() => {
+  //   const n = 'yandexContextAsyncCallbacks';
+  //   this[n] = this[n] || [];
+  //   // eslint-disable-next-line prefer-arrow-callback
+  //   this[n].push(function yandexRtbRender() {
+  //     Ya.Context.AdvManager.render({
+  //       blockId: 'R-A-414612-1',
+  //       renderTo: 'yandex_rtb_R-A-414612-1',
+  //       async: true,
+  //     });
+  //   });
+  // });
+}
+
+function yandexRtbLazyLoad() {
+  console.log('yandexRtbLazyLoad');
+  let inViewport = false;
+  if (isInViewport(yandexRtb)) {
+    yandexRtbMount();
+    window.removeEventListener('scroll', yandexRtbLazyLoad);
+    console.log('remove yandexRtbLazyLoad');
+    inViewport = true;
+  }
+
+  return inViewport;
+}
+
+function yandexRtbInit() {
+  if (!yandexRtbLazyLoad()) {
+    console.log('add yandexRtbLazyLoad');
+    window.addEventListener('scroll', yandexRtbLazyLoad);
+  }
+}
+
+if (yandexRtb && window.screen.width > 768) {
+  window.addEventListener('load', yandexRtbInit);
+}

@@ -21,6 +21,7 @@ Disallow: *utm*=
 Disallow: *openstat=
 Allow: */uploads
 Allow: /wp-admin/admin-ajax.php
+Allow: /wp-content/themes/excursions/
 
 Sitemap: https://excurs-orel.ru/sitemap.xml
 

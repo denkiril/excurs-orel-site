@@ -1,4 +1,3 @@
-/* global registerListener */
 /* global getScript */
 /* global ymapsApiUrl */
 /* global ymaps */
@@ -91,4 +90,4 @@ function initOpenEventMap() {
   }
 }
 
-registerListener('load', initOpenEventMap);
+window.addEventListener('load', initOpenEventMap);

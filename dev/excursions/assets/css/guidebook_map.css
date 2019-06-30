@@ -101,6 +101,11 @@
     align-items: center;
     padding: 0 4px;
 }
+@media (min-width: 769px) and (max-width: 992px) {
+    #filterByTitle{
+        width: 140px;
+    }
+}
 .ctrl_flex{
     display: flex;
     justify-content: space-between;
@@ -167,8 +172,7 @@ input[value="imgs"]:checked:focus + .chb_svg{
 
 .omb_list{
     height: 380px;
-    /* height: 500px; */
-    overflow: auto;
+    overflow-y: scroll;
 }
 @media (max-width: 768px) {
     .omb_list{
@@ -205,18 +209,12 @@ input[value="imgs"]:checked:focus + .chb_svg{
     line-height: 1.2;
     display: block;
 }
-@media (max-width: 992px) {
+@media (min-width: 769px) and (max-width: 992px) {
     #infoRef{
         position: absolute;
-        /* background: #fff; */
+        background: #fff;
         top: 0;
         left: 0;
-    }
-}
-@media (max-width: 768px) {
-    #infoRef{
-        position: static;
-        /* background: transparent; */
     }
 }
 

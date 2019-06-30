@@ -124,8 +124,8 @@ add_action( 'widgets_init', 'excursions_widgets_init' );
 $LINKS = array();
 // $SCRIPTS = array();
 $consolelog = '';
-$SCRIPTS_VER = '20190529';
-$STYLES_VER = '20190529';
+$SCRIPTS_VER = '20190701';
+$STYLES_VER = '20190701';
 $WEBP_ON = !(home_url() == 'http://excurs-orel');
 // $WEBP_ON = true;
 if(!$WEBP_ON) console_log('WEBP_OFF');
@@ -1553,7 +1553,7 @@ function markup_fancy_figure($id, $fancybox, $full_image_url, $fancy_caption, $s
 	return $echo;
 }
 
-// [gallery acf_field=gallery_gal class=post-gallery item=gallery-item fancybox=gallery lazy=1 size=large nums=null(1,2,4) figcaption=image_description(parent_href) mini=false permalink=true] 
+// [gallery acf_field=gallery_gal class=post-gallery item=gallery-item fancybox=gallery lazy=1 size=large nums=null(1,2,4|1-5) figcaption=image_description(parent_href) mini=false permalink=true] 
 add_shortcode( 'gallery', 'gallery_func' );
 
 function gallery_func( $atts ){
@@ -1594,8 +1594,17 @@ function gallery_func( $atts ){
 		$bootstrap = $mini ? ' col-12 col-sm-6 col-md-6 col-lg-4' : ' col-12';
 		
 		$images_counter = 0;
-		if($nums){
-			$nums_arr = explode(',', $nums);
+		if ($nums) {
+			$nums_arr = [];
+			if (strpos($nums, '-') !== false) {
+				$nums_extremes = explode('-', $nums);
+				if (count($nums_extremes) > 1) {
+					for ($i = $nums_extremes[0]; $i <= $nums_extremes[1]; $i++)
+						$nums_arr[] = $i;
+				}
+			} else {
+				$nums_arr = explode(',', $nums);
+			}
 			// print_r($nums_arr);
 		}
 
@@ -1811,6 +1820,8 @@ function get_sights() {
 	// wp_die();
 	$sights 	= array();
 	$myposts 	= get_guidebook_posts(null, -1); 
+	$mus_posts 	= get_guidebook_posts('museums', -1);
+	$myposts 	= array_merge($myposts, $mus_posts);
 
 	if( $myposts ){
 		global $post;
