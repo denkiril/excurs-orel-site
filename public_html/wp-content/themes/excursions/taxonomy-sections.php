@@ -12,7 +12,22 @@ get_header();
 
 <main id="main" class="site-main taxonomy-sections">
 
-	<?php if( have_posts() ): ?>
+	<?php if (have_posts()) :
+	$term = get_queried_object();
+	if ( $term->slug == 'museums' ) : 
+		do_action( 'guidebook_map_scripts' );
+		?>
+		<div class="obj_map noautoopen" data-state="init" data-slug="museums">
+		<div class="om_block omb_panel" style="display: none;">
+			<button class="OpenMap_btn">
+				<span class="state_init">[ Показать на карте ]</span>
+				<span class="state_open">[ Закрыть карту ]</span>
+				<span class="state_close">[ Открыть карту ]</span>
+			</button>
+		</div>
+		<div class="om_content"></div>
+	</div>
+	<?php endif; ?>
 
 	<div class="row">
 		<?php while( have_posts() ):
@@ -35,6 +50,8 @@ get_header();
 	</div>
 
 		<?php the_posts_pagination();
+
+		echo term_description();
 
 	else :
 

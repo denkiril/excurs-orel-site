@@ -613,7 +613,7 @@ function register_post_types(){
 		//'query_var'             => $taxonomy, // название параметра запроса
 		'capabilities'          => array(),
 		'meta_box_cb'           => null, // callback функция. Отвечает за html код метабокса (с версии 3.8): post_categories_meta_box или post_tags_meta_box. Если указать false, то метабокс будет отключен вообще
-		'show_admin_column'     => false, // Позволить или нет авто-создание колонки таксономии в таблице ассоциированного типа записи. (с версии 3.5)
+		'show_admin_column'     => true, // Позволить или нет авто-создание колонки таксономии в таблице ассоциированного типа записи. (с версии 3.5)
 		'_builtin'              => false,
 		'show_in_quick_edit'    => null, // по умолчанию значение show_ui
 	) );
@@ -1818,10 +1818,15 @@ if( wp_doing_ajax() ){
 function get_sights() {
 	// echo json_encode($_SERVER['REQUEST_URI']);
 	// wp_die();
-	$sights 	= array();
-	$myposts 	= get_guidebook_posts(null, -1); 
-	$mus_posts 	= get_guidebook_posts('museums', -1);
-	$myposts 	= array_merge($myposts, $mus_posts);
+	$sights = array();
+	$slug = $_GET['slug'];
+	if (!$slug) {
+		$myposts 	= get_guidebook_posts(null, -1); 
+		$mus_posts 	= get_guidebook_posts('museums', -1);
+		$myposts 	= array_merge($myposts, $mus_posts);
+	} else {
+		$myposts 	= get_guidebook_posts($slug, -1); 
+	}
 
 	if( $myposts ){
 		global $post;

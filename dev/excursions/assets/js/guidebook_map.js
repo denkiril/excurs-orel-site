@@ -407,7 +407,11 @@ function NewObjMap(objectsMap) {
   };
 
   const searchStr = window.location.search ? `${window.location.search}&` : '?';
-  const requestUrl = `${myajax.url + searchStr}action=get_sights`;
+  let requestUrl = `${myajax.url + searchStr}action=get_sights`;
+  const slug = objectsMap.getAttribute('data-slug');
+  if (slug) {
+    requestUrl += `&slug=${slug}`;
+  }
   // const searchParams = new URLSearchParams(window.location.search);
   // requestUrl += '&' + searchParams.toString();
 
@@ -495,7 +499,7 @@ function initGBMap() {
       const searchStr = window.location.search;
       // const searchParams = new URLSearchParams(window.location.search);
       // if (!searchParams.has('pagenum')) {
-      if (!searchStr.includes('pagenum=')) {
+      if (!(searchStr.includes('pagenum=') || objMap.classList.contains('noautoopen'))) {
         changeObjMapState(objMap);
       }
     }
