@@ -271,6 +271,70 @@
 		<?php endif; ?>
 		
 	</div><!-- .entry-content -->
+
+	<?php
+	/* Prev & Next Events */
+	$events_args = array(
+		'post_type' 	=> 'events',
+		'orderby' 		=> 'meta_value',
+		'order'     	=> 'ASC',
+		'meta_key' 		=> 'event_info_event_date',
+		'numberposts' 	=> -1,
+	);
+	$events_posts = get_posts($events_args);
+	$event_id = get_queried_object()->ID;
+	foreach ($events_posts as $key => $post) {
+		if ($event_id == $post->ID) {
+			$this_event_key = $key;
+			break;
+		}
+	}
+	if ($this_event_key) {
+		$prev_event = $events_posts[$this_event_key-1];
+		$next_event = $events_posts[$this_event_key+1];
+	}
+	
+	if ($prev_event || $next_event) :
+	?>
+		<hr />
+		<div class="flex-container">
+		<?php if ($prev_event) : ?>
+			<div class="prevnext-card">
+				<p style="text-align: left">< Предыдущее<span class="sm-hide"> событие</span></p>
+				<div class="anno-card">
+					<?php
+						
+						$thumb_id = get_post_thumbnail_id($prev_event);
+						$permalink = get_the_permalink($prev_event);
+						$title = esc_html( get_the_title($prev_event) ); 
+						echo '<a href="'.$permalink.'" title="Ссылка на:'.$title.'">';
+						echo get_attachment_picture( $thumb_id, 'medium', false, null, true, true );
+						echo '</a>';
+					?>
+					<h2 class="annocard-title"><a href="<?=$permalink?>" title="Ссылка на: <?=$title?>"><?=$title?></a></h2>
+				</div>
+			</div>
+		<?php endif; ?>
+
+		<?php if ($next_event) : ?>
+			<div class="prevnext-card">
+				<p style="text-align: right">Следующее<span class="sm-hide"> событие</span> ></p>
+				<div class="anno-card">
+					<?php
+						$thumb_id = get_post_thumbnail_id($next_event);
+						$permalink = get_the_permalink($next_event);
+						$title = esc_html( get_the_title($next_event) ); 
+						echo '<a href="'.$permalink.'" title="Ссылка на:'.$title.'">';
+						echo get_attachment_picture( $thumb_id, 'medium', false, null, true, true );
+						echo '</a>';
+					?>
+					<h2 class="annocard-title"><a href="<?=$permalink?>" title="Ссылка на: <?=$title?>"><?=$title?></a></h2>
+				</div>
+			</div>
+		<?php endif; ?>
+		</div>
+	
+	<?php endif; ?>
 </article><!-- #post-<?php the_ID(); ?> -->
 
 <?php if( $gallery ) do_action( 'add_gallery_scripts' ); ?>

@@ -125,7 +125,7 @@ $LINKS = array();
 // $SCRIPTS = array();
 $consolelog = '';
 $SCRIPTS_VER = '20190701';
-$STYLES_VER = '20190701';
+$STYLES_VER = '20190708';
 $WEBP_ON = !(home_url() == 'http://excurs-orel');
 // $WEBP_ON = true;
 if(!$WEBP_ON) console_log('WEBP_OFF');
@@ -811,6 +811,7 @@ function newscards_func( $atts ){
 		'orderby' 		=> 'meta_value',
 		'order'     	=> 'DESC',
 		'meta_key' 		=> 'event_info_event_date',
+		'numberposts' 	=> -1,
 	);
 
 	if ($future_events || $actual_events) {
