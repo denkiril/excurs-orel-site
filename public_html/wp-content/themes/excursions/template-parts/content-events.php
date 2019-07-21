@@ -212,6 +212,33 @@
 		</div> <!-- post-gallery -->
 		<?php endif;
 
+		$smi = get_field('smi');
+		if( $smi ): ?>
+			<div class="row">
+			<div class="col">
+				<h2>О нас пишут</h2>
+				<ul>
+				<?php
+				$lines = explode(PHP_EOL, trim($smi));
+				foreach( $lines as $line ){
+					$sublines = explode('=', $line, 2);
+					$text = esc_html( trim($sublines[0]) );
+					$url = esc_html( trim($sublines[1]) );
+					if( $url ){
+						$ret = parse_url($url);
+						if( !isset($ret['scheme']) ){
+							$url = "http://{$url}";
+						}
+						$text = '<a href="'.$url.'" target="_blank" rel="noopener noreferrer">'.$text.'</a>';
+					}
+					echo '<li>'.$text.'</li>';
+				}
+				?>
+				</ul>
+			</div>
+		</div> <!-- row -->
+		<?php endif;
+
 		/* video */
 		// $video = get_field('video'); 
 		if ($yt_links = trim(get_field('video_youtube'))) {
@@ -300,14 +327,14 @@
 		<div class="flex-container">
 		<?php if ($prev_event) : ?>
 			<div class="prevnext-card">
-				<p style="text-align: left">< Предыдущее<span class="sm-hide"> событие</span></p>
+				<p style="text-align: left">&lt;&nbsp;Предыдущее<span class="sm-hide"> событие</span></p>
 				<div class="anno-card">
 					<?php
 						
 						$thumb_id = get_post_thumbnail_id($prev_event);
 						$permalink = get_the_permalink($prev_event);
 						$title = esc_html( get_the_title($prev_event) ); 
-						echo '<a href="'.$permalink.'" title="Ссылка на:'.$title.'">';
+						echo '<a href="'.$permalink.'" title="Ссылка на: '.$title.'">';
 						echo get_attachment_picture( $thumb_id, 'medium', false, null, true, true );
 						echo '</a>';
 					?>
@@ -318,7 +345,7 @@
 
 		<?php if ($next_event) : ?>
 			<div class="prevnext-card">
-				<p style="text-align: right">Следующее<span class="sm-hide"> событие</span> ></p>
+				<p style="text-align: right">Следующее<span class="sm-hide"> событие</span>&nbsp;&gt;</p>
 				<div class="anno-card">
 					<?php
 						$thumb_id = get_post_thumbnail_id($next_event);

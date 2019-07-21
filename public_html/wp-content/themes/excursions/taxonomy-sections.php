@@ -12,7 +12,8 @@ get_header();
 
 <main id="main" class="site-main taxonomy-sections">
 
-	<?php if (have_posts()) :
+<?php
+if (have_posts()) :
 	$term = get_queried_object();
 	if ( $term->slug == 'museums' ) : 
 		do_action( 'guidebook_map_scripts' );
@@ -51,14 +52,16 @@ get_header();
 
 		<?php the_posts_pagination();
 
-		echo term_description();
+		// echo term_description();
 
-	else :
+		echo get_field('gbs_content', $term);
 
-		get_template_part( 'template-parts/content', 'none' );
+else :
 
-	endif;
-	?>
+	get_template_part( 'template-parts/content', 'none' );
+
+endif;
+?>
 
 </main><!-- #main -->
 

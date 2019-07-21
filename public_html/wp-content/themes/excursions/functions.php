@@ -783,9 +783,10 @@ function newscards_func( $atts ){
 		'read_more' 	=> '[Перейти&nbsp;>>]',
 		'exclude' 		=> array(),
 		'size' 			=> 'medium_large',
+		'events_num' 	=> 6,
 	), $atts );
 
-	$numberposts 	= 9;
+	// $numberposts 	= 9;
 	$post_type 		= $atts['post_type'];
 	$section_id 	= $atts['section_id'];
 	$section_title 	= $atts['section_title'];
@@ -800,6 +801,7 @@ function newscards_func( $atts ){
 	$exclude 		= $atts['exclude'];
 	$size 			= $atts['size'];
 	$section_link 	= $atts['section_link'];
+	$events_num 	= $atts['events_num'];
 
 	// $args = array( 'numberposts' => $numberposts, 'post_type' => $post_type, 'category_name' => $cat_name );
 	$today = date('Ymd');
@@ -854,7 +856,7 @@ function newscards_func( $atts ){
 		// );
 		// $myposts = array_merge($myposts, get_posts($args));
 		$ev_posts = array();
-		$numberposts = 0;
+		$posts_number = 0;
 		foreach ($events_posts as $counter => $post) {
 			setup_postdata($post);
 			$event_date = get_field('event_info_event_date', false, false);
@@ -862,7 +864,7 @@ function newscards_func( $atts ){
 				$ev_posts[] = $post;
 				unset( $events_posts[$counter] );
 				
-				if (++$numberposts > 2) break;
+				if (++$posts_number >= $events_num) break;
 			}
 		}
 		wp_reset_postdata();
@@ -1431,9 +1433,13 @@ function image_func( $atts ){
 				$ahref_post = '</a>';
 			}
 		}
-		elseif( $title ){
-			$title = get_the_title( $id );
-			$attr = array( 'title' => $title);
+		else {
+			$ahref_pre = '<a href="'.wp_get_attachment_image_url($id, 'full').'" title="'.get_the_title($id).'" target="_blank">';
+			$ahref_post = '</a>';
+			// if ($title) {
+			// 	$title = get_the_title( $id );
+			// 	$attr = array( 'title' => $title);
+			// }
 		}
 
 		// $image = wp_get_attachment_image( $id, $size, false, $attr );
