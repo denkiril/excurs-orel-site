@@ -125,7 +125,7 @@ $LINKS = array();
 // $SCRIPTS = array();
 $consolelog = '';
 $SCRIPTS_VER = '20190701';
-$STYLES_VER = '20190708';
+$STYLES_VER = '20190723';
 $WEBP_ON = !(home_url() == 'http://excurs-orel');
 // $WEBP_ON = true;
 if(!$WEBP_ON) console_log('WEBP_OFF');
@@ -804,8 +804,11 @@ function newscards_func( $atts ){
 	$events_num 	= $atts['events_num'];
 
 	// $args = array( 'numberposts' => $numberposts, 'post_type' => $post_type, 'category_name' => $cat_name );
+	date_default_timezone_set('Europe/Moscow');
 	$today = date('Ymd');
+	$current_time = date('H:i');
 	$myposts = array();
+	$future_events_posts = array();
 	global $post;
 	$events_args = array(
 		'post_type' 	=> 'events', 
@@ -824,17 +827,23 @@ function newscards_func( $atts ){
 		// $args = array( 'post_type' => 'events', 'exclude' => $exclude, 'meta_query' => array(
 			// 	array('key' => 'event_info_event_date', 'compare' => '>=', 'value' => $today)
 			// 	) );
-		$ev_posts = array();
 		foreach ($events_posts as $counter => $post) {
 			setup_postdata($post);
 			$event_date = get_field('event_info_event_date', false, false);
-			if ($event_date >= $today) {
-				$ev_posts[] = $post;
+			if ($event_date > $today) {
+				$future_events_posts[] = $post;
 				unset( $events_posts[$counter] );
+			} elseif ($event_date == $today) {
+				$event_time = get_field('event_info_event_time');
+				if ($event_time > $current_time) {
+					// print_r2($event_time.' > '.$current_time);
+					$future_events_posts[] = $post;
+					unset( $events_posts[$counter] );
+				}
 			}
 		}
 		wp_reset_postdata();
-		$myposts = array_merge($myposts, $ev_posts);
+		$myposts = array_merge($myposts, $future_events_posts);
 		// $myposts = array_merge($myposts, get_posts($args));
 	}
 	if ($actual_events && !empty($events_posts)) {
@@ -920,11 +929,12 @@ function newscards_func( $atts ){
 		}
 
 		$echo .= '<div class="row">';
-		foreach( $myposts as $post ):
+		foreach ($myposts as $post) :
 			setup_postdata( $post );
 			$permalink 		= get_the_permalink(); 
 			$title 			= esc_html( get_the_title() );
-			$show_attention = get_field('event_info_event_date', false, false) >= $today;
+			// $show_attention = get_field('event_info_event_date', false, false) >= $today;
+			$show_attention = in_array($post, $future_events_posts);
 			$newscard_title = esc_html( get_field('newscard-title') );
 			if( empty($newscard_title) ){
 				$event_date = ( $post->post_type == 'events') ? markup_event_date( $post->id ) : '';
@@ -1403,32 +1413,34 @@ function generate_image_srcset( $image_meta, $image_baseurl, $webp = false ){
 // [image class="" id=1 size="medium_large" title=false href=1 lazy=0] 
 add_shortcode( 'image', 'image_func' );
 
-function image_func( $atts ){
+function image_func( $atts ) {
 	// белый список параметров и значения по умолчанию
 	$atts = shortcode_atts( array(
-		'class' => 'image',
-		'id' 	=> null,
-		'size' 	=> 'thumbnail',
-		'title' => true,
-		'href' 	=> false,
-		'lazy' 	=>true,
+		'class' 		=> 'image',
+		'id' 			=> null,
+		'size' 			=> 'thumbnail',
+		'title' 		=> true,
+		'href' 			=> false,
+		'lazy' 			=> true,
+		'figcaption' 	=> null,
 	), $atts );
 
-	$class 	= $atts['class'];
-	$id 	= $atts['id'];
-	$size 	= $atts['size'];
-	$title 	= $atts['title'];
-	$href 	= $atts['href'];
-	$lazy 	= $atts['lazy'];
+	$class 		= $atts['class'];
+	$id 		= $atts['id'];
+	$size 		= $atts['size'];
+	$title 		= $atts['title'];
+	$href 		= $atts['href'];
+	$lazy 		= $atts['lazy'];
+	$figcaption	= $atts['figcaption'];
 
 	$echo = '';
 
-	if( !$id ) $id = get_post_thumbnail_id();
+	if (!$id) $id = get_post_thumbnail_id();
 
-	if( $id ){
-		if( $href ){
+	if ($id) {
+		if ($href) {
 			$post_id = wp_get_post_parent_id( $id );
-			if( $post_link = get_permalink( $post_id ) ){
+			if ($post_link = get_permalink($post_id)) {
 				$ahref_pre = '<a href="'.$post_link.'" title="'.get_the_title( $post_id ).'">';
 				$ahref_post = '</a>';
 			}
@@ -1445,8 +1457,12 @@ function image_func( $atts ){
 		// $image = wp_get_attachment_image( $id, $size, false, $attr );
 		$image = get_attachment_picture( $id, $size, false, $attr, $lazy );
 
-		if( $image ){
-			$echo .= '<div class="'.$class.'"><figure>'.$ahref_pre.$image.$ahref_post.'</figure></div>';
+		if ($image) {
+			$echo .= '<div class="'.$class.'"><figure>'.$ahref_pre.$image.$ahref_post;
+			if ($figcaption) {
+				$echo .= '<figcaption>'.$figcaption.'</figcaption>';
+			}
+			$echo .= '</figure></div>';
 		}
 	}
 
