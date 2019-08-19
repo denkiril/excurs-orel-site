@@ -1410,7 +1410,7 @@ function generate_image_srcset( $image_meta, $image_baseurl, $webp = false ){
 	return $srcset;
 }
 
-// [image class="" id=1 size="medium_large" title=false href=1 lazy=0] 
+// [image num=1 class="" id=1 size=medium_large title=false href=1 lazy=0 figcaption=''] 
 add_shortcode( 'image', 'image_func' );
 
 function image_func( $atts ) {
@@ -1423,6 +1423,7 @@ function image_func( $atts ) {
 		'href' 			=> false,
 		'lazy' 			=> true,
 		'figcaption' 	=> null,
+		'num' 			=> null,
 	), $atts );
 
 	$class 		= $atts['class'];
@@ -1432,10 +1433,24 @@ function image_func( $atts ) {
 	$href 		= $atts['href'];
 	$lazy 		= $atts['lazy'];
 	$figcaption	= $atts['figcaption'];
+	$num		= $atts['num'];
+
+	$acf_field 	= 'image_gal';
 
 	$echo = '';
 
-	if (!$id) $id = get_post_thumbnail_id();
+	if (!$id && !$num) {
+		$id = get_post_thumbnail_id();
+	} 
+
+	if (!$id && $num) {
+		global $post;
+		//Get the images ids from the post_metadata
+		$images = acf_photo_gallery( $acf_field, $post->ID );
+		if (count($images) >= $num) {
+			$id = $images[$num-1]['id'];
+		}
+	}
 
 	if ($id) {
 		if ($href) {
@@ -1465,6 +1480,102 @@ function image_func( $atts ) {
 			$echo .= '</figure></div>';
 		}
 	}
+
+	return $echo;
+}
+
+// [gb_images nums=1 title="Музеи Орла на карте" subtitle="(*Кликните на картинку, чтобы открыть в большом размере)"]
+add_shortcode( 'gb_images', 'gb_images_func' );
+
+function gb_images_func( $atts ) {
+	// белый список параметров и значения по умолчанию
+	$atts = shortcode_atts( array(
+		'nums' 			=> null,
+		'class' 		=> 'large-image',
+		'size' 			=> 'large',
+		'lazy' 			=> true,
+		'title' 		=> null,
+		'subtitle' 		=> null,
+	), $atts );
+
+	$nums		= $atts['nums'];
+	$class 		= $atts['class'];
+	$size 		= $atts['size'];
+	$lazy 		= $atts['lazy'];
+	$title 		= $atts['title'];
+	$subtitle 	= $atts['subtitle'];
+
+	$acf_field 	= 'image_gal';
+	$echo 		= '';
+
+	// Hide this block on pagen 
+	if ((int)$_GET['pagenum'] > 1) return $echo;
+
+	global $post;
+	//Get the images ids from the post_metadata
+	$images = acf_photo_gallery($acf_field, $post->ID);
+
+	if (count($images)) :
+		$images_count = count($images);
+		$images_counter = 0;
+		if ($nums) {
+			$nums_arr = [];
+			if (strpos($nums, '-') !== false) {
+				$nums_extremes = explode('-', $nums);
+				if (count($nums_extremes) > 1) {
+					for ($i = $nums_extremes[0]; $i <= $nums_extremes[1]; $i++)
+						$nums_arr[] = $i;
+				}
+			} else {
+				$nums_arr = explode(',', $nums);
+			}
+
+			$images_count = count($nums_arr);
+			// print_r($nums_arr);
+		}
+
+		switch ($images_count) {
+			case 1: $bootstrap = 'col-12'; break;
+			case 3: $bootstrap = 'col-12 col-sm-6 col-md-4 col-lg-4'; break;
+			default: $bootstrap = 'col-12 col-sm-6';
+		}
+
+		if ($title) {
+			$echo .= '<h2>'.$title.'</h2>';
+		}
+		$echo .= '<div class="row '.$class.'">';
+		foreach ($images as $image) :
+			// if( $number>0 && $number != ++$images_counter ) continue;
+			if ($nums && !in_array( ++$images_counter, $nums_arr )) continue;
+
+			$id 			= $image['id']; // The attachment id of the media
+			$title 			= $image['title']; //The title
+			$full_image_url = $image['full_image_url']; //Full size image url
+			$figcaption_html = image_description_parse($image['caption']);
+
+			if ($id) {
+				// $ahref_pre = '<a href="'.wp_get_attachment_image_url($id, 'full').'" title="'.get_the_title($id).'" target="_blank">';
+				$ahref_pre = '<a href="'.$full_image_url.'" title="'.$title.'" target="_blank">';
+				$ahref_post = '</a>';
+				$picture = get_attachment_picture( $id, $size, false, $attr, $lazy );
+		
+				if ($picture) {
+					$echo .= '<div class="'.$bootstrap.'"><figure>'.$ahref_pre.$picture.$ahref_post;
+					if ($figcaption_html) {
+						$echo .= '<figcaption>'.$figcaption_html.'</figcaption>';
+					}
+					$echo .= '</figure></div>';
+				}
+			}
+
+		endforeach;
+		$echo .= '</div> <!-- row '.$class.' -->';
+
+		if ($subtitle) {
+			$echo .= '<p style="font-size:0.9em;color:#3f3f3f;">'.$subtitle.'</p>';
+		}
+		// do_action('add_gallery_scripts');
+	endif;
 
 	return $echo;
 }
@@ -1609,9 +1720,9 @@ function gallery_func( $atts ){
 
 	global $post;
 	//Get the images ids from the post_metadata
-	$images = acf_photo_gallery( $acf_field, $post->ID );
-	if( count($images) ):
-		if( !$class ){
+	$images = acf_photo_gallery($acf_field, $post->ID);
+	if (count($images)) :
+		if (!$class) {
 			$class = $mini ? 'pre-gallery' : 'post-gallery';
 		}
 		$bootstrap = $mini ? ' col-12 col-sm-6 col-md-6 col-lg-4' : ' col-12';
@@ -1632,24 +1743,24 @@ function gallery_func( $atts ){
 		}
 
 		$echo .= '<div class="row '.$class.'">'; //  nums-'.$nums.'
-		foreach( $images as $image ):
+		foreach ($images as $image) :
 			// if( $number>0 && $number != ++$images_counter ) continue;
-			if( $nums && !in_array( ++$images_counter, $nums_arr ) ) continue;
+			if ($nums && !in_array( ++$images_counter, $nums_arr )) continue;
 
 			$id 			= $image['id']; // The attachment id of the media
 			$title 			= $image['title']; //The title
 			$full_image_url = $image['full_image_url']; //Full size image url
 
 			$figcaption_html = '';
-			if( $figcaption == 'parent_href' ){
-				$post_parent_id = wp_get_post_parent_id( $id );
+			if ($figcaption == 'parent_href') {
+				$post_parent_id = wp_get_post_parent_id($id);
 				// Если картинка имеет родительский пост отличный от текущего, выводим на него ссылку в подписи 
-				if( $post_parent_id != $post->ID && $post_parent_link = get_permalink( $post_parent_id ) ){
+				if ($post_parent_id != $post->ID && $post_parent_link = get_permalink($post_parent_id)) {
 					$figcaption_html = '<a href="'.$post_parent_link.'">'.get_the_title( $post_parent_id ).'</a>';
 				}
 			}
 			// Иначе берем подпись из БД и парсим ее
-			if(!$figcaption_html && ($figcaption == 'image_description' || $figcaption == 'parent_href')){
+			if (!$figcaption_html && ($figcaption == 'image_description' || $figcaption == 'parent_href')) {
 				$figcaption_html = image_description_parse( $image['caption'], $permalink ); //The caption (Description!)
 			}
 
@@ -1662,9 +1773,173 @@ function gallery_func( $atts ){
 		endforeach;
 		$echo .= '</div> <!-- row '.$class.' -->';
 
-		do_action( 'add_gallery_scripts' );
+		do_action('add_gallery_scripts');
 
 	endif;
+
+	return $echo;
+}
+
+// [guidebook_map class="" id=1 size="medium_large" title=false href=1 lazy=0] 
+add_shortcode( 'guidebook_map', 'guidebook_map_func' );
+
+function guidebook_map_func( $atts ) {
+	// белый список параметров и значения по умолчанию
+	$atts = shortcode_atts( array(
+		'class' 	=> 'obj_map',
+		'form' 		=> false,
+		// 'size' 	=> 'thumbnail',
+	), $atts );
+
+	$class 	= $atts['class'];
+	$form 	= $atts['form'];
+	// $size 	= $atts['size'];
+
+	$form_html = '';
+	if ($form) {
+		$cat_f_checked 			= isset($_GET['cat_f']) ? 'checked' : '';
+		$numberposts_1_checked 	= isset($_GET['numberposts_1']) ? 'checked' : '';
+		$numberposts_2_checked 	= isset($_GET['numberposts_2']) ? 'checked' : '';
+		$pagenum1_checked 		= (!isset($_GET['pagenum']) || $_GET['pagenum'] == 1) ? 'checked' : '';
+		$pagenum2_checked 		= $_GET['pagenum'] == 2 ? 'checked' : '';
+		
+		$form_html .= '<form>';
+		$form_html .= '<label><input type="checkbox" name="cat_f" '.$cat_f_checked.'>Ф</label>';
+        $form_html .= '<label><input type="checkbox" name="numberposts_1" '.$numberposts_1_checked.'>1</label>';
+        $form_html .= '<label><input type="checkbox" name="numberposts_2" '.$numberposts_2_checked.'>2</label>';
+		$form_html .= '<label><input type="radio" name="pagenum" value="1" '.$pagenum1_checked.'>1</label>';
+		$form_html .= '<label><input type="radio" name="pagenum" value="2" '.$pagenum2_checked.'>2</label>';
+        $form_html .= '<button type="submit">Применить</button></form>';
+	}
+
+	$echo = '<div class="'.$class.'" data-state="init">';
+	$echo .= '<div class="om_block omb_panel" style="display: none;">';
+	$echo .= '<button class="OpenMap_btn">';
+	$echo .= '<span class="state_init">[ Показать на карте ]</span>';
+	$echo .= '<span class="state_open">[ Закрыть карту ]</span>';
+	$echo .= '<span class="state_close">[ Открыть карту ]</span></button></div>';
+	$echo .= '<div class="om_content">';
+	$echo .= '<div class="om_block omb_topFilter" style="display: none;">';
+	$echo .= $form_html;
+	$echo .= '</div></div></div>';
+	
+	do_action('guidebook_map_scripts');
+
+	return $echo;
+}
+
+// [guidebook_sections content=""] 
+add_shortcode( 'guidebook_sections', 'guidebook_sections_func' );
+
+function guidebook_sections_func( $atts ) {
+	// белый список параметров и значения по умолчанию
+	$atts = shortcode_atts( array(
+		'content' => null,
+		// 'form' 		=> false,
+		// 'size' 	=> 'thumbnail',
+	), $atts );
+
+	$gb_content = $atts['content'];
+	// $form 	= $atts['form'];
+	// $size 	= $atts['size'];
+	$echo = '';
+
+	// $taxonomy_names = get_object_taxonomies('guidebook');
+	$tax_name = 'sections';
+	$terms = get_terms($tax_name);
+	if ($terms && ! is_wp_error($terms)) :
+		$term_counter = 0;
+		foreach ($terms as $term) :
+			$numberposts = 12;
+			// $numberposts = 4; // for dev
+			if ($term_counter == 0) {
+				if (isset($_GET['numberposts_1'])) {
+					$numberposts = 1;
+				}
+				if (isset($_GET['numberposts_2'])) {
+					$numberposts = 2;
+				}
+			}
+			$myposts = get_guidebook_posts( $term->slug, $numberposts );
+			// print_r2($myposts);
+
+			if ($myposts) :
+				$term_link = get_term_link( (int)$term->term_id );
+				$term_name = $term->name;
+				// echo '<li><a href="'.$term_link.'" title="Ссылка на '.$term_name.'">'.$term_name.'</a></li>';
+				if ($term_counter == 1) {
+					$echo .= '<hr />';
+				}
+				if ($term_counter == 0) {
+					$annocard_title = '<h2 class="annocard-title">'.$term_name.'</h2>';
+				} else {
+					$annocard_title = '<h2 class="annocard-title"><a href="'.$term_link.'" title="Ссылка на '.$term_name.'">'.$term_name.'</a></h2>';
+				}
+				$echo .= '<div class="section-container">'.$annocard_title.'<div class="row">';
+				global $post;
+				foreach ($myposts as $post) {
+					setup_postdata($post);
+					$permalink = get_the_permalink(); 
+					$title = esc_html( get_the_title() );
+					// $title = get_field('gba_rating').' '.$title;
+					$echo .= '<div class="anno-card col-6 col-sm-6 col-md-4 col-lg-3">';
+					$echo .= '<a href="'.$permalink.'" title="Ссылка на: <?=$title?>" tabindex="-1">';
+					// the_post_thumbnail('medium'); 
+					$thumb_id = get_post_thumbnail_id();
+					$echo .= get_attachment_picture( $thumb_id, 'medium', false, null, true, true ); // medium_large 
+					$echo .= '</a><h3 class="annocard-caption"><a href="'.$permalink.'" title="Ссылка на: '.$title.'">'.$title.'</a></h3></div>';
+				}
+				wp_reset_postdata();
+				$echo .= '</div> <!-- .anno-card -->';
+
+				// После первой секции (Достопримечательности) выводим её пагинацию
+				if ($term_counter == 0) {
+					// the_posts_pagination();
+					$all_posts = get_guidebook_posts(null, -1);
+					$total = ceil(count($all_posts)/$numberposts);
+					// print_r($numberposts.' = ');
+					// print_r($total);
+					// print_r('ceil = '.ceil($total));
+					$current = (!isset($_GET['pagenum']) || $_GET['pagenum'] == 1) ? 1 : (int)$_GET['pagenum'];
+					$url 	= get_url_wo_pagenum();
+					$query 	= parse_url($url, PHP_URL_QUERY);
+					$sfx 	= $query ? '&' : '?';
+					$args 	= array(
+						'base'         			=> $url.'%_%',
+						'format'       			=> $sfx.'pagenum=%#%',
+						'total'        			=> $total,
+						'current'      			=> $current,
+						'mid_size'     			=> 1,
+						'prev_text'    			=> '<<',
+						'next_text'    			=> '>>',
+						'screen_reader_text' 	=> __( 'Posts navigation' ),
+					); 
+					$links = paginate_links($args);
+					if ($links) {
+						$echo .= _navigation_markup( $links, 'pagination', $args['screen_reader_text'] );
+					}
+				}
+				$echo .= '</div> <!-- .section-container -->';
+
+				// Если это не главная страница Путеводителя (первая стр. пагинации), Описание и другие разделы не выводим
+				if ($current > 1) break;
+
+				// После первой секции (Достопримечательности) выводим Описание путеводителя 
+				if ($term_counter == 0 && $gb_content) {
+					$echo .= '<div class="main-section">'.$gb_content.'</div>';
+				}
+
+			endif; // $myposts
+
+			$term_counter++;
+
+		endforeach; // $terms as $term
+		
+		if ($term_counter > 1) {
+			$echo .= '<hr />';
+		}
+
+	endif; // $terms
 
 	return $echo;
 }

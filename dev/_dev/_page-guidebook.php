@@ -167,6 +167,9 @@ do_action( 'guidebook_map_scripts' );
 
 	endif; // $terms
 	?>
+	<h2>Карта музеев Орла</h2>
+	
+	<?php echo do_shortcode('[image id=1151 class=large-image size=large figcaption="Карта музеев Орла (Кликните на картинку, чтобы открыть в большом размере)"]'); ?>
 
 </main><!-- #main -->
 
