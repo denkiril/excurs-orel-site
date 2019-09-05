@@ -407,7 +407,7 @@ class MLAData_Source {
 			$parent_info = NULL;
 			$references = NULL;
 			$alt_text = NULL;
-			MLAData::mla_reset_regex_matches();
+			MLAData::mla_reset_regex_matches( $post_id );
 
 			if ( 'single_attachment_mapping' == $category ) {
 				$metadata = get_metadata( 'post', $post_id, '_wp_attached_file' );

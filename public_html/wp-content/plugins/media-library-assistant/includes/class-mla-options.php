@@ -34,7 +34,7 @@ class MLAOptions {
 			add_action( 'add_attachment', 'MLAOptions::mla_add_attachment_action', 0x7FFFFFFF, 1 );
 			add_filter( 'wp_update_attachment_metadata', 'MLAOptions::mla_update_attachment_metadata_filter', 0x7FFFFFFF, 2 );
 
-			MLACore::mla_debug_add( __LINE__ . " MLAOptions::initialize() hooks set", MLACore::MLA_DEBUG_CATEGORY_REST );
+			MLACore::mla_debug_add( __LINE__ . " MLAOptions::initialize( " . $_SERVER['REQUEST_URI'] . " ) hooks set", MLACore::MLA_DEBUG_CATEGORY_REST );
 		}
 	}
 
@@ -573,6 +573,8 @@ class MLAOptions {
 	/**
 	 * Examine or alter the filename before the file is made permanent
  	 *
+	 * The filter is applied by function _wp_handle_upload() in /wp-admin/includes/file.php
+	 *
 	 * @since 1.70
 	 *
 	 * @param	array	file parameters ( 'name' )
@@ -585,9 +587,7 @@ class MLAOptions {
 		 * if someone has hooked it.
 		 */
 		if ( has_filter( 'mla_upload_prefilter' ) ) {
-			/* 
-			 * The image.php file is not loaded for "front end" uploads
-			 */
+			// The image.php file is not loaded for "front end" uploads
 			if ( !function_exists( 'wp_read_image_metadata' ) ) {
 				require_once( ABSPATH . 'wp-admin/includes/image.php' );
 			}
@@ -604,6 +604,8 @@ class MLAOptions {
 	/**
 	 * Called once for each file uploaded
  	 *
+	 * The filter is applied by function _wp_handle_upload() in /wp-admin/includes/file.php
+	 *
 	 * @since 1.70
 	 *
 	 * @param	array	file parameters ( 'name' )
@@ -615,10 +617,8 @@ class MLAOptions {
 		 * This filter requires file access and processing, so only do the work
 		 * if someone has hooked it.
 		 */
-		if ( has_filter( 'mla_upload_prefilter' ) ) {
-			/* 
-			 * The getid3.php file is not loaded for "front end" uploads
-			 */
+		if ( has_filter( 'mla_upload_filter' ) ) {
+			// The getid3.php file is not loaded for "front end" uploads
 			if ( ! class_exists( 'getID3' ) ) {
 				require( ABSPATH . WPINC . '/ID3/getid3.php' );
 			}
@@ -647,6 +647,8 @@ class MLAOptions {
 	 * Set $add_attachment_id to just-inserted attachment
  	 *
 	 * All of the actual processing is done later, in mla_update_attachment_metadata_filter.
+	 *
+	 * The filter is applied by function wp_insert_post() in /wp-includes/post.php
 	 *
 	 * @since 1.00
 	 *
@@ -698,6 +700,8 @@ class MLAOptions {
  	 *
 	 * This filter tests the $add_attachment_id variable set by the mla_add_attachment_action
 	 * to ensure that mapping is only performed for new additions, not metadata updates.
+	 *
+	 * The filter is applied by function wp_update_attachment_metadata() in /wp-includes/post.php
 	 *
 	 * @since 1.10
 	 *

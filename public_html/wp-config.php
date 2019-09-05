@@ -76,7 +76,18 @@ $table_prefix  = 'wp_';
  *
  * @link https://codex.wordpress.org/Debugging_in_WordPress
  */
-define('WP_DEBUG', false);
+// define('WP_DEBUG', false);
+// Активировать отладку
+define('WP_DEBUG', true);
+
+// Регистрировать все ошибки в текстовом файле /wp-content/debug.log
+// define('WP_DEBUG_LOG', true);
+
+// Не выводить сообщения об ошибках
+// define('WP_DEBUG_DISPLAY', false);
+
+// Убедиться, что все ошибки PHP также записываются в логи и не выводятся на экран
+// @ini_set('display_errors', 0);
 
 /* Это всё, дальше не редактируем. Успехов! */
 

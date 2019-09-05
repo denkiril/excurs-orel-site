@@ -5,6 +5,8 @@
  * @package cyr-to-lat
  */
 
+use Cyr_To_Lat\Symfony\Polyfill\Mbstring\Mbstring;
+
 /**
  * Class Cyr_To_Lat_Conversion_Tables
  *
@@ -16,6 +18,7 @@ class Cyr_To_Lat_Conversion_Tables {
 	 * Get conversion table by locale.
 	 *
 	 * @link https://ru.wikipedia.org/wiki/ISO_9
+	 *
 	 * @param string $locale WordPress locale.
 	 *
 	 * @return array
@@ -198,6 +201,55 @@ class Cyr_To_Lat_Conversion_Tables {
 				unset( $table['Ѵ'] );
 				unset( $table['ѵ'] );
 				break;
+			// Serbian.
+			case 'sr_RS':
+				$table['Ђ'] = 'Dj';
+				$table['ђ'] = 'dj';
+				unset( $table['Ё'] );
+				unset( $table['ё'] );
+				$table['Ж'] = 'Z';
+				$table['ж'] = 'z';
+				unset( $table['Й'] );
+				unset( $table['й'] );
+				unset( $table['І'] );
+				unset( $table['і'] );
+				$table['J'] = 'J';
+				$table['j'] = 'j';
+				$table['Љ'] = 'Lj';
+				$table['љ'] = 'lj';
+				$table['Њ'] = 'Nj';
+				$table['њ'] = 'nj';
+				$table['Ћ'] = 'C';
+				$table['ћ'] = 'c';
+				$table['Ц'] = 'C';
+				$table['ц'] = 'c';
+				$table['Ч'] = 'C';
+				$table['ч'] = 'c';
+				$table['Џ'] = 'Dz';
+				$table['џ'] = 'dz';
+				$table['Ш'] = 'S';
+				$table['ш'] = 's';
+				unset( $table['Щ'] );
+				unset( $table['щ'] );
+				unset( $table['Ъ'] );
+				unset( $table['ъ'] );
+				unset( $table['Ы'] );
+				unset( $table['ы'] );
+				unset( $table['Ь'] );
+				unset( $table['ь'] );
+				unset( $table['Э'] );
+				unset( $table['э'] );
+				unset( $table['Ю'] );
+				unset( $table['ю'] );
+				unset( $table['Я'] );
+				unset( $table['я'] );
+				unset( $table['Ѣ'] );
+				unset( $table['ѣ'] );
+				unset( $table['Ѳ'] );
+				unset( $table['ѳ'] );
+				unset( $table['Ѵ'] );
+				unset( $table['ѵ'] );
+				break;
 			// Georgian.
 			case 'ka_GE':
 				$table['áƒ'] = 'a';
@@ -287,9 +339,77 @@ class Cyr_To_Lat_Conversion_Tables {
 				$table['Ý'] = 'O';
 				$table['ý'] = 'o';
 				break;
+			// Hebrew.
+			case 'he_IL':
+				$table = array(
+					'א' => '',
+					'ב' => 'b',
+					'ג' => 'g',
+					'ד' => 'd',
+					'ה' => 'h',
+					'ו' => 'w',
+					'ז' => 'z',
+					'ח' => 'x',
+					'ט' => 't',
+					'י' => 'y',
+					'ך' => '',
+					'כ' => 'kh',
+					'ל' => 'l',
+					'ם' => '',
+					'מ' => 'm',
+					'ן' => '',
+					'נ' => 'n',
+					'ס' => 's',
+					'ע' => '',
+					'ף' => '',
+					'פ' => 'ph',
+					'ץ' => '',
+					'צ' => 's',
+					'ק' => 'k',
+					'ר' => 'r',
+					'ש' => 'sh',
+					'ת' => 'th',
+				);
+				for ( $code = 0x0590; $code <= 0x05CF; $code ++ ) {
+					$table[ Mbstring::mb_chr( $code ) ] = '';
+				}
+				for ( $code = 0x05F0; $code <= 0x05F5; $code ++ ) {
+					$table[ Mbstring::mb_chr( $code ) ] = '';
+				}
+				for ( $code = 0xFB1D; $code <= 0xFB4F; $code ++ ) {
+					$table[ Mbstring::mb_chr( $code ) ] = '';
+				}
+				break;
 			default:
 		}
 
 		return $table;
+	}
+
+	/**
+	 * Get fix table for MacOS.
+	 * On MacOS, files containing characters in the table, are sometimes encoded improperly.
+	 *
+	 * @return array
+	 */
+	public static function get_fix_table_for_mac() {
+		/**
+		 * Keys in the table are standard ISO9 characters.
+		 *
+		 * Example of wrong encoding on Mac:
+		 * берЁзовыЙ-белозёрский - original input,
+		 * берЁзовыЙ-белозёрский.png - actual filename created on Mac (ЁёЙй are already wrongly encoded),
+		 * ber%d0%95%cc%88zovy%d0%98%cc%86-beloz%d0%B5%cc%88rski%d0%B8%cc%86.png - urlencode() of the above,
+		 * berËzovyĬ-belozërskiĭ.png - actual filename passed via standard ISO9 transliteration table,
+		 * berE%CC%88zovyI%CC%86-beloze%CC%88rskii%CC%86.png - urlencode() of the above.
+		 *
+		 * To avoid misunderstanding, we use urldecode() here.
+		 */
+		return [
+			'Ё' => urldecode( '%d0%95%cc%88' ),
+			'ё' => urldecode( '%d0%B5%cc%88' ),
+			'Й' => urldecode( '%d0%98%cc%86' ),
+			'й' => urldecode( '%d0%B8%cc%86' ),
+		];
 	}
 }

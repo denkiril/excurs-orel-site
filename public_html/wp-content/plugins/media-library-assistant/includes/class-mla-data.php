@@ -178,9 +178,7 @@ class MLAData {
 	 * @return	strng	Placeholders corresponding to the keys of the markup_values will be replaced with their values.
 	 */
 	public static function mla_parse_template( $tpl, $markup_values ) {
-		/*
-		 * If templates are present we must step through $tpl and expand them
-		 */
+		// If templates are present we must step through $tpl and expand them
 		if ( isset( $markup_values['[+template_count+]'] ) ) {
 			$offset = 0;
 			while ( false !== $start = strpos( $tpl, '[+', $offset ) ) {
@@ -207,9 +205,7 @@ class MLAData {
 				} // simple substitution
 			} // while substitution parameter present
 		} else { // template(s) present
-			/*
-			 * No templates means a simple string substitution will suffice
-			 */
+			// No templates means a simple string substitution will suffice
 			foreach ( $markup_values as $key => $value ) {
 				if ( is_scalar( $value ) ) {
 					$tpl = str_replace( '[+' . $key . '+]', $value, $tpl );
@@ -780,13 +776,20 @@ class MLAData {
 	 *
 	 * @since 2.71
 	 *
+	 * @param	int		current attachment ID
 	 */
-	public static function mla_reset_regex_matches() {
-		MLAData::$regex_matches = array();
+	public static function mla_reset_regex_matches( $post_id ) {
+		static $current_id = 0;
+
+		// Do this once per post.
+		if ( $current_id != $post_id ) {
+			$current_id = $post_id;
+			MLAData::$regex_matches = array();
+		}
 	}
 
 	/**
-	 * Intercept thumbnail file deletion errors
+	 * Intercept regex pattern matching errors
 	 * 
 	 * @since 2.54
 	 *
@@ -1039,7 +1042,11 @@ class MLAData {
 						$pattern = trim( $args['args'][0] );
 
 						if ( 1 < count( $args['args'] ) ) {
-							$return_value = intval( $args['args'][1] );
+							$return_value = $args['args'][1];
+
+							if ( is_numeric( $return_value ) ) {
+								$return_value = intval( $return_value );
+							}
 						}
 					} else {
 						$pattern = trim( $args['args'] );
@@ -1151,7 +1158,7 @@ class MLAData {
 	 * Analyze a template, expanding Field-level Markup Substitution Parameters
 	 *
 	 * Field-level parameters must have one of the following prefix values:
-	 * template, request, query, custom, terms, meta, iptc, exif, xmp, pdf.
+	 * template, meta, query, request, terms, custom, iptc, exif, xmp, id3, pdf, matches.
 	 * All but request and query require an attachment ID.
 	 *
 	 * @since 1.50
@@ -1173,7 +1180,7 @@ class MLAData {
 			$item_metadata = NULL;
 			$attachment_metadata = NULL;
 			$id3_metadata = NULL;
-			MLAData::mla_reset_regex_matches();
+			MLAData::mla_reset_regex_matches( $post_id );
 			$cached_post_id = $post_id;
 		}
 
@@ -3259,6 +3266,8 @@ class MLAData {
 			}
 
 			$size = getimagesize( $path, $info );
+			MLACore::mla_debug_add( __LINE__ . ' mla_fetch_attachment_image_metadata getimagesize returns ' . var_export( $size, true ), MLACore::MLA_DEBUG_CATEGORY_METADATA );
+			MLACore::mla_debug_add( __LINE__ . ' mla_fetch_attachment_image_metadata getimagesize info keys =  ' . var_export( array_keys( $info ), true ), MLACore::MLA_DEBUG_CATEGORY_METADATA );
 
 			if ( is_callable( 'iptcparse' ) ) {
 				if ( ! empty( $info['APP13'] ) ) {

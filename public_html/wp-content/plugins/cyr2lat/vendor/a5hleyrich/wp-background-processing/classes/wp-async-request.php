@@ -127,7 +127,7 @@ if ( ! class_exists( 'WP_Async_Request' ) ) {
 			}
 
 			return array(
-				'timeout'   => 0.01,
+				'timeout'   => 5,
 				'blocking'  => false,
 				'body'      => $this->data,
 				'cookies'   => $_COOKIE,
@@ -141,7 +141,7 @@ if ( ! class_exists( 'WP_Async_Request' ) ) {
 		 * Check for correct nonce and pass to handler.
 		 */
 		public function maybe_handle() {
-			// Don't lock up other requests while processing
+			// Don't lock up other requests while processing.
 			session_write_close();
 
 			check_ajax_referer( $this->identifier, 'nonce' );

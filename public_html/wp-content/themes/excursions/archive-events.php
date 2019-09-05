@@ -67,6 +67,7 @@ get_header();
 		<?php endwhile;
 
 		the_posts_pagination();
+		// echo get_the_posts_pagination();
 
 	else :
 

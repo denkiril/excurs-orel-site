@@ -277,7 +277,7 @@ The <code>[mla_gallery]</code> shortcode has many parameters and some of them ha
 <li>Use the alternative "enclosing shortcode" syntax detailed below.</li>
 </ul>
 <p>
-When embedding the shortcode in the body of a post, be very careful when coding parameters such as <code>tax_query</code>, <code>meta_query</code> or <code>date_query;</code> they must be a valid PHP array specification. Splitting your query over multiple lines or using the "Visual" editor will introduce HTML markup and escape sequences that can render your query invalid. MLA can clean up some of the damage, but if your query fails use the "mla_debug=true" parameter to see if your query has been corrupted. 
+When embedding the shortcode in the body of a post, be very careful when coding parameters such as <code>tax_query</code>, <code>meta_query</code> or <code>date_query;</code> they must be a valid PHP array specification. Splitting your query over multiple lines or using the "Visual" editor will introduce HTML markup and escape sequences that can render your query invalid. MLA can clean up some of the damage, but if your query fails use the "mla_debug=true" parameter to see if your query has been corrupted. Look for the "mla_debug attribute_errors" entry in the debug output; it will often list the parts of the shortcode parameters that could&rsquo;nt be parsed.
 </p>
 <p>
 <strong>IMPORTANT:</strong> Beginning with version 4.0, WordPress changed the way it handles shortcode parameters. Using angle brackets, e.g., the <code>=></code> characters in a shortcode will often return "Invalid mla_gallery tax_query" errors. To prevent this: 1) add "&lt;code&gt;&lt;/code&gt;" tags around your shortcode, 2) use an escape sequence like "=&amp;gt;" in your query or 3) use the enclosing shortcode syntax.
@@ -1194,6 +1194,9 @@ The "mla_debug" parameter controls the display of information about the query pa
 </p>
 <p>
 If you code <code>mla_debug=log</code> all of the information will be written to the error log. You can use the <a href="#mla_debug_tab">MLA Debug Tab</a> to view and download the information in the error log.
+</p>
+ <p>
+Look for the "mla_debug attribute_errors" entry in the debug output; it will often list the parts of the shortcode parameters that could&rsquo;nt be parsed. If you see "[mla_gallery" in this entry you probably used the enclosing shortcode format in that shortcode but did not add the "[/mla_gallery]" delimiter to an earlier shortcode.
 <a name="mla_gallery_hooks"></a>
 </p>
 <h4>MLA Gallery Filters and Actions (Hooks)</h4>
@@ -1651,6 +1654,9 @@ The "mla_debug" parameter controls the display of information about the query pa
 </p>
 <p>
 If you code <code>mla_debug=log</code> all of the information will be written to the error log. You can use the <a href="#mla_debug_tab">MLA Debug Tab</a> to view and download the information in the error log.
+</p>
+ <p>
+Look for the "mla_debug attribute_errors" entry in the debug output; it will often list the parts of the shortcode parameters that could&rsquo;nt be parsed. If you see "[mla_gallery" in this entry you probably used the enclosing shortcode format in that shortcode but did not add the "[/mla_gallery]" delimiter to an earlier shortcode.
 <a name="tag_cloud_substitution"></a>
 </p>
 <h4>Tag Cloud Substitution Parameters</h4>
@@ -2608,6 +2614,9 @@ The "mla_debug" parameter controls the display of information about the query pa
 </p>
 <p>
 If you code <code>mla_debug=log</code> all of the information will be written to the error log. You can use the <a href="#mla_debug_tab">MLA Debug Tab</a> to view and download the information in the error log.
+</p>
+<p>
+Look for the "mla_debug attribute_errors" entry in the debug output; it will often list the parts of the shortcode parameters that could&rsquo;nt be parsed. If you see "[mla_gallery" in this entry you probably used the enclosing shortcode format in that shortcode but did not add the "[/mla_gallery]" delimiter to an earlier shortcode.
 <a name="term_list_data_selection"></a>
 </p>
 <h4>Term List Data Selection Parameters</h4>
@@ -5323,8 +5332,7 @@ The <code>,extract(p)</code> option/format value can be applied to any data sour
 </p>
 <h4>The <code>,replace(p,r,v)</code> option/format value</h4>
 <p>
-The <code>,replace(p,r)</code> option/format value matches a pattern (like <code>,match(p)</code>) but returns a modified version of the original data source value. The "p" argument is a regular expression pattern that is applied to the data source. The "r" argument is a replacement pattern. If a match is found the data source modified by the replacement pattern is returned. If the match is not found, the original data source value is returned unaltered. For example, if a <code>post_date</code> data source contains "2013-10-03 02:47:13", then <code>[+post_date,replace( '/(\\d{4})-(\\d{2})-(\\d{2})/', 'year: $1, month: $2, day: $3' )+]</code> would return "year: 2013, month: 10, day: 03 02:47:13". Note the double backslashes in the pattern argument!
-Fund a SEP. Business owners and the self-employed can stash pretax money in a Simplified Employee Pension Plan. “Typically, you can contribute up to 20 percent of your net employment income,’’ says New Jersey-based Certified Public Accountant Barry Kleiman. While you have until April 17 to fund an IRA or Roth IRA, you can fund a SEP until Oct. 15 with a filing extension.To specify an array argument enclose the argument in braces ( "{" and "}" ) and separate elements with <strong>spaces</strong>. For a simple example, <code>,replace( {'/,/' '/-/'}, {' ' '_'} )</code> will change commas to spaces and dashes to underscores, while <code>,replace( {'/,/' '/-/'}, ' ' )</code> will change both commas <strong>and</strong> dashes to spaces.
+The <code>,replace(p,r)</code> option/format value matches a pattern (like <code>,match(p)</code>) but returns a modified version of the original data source value. The "p" argument is a regular expression pattern that is applied to the data source. The "r" argument is a replacement pattern. If a match is found the data source modified by the replacement pattern is returned. If the match is not found, the original data source value is returned unaltered. For example, if a <code>post_date</code> data source contains "2013-10-03 02:47:13", then <code>[+post_date,replace( '/(\\d{4})-(\\d{2})-(\\d{2})/', 'year: $1, month: $2, day: $3' )+]</code> would return "year: 2013, month: 10, day: 03 02:47:13". Note the double backslashes in the pattern argument! To specify an array argument enclose the argument in braces ( "{" and "}" ) and separate elements with <strong>spaces</strong>. For a simple example, <code>,replace( {'/,/' '/-/'}, {' ' '_'} )</code> will change commas to spaces and dashes to underscores, while <code>,replace( {'/,/' '/-/'}, ' ' )</code> will change both commas <strong>and</strong> dashes to spaces.
 </p>
 You can alter the value returned by adding the optional third "v" parameter set to "true". If you add this parameter the returned value will be just the matched portion of the original with the replacement modifications applied. For example, if a <code>post_date</code> data source contains "2013-10-03 02:47:13", then <code>[+post_date,replace( '/(\\d{4})-(\\d{2})-(\\d{2})/', 'year: $1, month: $2, day: $3', true )+]</code> would return "year: 2013, month: 10, day: 03". Note the double backslashes in the pattern argument!
 <p>

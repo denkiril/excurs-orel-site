@@ -175,6 +175,15 @@ class Cyr_To_Lat_Settings {
 				'supplemental' => '',
 				'default'      => Cyr_To_Lat_Conversion_Tables::get( 'mk_MK' ),
 			),
+			'sr_RS' => array(
+				'label'        => __( 'sr_RS Table', 'cyr2lat' ),
+				'section'      => 'sr_RS_section',
+				'type'         => 'table',
+				'placeholder'  => '',
+				'helper'       => '',
+				'supplemental' => '',
+				'default'      => Cyr_To_Lat_Conversion_Tables::get( 'sr_RS' ),
+			),
 			'ka_GE' => array(
 				'label'        => __( 'ka_GE Table', 'cyr2lat' ),
 				'section'      => 'ka_GE_section',
@@ -192,6 +201,15 @@ class Cyr_To_Lat_Settings {
 				'helper'       => '',
 				'supplemental' => '',
 				'default'      => Cyr_To_Lat_Conversion_Tables::get( 'kk' ),
+			),
+			'he_IL' => array(
+				'label'        => __( 'he_IL Table', 'cyr2lat' ),
+				'section'      => 'he_IL_section',
+				'type'         => 'table',
+				'placeholder'  => '',
+				'helper'       => '',
+				'supplemental' => '',
+				'default'      => Cyr_To_Lat_Conversion_Tables::get( 'he_IL' ),
 			),
 		);
 	}
@@ -289,8 +307,8 @@ class Cyr_To_Lat_Settings {
 				?>
 			</form>
 
-			<div>
-				<h2 id="donate">
+			<div id="donate">
+				<h2>
 					<?php echo esc_html( __( 'Donate', 'cyr2lat' ) ); ?>
 				</h2>
 				<p>
@@ -300,7 +318,7 @@ class Cyr_To_Lat_Settings {
 					<input type="hidden" name="cmd" value="_s-xclick">
 					<input type="hidden" name="hosted_button_id" value="BENCPARA8S224">
 					<input
-							type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif"
+							type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif"
 							name="submit" alt="PayPal - The safer, easier way to pay online!">
 					<img
 							alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1"
@@ -324,6 +342,10 @@ class Cyr_To_Lat_Settings {
 	 * Setup settings sections.
 	 */
 	public function setup_sections() {
+		if ( ! $this->is_ctl_options_screen() ) {
+			return;
+		}
+
 		add_settings_section(
 			'iso9_section',
 			__( 'ISO9 Table', 'cyr2lat' ),
@@ -355,6 +377,12 @@ class Cyr_To_Lat_Settings {
 			self::PAGE
 		);
 		add_settings_section(
+			'sr_RS_section',
+			__( 'sr_RS Table', 'cyr2lat' ),
+			array( $this, 'cyr_to_lat_section' ),
+			self::PAGE
+		);
+		add_settings_section(
 			'ka_GE_section',
 			__( 'ka_GE Table', 'cyr2lat' ),
 			array( $this, 'cyr_to_lat_section' ),
@@ -363,6 +391,12 @@ class Cyr_To_Lat_Settings {
 		add_settings_section(
 			'kk_section',
 			__( 'kk Table', 'cyr2lat' ),
+			array( $this, 'cyr_to_lat_section' ),
+			self::PAGE
+		);
+		add_settings_section(
+			'he_IL_section',
+			__( 'he_IL Table', 'cyr2lat' ),
 			array( $this, 'cyr_to_lat_section' ),
 			self::PAGE
 		);
@@ -409,6 +443,10 @@ class Cyr_To_Lat_Settings {
 	 * @param array $arguments Field arguments.
 	 */
 	public function field_callback( $arguments ) {
+		if ( ! isset( $arguments['field_id'] ) ) {
+			return;
+		}
+
 		$value = $this->get_option( $arguments['field_id'] );
 
 		// Check which type of field we want.
@@ -566,6 +604,7 @@ class Cyr_To_Lat_Settings {
 				}
 				break;
 			default:
+				break;
 		}
 
 		// If there is help text.
@@ -656,6 +695,7 @@ class Cyr_To_Lat_Settings {
 					$value[ $key ]    = $form_field_value;
 					break;
 				default:
+					break;
 			}
 		}
 
@@ -698,6 +738,22 @@ class Cyr_To_Lat_Settings {
 	}
 
 	/**
+	 * Get transliteration table.
+	 *
+	 * @return string
+	 */
+	public function get_table() {
+		// List of locales: https://make.wordpress.org/polyglots/teams/.
+		$locale = get_locale();
+		$table  = $this->get_option( $locale );
+		if ( empty( $table ) ) {
+			$table = $this->get_option( 'iso9' );
+		}
+
+		return $table;
+	}
+
+	/**
 	 * Is current admin screen the plugin options screen.
 	 *
 	 * @return bool
@@ -708,5 +764,3 @@ class Cyr_To_Lat_Settings {
 		return $current_screen && ( 'options' === $current_screen->id || self::SCREEN_ID === $current_screen->id );
 	}
 }
-
-// eof.

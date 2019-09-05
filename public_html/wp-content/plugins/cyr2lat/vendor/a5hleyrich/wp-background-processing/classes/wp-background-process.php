@@ -68,7 +68,7 @@ if ( ! class_exists( 'WP_Background_Process' ) ) {
 		 * Dispatch
 		 *
 		 * @access public
-		 * @return void
+		 * @return array|WP_Error
 		 */
 		public function dispatch() {
 			// Schedule the cron healthcheck.
@@ -109,7 +109,7 @@ if ( ! class_exists( 'WP_Background_Process' ) ) {
 		/**
 		 * Update queue
 		 *
-		 * @param string $key Key.
+		 * @param string $key  Key.
 		 * @param array  $data Data.
 		 *
 		 * @return $this
@@ -159,7 +159,7 @@ if ( ! class_exists( 'WP_Background_Process' ) ) {
 		 * the process is not already running.
 		 */
 		public function maybe_handle() {
-			// Don't lock up other requests while processing
+			// Don't lock up other requests while processing.
 			session_write_close();
 
 			if ( $this->is_process_running() ) {
@@ -197,11 +197,12 @@ if ( ! class_exists( 'WP_Background_Process' ) ) {
 
 			$key = $wpdb->esc_like( $this->identifier . '_batch_' ) . '%';
 
-			$count = $wpdb->get_var( $wpdb->prepare( "
-			SELECT COUNT(*)
-			FROM {$table}
-			WHERE {$column} LIKE %s
-		", $key ) );
+			$count = $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT COUNT(*) FROM {$table} WHERE {$column} LIKE %s ",
+					$key
+				)
+			);
 
 			return ( $count > 0 ) ? false : true;
 		}
@@ -272,13 +273,12 @@ if ( ! class_exists( 'WP_Background_Process' ) ) {
 
 			$key = $wpdb->esc_like( $this->identifier . '_batch_' ) . '%';
 
-			$query = $wpdb->get_row( $wpdb->prepare( "
-			SELECT *
-			FROM {$table}
-			WHERE {$column} LIKE %s
-			ORDER BY {$key_column} ASC
-			LIMIT 1
-		", $key ) );
+			$query = $wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT * FROM {$table} WHERE {$column} LIKE %s ORDER BY {$key_column} ASC LIMIT 1",
+					$key
+				)
+			);
 
 			$batch       = new stdClass();
 			$batch->key  = $query->$column;
@@ -355,7 +355,7 @@ if ( ! class_exists( 'WP_Background_Process' ) ) {
 		}
 
 		/**
-		 * Get memory limit
+		 * Get memory limit in bytes.
 		 *
 		 * @return int
 		 */
@@ -367,12 +367,35 @@ if ( ! class_exists( 'WP_Background_Process' ) ) {
 				$memory_limit = '128M';
 			}
 
-			if ( ! $memory_limit || -1 === intval( $memory_limit ) ) {
+			if ( ! $memory_limit || - 1 === intval( $memory_limit ) ) {
 				// Unlimited, set to 32GB.
 				$memory_limit = '32000M';
 			}
 
-			return intval( $memory_limit ) * 1024 * 1024;
+			return $this->convert_shorthand_to_bytes( $memory_limit );
+		}
+
+		/**
+		 * Converts a shorthand byte value to an integer byte value.
+		 *
+		 * @param string $value A (PHP ini) byte value, either shorthand or ordinary.
+		 *
+		 * @return int An integer byte value.
+		 */
+		protected function convert_shorthand_to_bytes( $value ) {
+			$value = strtolower( trim( $value ) );
+			$bytes = (int) $value;
+
+			if ( false !== strpos( $value, 'g' ) ) {
+				$bytes *= 1024 * 1024 * 1024;
+			} elseif ( false !== strpos( $value, 'm' ) ) {
+				$bytes *= 1024 * 1024;
+			} elseif ( false !== strpos( $value, 'k' ) ) {
+				$bytes *= 1024;
+			}
+
+			// Deal with large (float) values which run into the maximum integer size.
+			return min( $bytes, PHP_INT_MAX );
 		}
 
 		/**
@@ -389,6 +412,10 @@ if ( ! class_exists( 'WP_Background_Process' ) ) {
 
 			if ( time() >= $finish ) {
 				$return = true;
+			}
+
+			if ( defined( 'WP_CLI' ) && WP_CLI ) {
+				return false;
 			}
 
 			return apply_filters( $this->identifier . '_time_exceeded', $return );
@@ -409,7 +436,9 @@ if ( ! class_exists( 'WP_Background_Process' ) ) {
 		 * Schedule cron healthcheck
 		 *
 		 * @access public
+		 *
 		 * @param mixed $schedules Schedules.
+		 *
 		 * @return mixed
 		 */
 		public function schedule_cron_healthcheck( $schedules ) {
@@ -422,6 +451,7 @@ if ( ! class_exists( 'WP_Background_Process' ) ) {
 			// Adds every 5 minutes to the existing schedules.
 			$schedules[ $this->identifier . '_cron_interval' ] = array(
 				'interval' => MINUTE_IN_SECONDS * $interval,
+				/* translators: %d: cron interval */
 				'display'  => sprintf( __( 'Every %d Minutes' ), $interval ),
 			);
 
@@ -475,7 +505,6 @@ if ( ! class_exists( 'WP_Background_Process' ) ) {
 		 * Cancel Process
 		 *
 		 * Stop processing queue items, clear cronjob and delete batch.
-		 *
 		 */
 		public function cancel_process() {
 			if ( ! $this->is_queue_empty() ) {

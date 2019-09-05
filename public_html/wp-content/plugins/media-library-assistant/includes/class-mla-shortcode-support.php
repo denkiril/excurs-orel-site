@@ -223,6 +223,15 @@ class MLAShortcode_Support {
 	}
 
 	/**
+	 * Errors found in function _validate_attributes()
+	 *
+	 * @since 2.80
+	 *
+	 * @var	array
+	 */
+	private static $attributes_errors = array();
+
+	/**
 	 * Make sure $attr is an array, repair line-break damage, merge with $content
 	 *
 	 * @since 2.20
@@ -276,6 +285,8 @@ class MLAShortcode_Support {
 			$new_attr = array();
 			foreach ( $attr as $key => $value ) {
 				if ( is_numeric( $key ) || empty( $value ) ) {
+					self::$attributes_errors['raw'][] = '[' . $key . '] => ' . $value;
+					self::$attributes_errors['escaped'][] = '[' . $key . '] => ' . esc_html( $value );
 					continue;
 				}
 
@@ -289,8 +300,20 @@ class MLAShortcode_Support {
 		if ( ! ( empty( $content ) || isset( $attr['mla_alt_shortcode'] ) ) ) {
 			$content = str_replace( array( '&#038;', '&#8216;', '&#8217;', '&#8221;', '&#8243;', '&amp;', '<br />', '<br>', '<p>', '</p>', "\r", "\n" ),
 									array( '&',      '\'',      '\'',      '"',       '"',       '&',     ' ',      ' ',    ' ',   ' ',    ' ',  ' ' ), $content );
-			$new_attr = shortcode_parse_atts( $content );
-			if ( is_array( $new_attr ) ) {
+			$content_attr = shortcode_parse_atts( $content );
+			if ( is_array( $content_attr ) ) {
+				// Remove empty values and still-invalid parameters
+				$new_attr = array();
+				foreach ( $content_attr as $key => $value ) {
+					if ( is_numeric( $key ) || empty( $value ) ) {
+						self::$attributes_errors['raw'][] = 'content [' . $key . '] => ' . $value;
+						self::$attributes_errors['escaped'][] = 'content [' . $key . '] => ' . esc_html( $value );
+						continue;
+					}
+	
+					$new_attr[ $key ] = $value;
+				}
+	
 				$attr = array_merge( $attr, $new_attr );
 			}
 		}
@@ -576,6 +599,17 @@ class MLAShortcode_Support {
 
 		if ( self::$mla_debug ) {
 			MLACore::mla_debug_add( __LINE__ . ' <strong>' . __( 'mla_debug REQUEST', 'media-library-assistant' ) . '</strong> = ' . var_export( $_REQUEST, true ) );
+
+			if ( !empty( self::$attributes_errors ) ) {
+				if ( 'log' == self::$mla_debug ) {
+				MLACore::mla_debug_add( __LINE__ . ' <strong>' . __( 'mla_debug attributes_errors', 'media-library-assistant' ) . '</strong> = ' . var_export( self::$attributes_errors['raw'], true ) );
+				} else {
+				MLACore::mla_debug_add( __LINE__ . ' <strong>' . __( 'mla_debug attributes_errors', 'media-library-assistant' ) . '</strong> = ' . var_export( self::$attributes_errors['escaped'], true ) );
+				}
+
+				self::$attributes_errors = array();
+			}
+
 			MLACore::mla_debug_add( __LINE__ . ' <strong>' . __( 'mla_debug attributes', 'media-library-assistant' ) . '</strong> = ' . var_export( $attr, true ) );
 			MLACore::mla_debug_add( __LINE__ . ' <strong>' . __( 'mla_debug arguments', 'media-library-assistant' ) . '</strong> = ' . var_export( $arguments, true ) );
 		}
@@ -4555,7 +4589,7 @@ class MLAShortcode_Support {
 			$all_taxonomies = get_taxonomies( array ( 'show_ui' => true ), 'names' );
 			$simple_tax_queries = array();
 			foreach ( $attr as $key => $value ) {
-				if ( 'tax_query' == $key ) {
+				if ( 'tax_query' === $key ) {
 					if ( is_array( $value ) ) {
 						$query_arguments[ $key ] = $value;
 						self::$mla_get_shortcode_dynamic_attachments_parameters[ $key ] = $value;

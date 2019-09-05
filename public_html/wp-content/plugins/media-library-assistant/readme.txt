@@ -3,9 +3,9 @@ Contributors: dglingren
 Donate link: http://davidlingren.com/#two
 Tags: attachments, gallery, images, media, media library, tags, categories, IPTC, EXIF, XMP, GPS, PDF, metadata, photos, photographs, photo albums, MIME, mime-type, icon, upload, file extensions, WPML, Polylang
 Requires at least: 3.5.0
-Tested up to: 5.1.1
+Tested up to: 5.2.2
 Requires PHP: 5.3
-Stable tag: 2.79
+Stable tag: 2.80
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -181,6 +181,21 @@ All of the MLA source code has been annotated with "DocBlocks", a special type o
 
 == Changelog ==
 
+= 2.80 =
+* New: A new "MLA Phoenix Media Rename Example" plugin has been added to the "Examples" family in the Settings/Media Library Assistant Documentation tab. It adds support for the Phoenix Media Rename plugin's "Filename" column to the Media/Assistant submenu table.
+* Fix: For the Media/Assistant admin submenu screen, avoid "headers already sent" error with JoomUnited's WP Media Folders.
+* Fix: Improved error handling and debug logging for PDF thumbnail generation, especially "WordPress style" thumbnails.
+* Fix: Avoid Javascript "Uncaught Reference Error" in `mla-define-ajaxurl-scripts.js`, e.g., for Divi theme.
+* Fix: PHP 7.x compatibility error in `class-mla-settings-documentation-tab.php`, function `MLA_Upgrader_Skin->feedback()` has been resolved.
+* Fix: When the per-user "admin language" is set to "English (United States)", the untranslated MLA strings are restored in "back end" mode.
+* Fix: Improve handling of shortcode parameter/content errors, avoiding misleading "Invalid tax_query" messages. Improved error information in the `mla_debug` output as well.
+* Fix: For the "MLA Insert Fixit" example plugin, correct flaw in finding inserted images that have a relative path in the `src=` attribute of the IMG tag.
+* Fix: For the "MLA Insert Fixit" example plugin, correct flaw in finding inserted images that have other attributes preceding `src=` in the IMG tag.
+* Fix: For the `,extract(p,v)` option/format value, correct named subpattern and `matches:` prefix handling.
+* Fix: When Polylang is active, eliminate PHP messages and errors for some Media/Assistant Bulk Translate settings.
+* Fix: When decoding the `wp_filter` list for debug logging, unknown reference types no longer cause PHP errors.
+* Fix: Handles new synchronization protocol for WP/LR Sync version 5.0+
+
 = 2.79 =
 * New: For the `[mla_tag_cloud]` shortcode, a new `no_count=internal` parameter setting substitutes the WordPress-maintained "count" value for the explicitly-computed "attachments per term" value. This can significantly improve shortcode performance.
 * New: For the `[mla_gallery]` "date" and "timestamp" option/format codes, a second argument containing "i18n" will localize the returned value based on the site locale. A second argument containing "age" will return the difference between the source value and the current date/time. See the Documentation tab.
@@ -300,8 +315,8 @@ All of the MLA source code has been annotated with "DocBlocks", a special type o
 
 == Upgrade Notice ==
 
-= 2.79 =
-[mla_gallery] keyword/term search "exclude" logic, [mla_tag_cloud] performance improvements, Media/Assistant Download bulk action. Nine enhancements in all, six fixes.
+= 2.80 =
+A new "MLA Phoenix Media Rename Example" plugin supports the Phoenix Media Rename plugin. MLA Insert Fixit example plugin improvements, improved support for other plugins and themes. One enhancement, twelve fixes.
 
 == Other Notes ==
 

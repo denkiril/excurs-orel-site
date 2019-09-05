@@ -1639,25 +1639,25 @@ class MLA_Upgrader_Skin extends WP_Upgrader_Skin {
 	 *
 	 * @param string $string
 	 */
-	public function feedback($string) {
+	public function feedback( $string ) {
 		if ( isset( $this->upgrader->strings[$string] ) )
-			$string = $this->upgrader->strings[$string];
+			$feedback = $this->upgrader->strings[$string];
 
-		if ( strpos($string, '%') !== false ) {
+		if ( strpos( $feedback, '%' ) !== false ) {
 			$args = func_get_args();
-			$args = array_splice($args, 1);
+			$args = array_splice( $args, 1 );
 			if ( $args ) {
 				$args = array_map( 'strip_tags', $args );
 				$args = array_map( 'esc_html', $args );
-				$string = vsprintf($string, $args);
+				$feedback = vsprintf( $feedback, $args );
 			}
 		}
 
-		if ( empty($string) ) {
+		if ( empty( $feedback ) ) {
 			return;
 		}
 
-		$this->feedback[] = $string;
+		$this->feedback[] = $feedback;
 	}
 }
 

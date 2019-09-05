@@ -619,6 +619,12 @@ function register_post_types(){
 	) );
 }
 
+// Сбрасываем правила для произвольных типов записей 
+add_action( 'after_switch_theme', 'excursions_flush_rewrite_rules' );
+function excursions_flush_rewrite_rules() {
+	 flush_rewrite_rules();
+}
+
 // Меняем порядок вывода записей для архива типа записи 'events'
 add_action('pre_get_posts', 'events_orderby_meta', 1 );
 function events_orderby_meta( $query ) {

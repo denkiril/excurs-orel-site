@@ -32,8 +32,12 @@
  * opened on 3/01/2018 by "diesel33"
  * https://wordpress.org/support/topic/mla-shortcode-to-show-images-of-all-posts-of-a-wp-category
  *
+ * Enhanced for support topic "Updating decsription and alternative text for image already linked to a post"
+ * opened on 1/28/2019 by "scubarob"
+ * https://wordpress.org/support/topic/updating-decsription-and-alternative-text-for-image-already-linked-to-a-post/
+ *
  * @package Insert Fixit
- * @version 1.10
+ * @version 1.12
  */
 
 /*
@@ -41,10 +45,10 @@ Plugin Name: MLA Insert Fixit
 Plugin URI: http://davidlingren.com/
 Description: Synchronizes Media Library values to and from post/page inserted/featured/attached images
 Author: David Lingren
-Version: 1.10
+Version: 1.12
 Author URI: http://davidlingren.com/
 
-Copyright 2015-2018 David Lingren
+Copyright 2015-2019 David Lingren
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -74,7 +78,7 @@ class Insert_Fixit {
 	 *
 	 * @var	string
 	 */
-	const CURRENT_VERSION = '1.10';
+	const CURRENT_VERSION = '1.12';
 
 	/**
 	 * Slug prefix for registering and enqueueing submenu pages, style sheets and scripts
@@ -490,11 +494,26 @@ class Insert_Fixit {
 	/**
 	 * Array of post/page IDs giving inserted image URL and ALT Text:
 	 * post/page ID => array( 
-	 *      'content' => post_content,
-	 *      'files' => URL to img src,
-	 *      'inserts' => array( 'src', 'src_offset', 'alt', 'alt_offset' )
-	 *      'replacements' => array()
-	 *      )
+	 *     'content' => post_content,
+	 *     'files' => URL to img src,
+	 *     'inserts' => array(
+	 *         'img' => complete <img ...> tag,
+	 *         'img_offset' => offset within post_content,
+	 *         'src_att' => complete src="..." attribute,
+	 *         'src_att_offset' => offset within post_content,
+	 *         'src' => URL portion of src= attribute,
+	 *         'src_offset' => offset within post_content,
+	 *         'alt' => content of alt="..." attribute,
+	 *         'alt_offset' => offset within post_content
+	 *         )
+	 *      // For the add/replace/delete attribute tools:
+	 *     'replacements' => array(
+	 *         new_offset => array (
+	 *             'length' => strlen of the replacement 
+	 *             'text' => new value
+	 *             )
+	 *         )
+	 *     )
 	 *
 	 * @since 1.00
 	 *
@@ -546,10 +565,14 @@ class Insert_Fixit {
 		$upload_dir = wp_upload_dir();
 //error_log( __LINE__ . ' Insert_Fixit::_build_image_inserts_cache() $upload_dir = ' . var_export( $upload_dir, true ), 0 );
 		$upload_dir = $upload_dir['baseurl'] . '/';
+		$site_url = get_site_url();
+//error_log( __LINE__ . ' Insert_Fixit::_build_image_inserts_cache() $site_url = ' . var_export( $site_url, true ), 0 );
+		$upload_subdir = str_replace( $site_url, '', $upload_dir );
+//error_log( __LINE__ . ' Insert_Fixit::_build_image_inserts_cache() $upload_subdir = ' . var_export( $upload_subdir, true ), 0 );
 
 		$image_inserts = array();
 		foreach ( $results as $result ) {
-			$match_count = preg_match_all( '/\<img[^src]*(src="([^"]*)")[^\>]*\>/', $result->post_content, $matches, PREG_OFFSET_CAPTURE );
+			$match_count = preg_match_all( '/\<img .*(src="([^"]*)")[^\>]*\>/', $result->post_content, $matches, PREG_OFFSET_CAPTURE );
 //error_log( __LINE__ . " Insert_Fixit::_build_image_inserts_cache( {$result->ID} ) \$matches = " . var_export( $matches, true ), 0 );
 			if ( $match_count ) {
 				$image_inserts[ $result->ID ]['content'] = $result->post_content;
@@ -567,7 +590,8 @@ class Insert_Fixit {
 
 				// src= file URL
 				foreach( $matches[2] as $index => $match ) {
-					$file = str_replace( $upload_dir, '', $match[0] );
+					// Remove absolute and relative paths to the upload directory
+					$file = str_replace( $upload_subdir, '', str_replace( $upload_dir, '', $match[0] ) );
 					$image_inserts[ $result->ID ]['files'][] = $file;
 					$image_inserts[ $result->ID ]['inserts'][ $index ]['src'] = $file;
 					$image_inserts[ $result->ID ]['inserts'][ $index ]['src_offset'] = $match[1];
@@ -589,7 +613,7 @@ class Insert_Fixit {
 
 		$return = set_transient( self::SLUG_PREFIX . 'image_inserts', $image_inserts, 900 ); // fifteen minutes
 //error_log( __LINE__ . " Insert_Fixit::_build_image_inserts_cache set_transient return = " . var_export( $return, true ), 0 );
-//error_log( __LINE__ . " Insert_Fixit::_build_image_inserts_cache image_inserts " . var_export($image_inserts, true ), 0 );
+//error_log( __LINE__ . " Insert_Fixit::_build_image_inserts_cache self::\$image_inserts " . var_export($image_inserts, true ), 0 );
 		self::$image_inserts = $image_inserts;
 
 		return 'Image inserts cache refreshed with ' . count( self::$image_inserts ) . ' post/page elements.';
@@ -688,7 +712,9 @@ class Insert_Fixit {
 
 	/**
 	 * Array of attachment IDs giving posts/pages their ID appears in
-	 * attachment ID => array( 'parent' => post_parent, post/page IDs => post/page IDs )
+	 * attachment ID => array( post/page ID => post/page ID )
+	 *
+	 * Used exclusively by _attach_referenced_in()
 	 *
 	 * @since 1.08
 	 *
@@ -763,14 +789,19 @@ class Insert_Fixit {
 
 		$return = set_transient( self::SLUG_PREFIX . 'item_references', self::$item_references, 900 ); // fifteen minutes
 //error_log( __LINE__ . " Insert_Fixit::_build_item_references_cache set_transient return = " . var_export( $return, true ), 0 );
-//error_log( __LINE__ . " Insert_Fixit::_build_item_references_cache item_references " . var_export( self::$item_references, true ), 0 );
+//error_log( __LINE__ . " Insert_Fixit::_build_item_references_cache self::\$item_references " . var_export( self::$item_references, true ), 0 );
 
 		return 'Item references cache refreshed with ' . count( self::$item_references ) . ' items referenced in ' . count( $results ) . ' post/page elements.';
 	} // _build_item_references_cache
 
 	/**
 	 * Array of attachment IDs giving inserted image files:
-	 * attachment ID => array( 'parent' => post_parent, post/page IDs => array( URLs to inserted file ) )
+	 * attachment ID => array(
+	 *     post/page ID => array(
+	 *         [] => URLs to inserted file
+	 *         ),
+	 *     'parent' => attachment parent ID, // optional for _attach_inserted_in()
+	 *     )
 	 *
 	 * @since 1.00
 	 *
@@ -879,7 +910,9 @@ class Insert_Fixit {
 			$inserts = array();
 
 			foreach( $files as $file ) {
+//error_log( __LINE__ . " Insert_Fixit::_array_image_inserts_references( {$result->ID} ) file = " . var_export( $file, true ), 0 );
 				foreach ( self::$image_inserts as $insert_id => $value ) {
+//error_log( __LINE__ . " Insert_Fixit::_array_image_inserts_references( {$insert_id} ) value = " . var_export( $value, true ), 0 );
 					if ( in_array( $file, $value['files'] ) ) {
 						$inserts[ $insert_id ][] = $file;
 					}
@@ -903,7 +936,7 @@ class Insert_Fixit {
 
 		$return = set_transient( self::SLUG_PREFIX . 'image_objects', $references, 900 ); // fifteen minutes
 //error_log( __LINE__ . " Insert_Fixit::_build_image_objects_cache set_transient return = " . var_export( $return, true ), 0 );
-//error_log( __LINE__ . " Insert_Fixit::_build_image_objects_cache references = " . var_export( $references, true ), 0 );
+//error_log( __LINE__ . " Insert_Fixit::_build_image_objects_cache self::\$image_objects = " . var_export( $references, true ), 0 );
 		self::$image_objects = $references;
 
 		return 'Image objects cache refreshed with ' . count( self::$image_objects ) . ' attachment elements.';
@@ -963,14 +996,10 @@ class Insert_Fixit {
 		$preg_pattern = '/ ' . $attribute_name . '="([^"]*)"[ ]*/';
 //error_log( __LINE__ . " Insert_Fixit::_build_image_inserts_cache( {$operation} ) \$preg_pattern = " . var_export( $preg_pattern, true ), 0 );
 
-		/*
-		 * Load the image_inserts array
-		 */
+		// Load the image_inserts array
 		self::_build_image_inserts_cache( true );
 
-		/*
-		 * Load the image_objects array
-		 */
+		// Load the image_objects array
 		self::_build_image_objects_cache( true );
 
 		// Initialize statistics
