@@ -322,8 +322,10 @@
 	}
 	
 	if ($prev_event || $next_event) :
-	?>
-		<hr />
+		if( $show_offer || $report['show'] || $smi || $links_count ) {
+			echo '<hr />';
+		}
+		?>
 		<div class="flex-container">
 		<?php if ($prev_event) : ?>
 			<div class="prevnext-card">
