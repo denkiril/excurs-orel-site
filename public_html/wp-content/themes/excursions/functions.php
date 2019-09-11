@@ -692,7 +692,10 @@ function annocards_func( $atts ){
 	$size 			= $atts['size'];
 	$ids 			= $atts['ids'];
 
-	$echo = '';
+	$echo 			= '';
+	$event_date 	= '';
+	$past_events 	= false;
+	$future_events 	= false;
 
 	global $post;
 
@@ -797,7 +800,7 @@ function newscards_func( $atts ){
 	$section_id 	= $atts['section_id'];
 	$section_title 	= $atts['section_title'];
 	$cat_name 		= $atts['cat_name'];
-	$date 			= $atts['date'];
+	// $date 			= $atts['date'];
 	$future_events 	= $atts['future_events'];
 	$actual_events 	= $atts['actual_events'];
 	$promo_posts 	= $atts['promo_posts'];
@@ -1476,7 +1479,7 @@ function image_func( $atts ) {
 		}
 
 		// $image = wp_get_attachment_image( $id, $size, false, $attr );
-		$image = get_attachment_picture( $id, $size, false, $attr, $lazy );
+		$image = get_attachment_picture( $id, $size, false, null, $lazy );
 
 		if ($image) {
 			$echo .= '<div class="'.$class.'"><figure>'.$ahref_pre.$image.$ahref_post;
@@ -1515,7 +1518,9 @@ function gb_images_func( $atts ) {
 	$echo 		= '';
 
 	// Hide this block on pagen 
-	if ((int)$_GET['pagenum'] > 1) return $echo;
+	if ( isset( $_GET['pagenum'] ) && (int) $_GET['pagenum'] > 1) {
+		return $echo;
+	}
 
 	global $post;
 	//Get the images ids from the post_metadata
@@ -1563,7 +1568,7 @@ function gb_images_func( $atts ) {
 				// $ahref_pre = '<a href="'.wp_get_attachment_image_url($id, 'full').'" title="'.get_the_title($id).'" target="_blank">';
 				$ahref_pre = '<a href="'.$full_image_url.'" title="'.$title.'" target="_blank">';
 				$ahref_post = '</a>';
-				$picture = get_attachment_picture( $id, $size, false, $attr, $lazy );
+				$picture = get_attachment_picture( $id, $size, false, null, $lazy );
 		
 				if ($picture) {
 					$echo .= '<div class="'.$bootstrap.'"><figure>'.$ahref_pre.$picture.$ahref_post;
@@ -2258,18 +2263,20 @@ function check_pagenum_in_uri(){
 }
 add_action( 'template_redirect', 'check_pagenum_in_uri' );
 
-function get_url_wo_pagenum(){
-	$string 		= $_SERVER['REQUEST_URI'];
-	$parts 			= parse_url($string);
-	$queryParams 	= array();
-	parse_str($parts['query'], $queryParams);
-	unset($queryParams['pagenum']);
-	$queryString 	= http_build_query($queryParams);
-	if($queryString){
+function get_url_wo_pagenum() {
+	$string = $_SERVER['REQUEST_URI'];
+	$parts = parse_url( $string );
+	$queryParams = [];
+	if ( isset( $parts['query'] ) ) {
+		parse_str( $parts['query'], $queryParams );
+	}
+	unset( $queryParams['pagenum'] );
+	$queryString = http_build_query( $queryParams );
+	if ( $queryString ) {
 		$queryString = '?' . $queryString;
 	}
 	// $url 		= $_SERVER['HTTP_HOST'] . $parts['path'] . '?' . $queryString;
-	$url 			= home_url() . $parts['path'] . $queryString;
+	$url = home_url() . $parts['path'] . $queryString;
 
 	return $url;
 }

@@ -34,4 +34,9 @@ get_header();
 </main><!-- #main -->
 
 <?php
+// if ( $post_type != 'events' ) :
+// <!-- Yandex.RTB R-A-414612-1 -->
+// <div id="yandex_rtb_R-A-414612-1" style="padding: 20px 0 40px 0;"></div>
+// endif;
+
 get_footer();

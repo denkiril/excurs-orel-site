@@ -173,12 +173,15 @@
 			</div> <!-- row -->
 		<?php endif; ?>
 
+		<!-- Yandex.RTB R-A-414612-1 -->
+		<div id="yandex_rtb_R-A-414612-1" style="padding: 20px 0 20px 0;"></div>
+
 		<?php 
 		/* report_photos */
 		$report = get_field('report');
-		if( $report['show'] ): ?>
+		if ( $report['show'] ) : ?>
 		<div class="post-gallery">
-			<?php if( $report['title'] ): ?>
+			<?php if ( $report['title'] ) : ?>
 			<div class="row">
 				<div class="col">
 					<h2><?=$report['title']?></h2>
@@ -186,7 +189,7 @@
 			</div> <!-- row -->
 			<?php endif; ?>
 
-			<?php if( $report['pre-text'] ): ?>
+			<?php if ( $report['pre-text'] ) : ?>
 			<div class="report-text row">
 				<div class="col">
 					<?=$report['pre-text']?>
@@ -196,12 +199,12 @@
 
 			<?php 
 			$post_gallery = do_shortcode('[gallery acf_field=post-gallery ]');
-			if($post_gallery){
+			if ( $post_gallery ) {
 				$gallery = true;
 				echo $post_gallery;
 			}
 
-			if( $report['post-text'] ): ?>
+			if ( $report['post-text'] ) : ?>
 			<div class="report-text row">
 				<div class="col">
 					<?=$report['post-text']?>
@@ -213,20 +216,20 @@
 		<?php endif;
 
 		$smi = get_field('smi');
-		if( $smi ): ?>
+		if ( $smi ) : ?>
 			<div class="row">
 			<div class="col">
 				<h2>О нас пишут</h2>
 				<ul>
 				<?php
-				$lines = explode(PHP_EOL, trim($smi));
-				foreach( $lines as $line ){
-					$sublines = explode('=', $line, 2);
+				$lines = explode( PHP_EOL, trim($smi) );
+				foreach ( $lines as $line ) {
+					$sublines = explode( '=', $line, 2 );
 					$text = esc_html( trim($sublines[0]) );
 					$url = esc_html( trim($sublines[1]) );
-					if( $url ){
-						$ret = parse_url($url);
-						if( !isset($ret['scheme']) ){
+					if ( $url ) {
+						$ret = parse_url( $url );
+						if( ! isset( $ret['scheme'] ) ) {
 							$url = "http://{$url}";
 						}
 						$text = '<a href="'.$url.'" target="_blank" rel="noopener noreferrer">'.$text.'</a>';
@@ -301,6 +304,8 @@
 
 	<?php
 	/* Prev & Next Events */
+	$prev_event = null;
+	$next_event = null;
 	$events_args = array(
 		'post_type' 	=> 'events',
 		'orderby' 		=> 'meta_value',
@@ -308,21 +313,21 @@
 		'meta_key' 		=> 'event_info_event_date',
 		'numberposts' 	=> -1,
 	);
-	$events_posts = get_posts($events_args);
+	$events_posts = get_posts( $events_args );
 	$event_id = get_queried_object()->ID;
-	foreach ($events_posts as $key => $post) {
-		if ($event_id == $post->ID) {
+	foreach ( $events_posts as $key => $post ) {
+		if ( $event_id == $post->ID ) {
 			$this_event_key = $key;
 			break;
 		}
 	}
-	if ($this_event_key) {
-		$prev_event = $events_posts[$this_event_key-1];
-		$next_event = $events_posts[$this_event_key+1];
+	if ( $this_event_key ) {
+		$prev_event = ( isset( $events_posts[$this_event_key-1] ) ) ? $events_posts[$this_event_key-1] : null;
+		$next_event = ( isset( $events_posts[$this_event_key+1] ) ) ? $events_posts[$this_event_key+1] : null;
 	}
 	
-	if ($prev_event || $next_event) :
-		if( $show_offer || $report['show'] || $smi || $links_count ) {
+	if ( $prev_event || $next_event ) :
+		if ( $show_offer || $report['show'] || $smi || $links_count ) {
 			echo '<hr />';
 		}
 		?>

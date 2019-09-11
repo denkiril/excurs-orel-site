@@ -41,66 +41,65 @@
                 <div class="col header-container flex-container" itemscope itemtype="http://schema.org/Organization">
 					<div>
 					<?php 
-						$site_name = get_bloginfo();
-						$is_front_page = is_front_page();
+						$site_name 			= get_bloginfo();
+						$is_front_page 		= is_front_page();
+						$nav_title 			= null;
+						$nav_title_ref 		= null;
+						$alt_contenttitle 	= null;
 						
-						if( is_singular('guidebook') || is_tax('sections') ){
+						if ( is_singular('guidebook') || is_tax('sections') ) {
 							$guidebook_id 		= 789;
-							if(home_url() == 'http://excurs-orel'){
+							if ( home_url() == 'http://excurs-orel' ) {
 								$guidebook_id 	= 697;
 							}
 							$alt_headertitle 	= get_post_meta( $guidebook_id, 'header-title', true ); 
 							$term_0 			= get_terms( array('taxonomy' => 'sections') )[0]; // 'sights'
-							$term 				= get_the_terms($post->ID, 'sections')[0];
-							if(!$term_0 || !$term || $term->term_id == $term_0->term_id || is_tax('sections')){
+							$term 				= get_the_terms( $post->ID, 'sections' )[0];
+							if ( ! $term_0 || ! $term || $term->term_id == $term_0->term_id || is_tax('sections') ) {
 								// $nav_title 		= $term->name;
 								// $nav_title_ref 	= get_term_link( (int)$term->term_id );
 								$nav_title 			= get_the_title($guidebook_id); // Путеводитель
 								$nav_title_ref 		= get_permalink($guidebook_id);
-								if(is_tax('sections')){
+								if ( is_tax('sections') ) {
 									$alt_contenttitle = $term->name;
 								}
-							}
-							// elseif(is_tax('sections') && !is_tax('sections', 'sights')){}
-							else{
-								// $term 			= get_queried_object();
+							} else {
+								// $term 		= get_queried_object();
 								$nav_title 		= $term->name;
-								$nav_title_ref 	= get_term_link( (int)$term->term_id );
+								$nav_title_ref 	= get_term_link( (int) $term->term_id );
 							}
-						}
-						else{
+						} else {
 							$alt_headertitle = get_post_meta( $post->ID, 'header-title', true ); 
 						}
 
 						$headertitle = $alt_headertitle ? $alt_headertitle : $site_name;
 
-						if( $is_front_page || ($alt_headertitle && is_page()) ){
+						if ( $is_front_page || ( $alt_headertitle && is_page() ) ) {
 							$headertitle_html = '<h1 class="header-title">'.$headertitle.'</h1>';
 							$h1_is = true;
-						}
-						else{
+						} else {
 							$headertitle_html = '<h2 class="header-title">'.$headertitle.'</h2>';
 							$h1_is = false;
 						}
 						
-						if( $is_front_page){
+						if ( $is_front_page ) {
 							$headertitle_html .= '<p class="header-subtitle">мы не стоим на месте</p>';
 						} 
 
-						if( !$nav_title ){
-							$nav_title = (is_page() || is_home()) ? single_post_title(null, false) : '';
+						if ( ! $nav_title ) {
+							$nav_title = ( is_page() || is_home() ) ? single_post_title( null, false ) : '';
 						}
-						if( !$nav_title && is_archive() ){
+						if ( ! $nav_title && is_archive() ) {
 							$nav_title = get_the_archive_title();
 						}
-						if( !$nav_title && is_single() ){
+						if ( !$nav_title && is_single() ) {
 							// $ancestors = get_post_ancestors($post->ID);
-							if( is_singular('post') ){
+							if ( is_singular('post') ) {
 								$blog_id 		= get_option('page_for_posts');
 								$nav_title 		= get_the_title( $blog_id );
 								$nav_title_ref 	= get_permalink( $blog_id );
 							} 
-							if( is_singular('events') ){
+							if ( is_singular('events') ) {
 								$nav_title 		= 'События'; // get_the_archive_title();
 								$nav_title_ref 	= get_post_type_archive_link('events');
 							} 

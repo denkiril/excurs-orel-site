@@ -11,8 +11,10 @@
 
 ?>
 
-	<!-- Yandex.RTB R-A-414612-1 -->
-	<div id="yandex_rtb_R-A-414612-1" style="padding: 20px 0 40px 0;"></div>
+	<?php if ( get_post_type() != 'events' ) : ?>
+		<!-- Yandex.RTB R-A-414612-1 -->
+		<div id="yandex_rtb_R-A-414612-1" style="padding: 20px 0 40px 0;"></div>
+	<?php endif; ?>
 
 	<?php if( !(is_404() || is_search() || is_page('search')) ): ?> 
 	<div id="soc-buttons">
