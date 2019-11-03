@@ -11,7 +11,9 @@
 
 ?>
 
-	<?php if ( get_post_type() != 'events' ) : ?>
+	<?php 
+	$post_type = get_post_type();
+	if ( $post_type != 'events' && $post_type != 'post' ) : ?>
 		<!-- Yandex.RTB R-A-414612-1 -->
 		<div id="yandex_rtb_R-A-414612-1" style="padding: 20px 0 40px 0;"></div>
 	<?php endif; ?>

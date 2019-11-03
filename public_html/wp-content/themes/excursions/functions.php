@@ -2245,14 +2245,37 @@ function get_guidebook_posts( $term_slug='', $numberposts=0 ) {
 	return $posts;
 }
 
-function check_pagenum_in_uri(){
-	if(is_page('guidebook') && isset($_GET['pagenum'])){
-		$myposts = get_guidebook_posts();
-		// print_r($myposts);
+function check_query_params() {
+	$uri = $_SERVER['REQUEST_URI'];
+	$parts = parse_url($uri);
 	
-		if( !$myposts || $_GET['pagenum'] == 1){
+	if (isset($parts['query'])) {
+		$allowed_keys = ['pagenum', 'cat_f', 'numberposts_1', 'numberposts_2'];
+		$queryParams = [];
+		parse_str($parts['query'], $queryParams);
+		$start_queryParams = $queryParams;
+		
+		foreach ($queryParams as $key => $value) {
+			if (!in_array($key, $allowed_keys)) {
+				unset($queryParams[$key]);
+			}
+		}
 
-			$url = get_url_wo_pagenum();
+		if (is_page('guidebook') && isset($_GET['pagenum'])) {
+			$myposts = get_guidebook_posts();
+			// print_r($myposts);
+			if(!$myposts || $_GET['pagenum'] == 1){
+				// $url = get_url_wo_pagenum();
+				unset($queryParams['pagenum']);
+			}
+		}
+	
+		if ($start_queryParams != $queryParams) {
+			$queryString = http_build_query($queryParams);
+			if ($queryString) {
+				$queryString = '?' . $queryString;
+			}
+			$url = home_url() . $parts['path'] . $queryString;
 			// print_r($url);
 			// header( $protocol.' 301 Moved Permanently' );
 			// header( 'Location: '.strtolower($_SERVER['REQUEST_URI']) );
@@ -2261,7 +2284,7 @@ function check_pagenum_in_uri(){
 		}
 	}
 }
-add_action( 'template_redirect', 'check_pagenum_in_uri' );
+add_action( 'template_redirect', 'check_query_params' );
 
 function get_url_wo_pagenum() {
 	$string = $_SERVER['REQUEST_URI'];
