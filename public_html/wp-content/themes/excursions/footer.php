@@ -13,7 +13,8 @@
 
 	<?php 
 	$post_type = get_post_type();
-	if ( $post_type != 'events' && $post_type != 'post' ) : ?>
+	$no_ads_page = is_page('kvesty') || is_page('gid-v-orle');
+	if ( $post_type != 'events' && $post_type != 'post' && !$no_ads_page) : ?>
 		<!-- Yandex.RTB R-A-414612-1 -->
 		<div id="yandex_rtb_R-A-414612-1" style="padding: 20px 0 40px 0;"></div>
 	<?php endif; ?>

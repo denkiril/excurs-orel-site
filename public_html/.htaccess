@@ -10,6 +10,8 @@ php_value error_reporting -1;
 
     RewriteRule ^123$ https://excurs-orel.ru/afisha/ [L,R=301]
 
+    RewriteRule ^photo/(.*) https://excurs-orel.ru/files/$1 [L,R=301]
+
     # Переводим URL в нижний регистр
     RewriteCond %{REQUEST_URI} [A-Z]
     RewriteCond %{REQUEST_FILENAME} !-f

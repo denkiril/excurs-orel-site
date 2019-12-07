@@ -1699,6 +1699,7 @@ function markup_fancy_figure($id, $fancybox, $full_image_url, $fancy_caption, $s
 }
 
 // [gallery acf_field=gallery_gal class=post-gallery item=gallery-item fancybox=gallery lazy=1 size=large nums=null(1,2,4|1-5) figcaption=image_description(parent_href) mini=false permalink=true] 
+// [gallery nums=(1,2,4|1-5) pics_in_row=2] 
 add_shortcode( 'gallery', 'gallery_func' );
 
 function gallery_func( $atts ){
@@ -1709,11 +1710,12 @@ function gallery_func( $atts ){
 		'item' 			=> 'gallery-item',
 		'fancybox' 		=> 'gallery',
 		'lazy' 			=> true,
-		'size' 			=> 'large',
+		'size' 			=> null,
 		'nums' 			=> null,
 		'figcaption' 	=> 'image_description',
-		'mini' 			=> false,
+		'mini' 			=> false, // will be deprecated by pics_in_row
 		'permalink' 	=> true,
+		'pics_in_row'	=> 1,
 	), $atts );
 
 	$acf_field 		= $atts['acf_field'];
@@ -1724,8 +1726,9 @@ function gallery_func( $atts ){
 	$size 			= $atts['size'];
 	$nums 			= $atts['nums'];
 	$figcaption 	= $atts['figcaption'];
-	$mini 			= $atts['mini'];
+	$mini 			= $atts['mini']; // will be deprecated by pics_in_row
 	$permalink 		= $atts['permalink'];
+	$pics_in_row 	= $atts['pics_in_row'];
 
 	$echo = '';
 
@@ -1733,10 +1736,21 @@ function gallery_func( $atts ){
 	//Get the images ids from the post_metadata
 	$images = acf_photo_gallery($acf_field, $post->ID);
 	if (count($images)) :
-		if (!$class) {
-			$class = $mini ? 'pre-gallery' : 'post-gallery';
+		if ($mini) {
+			$pics_in_row = 3;
 		}
-		$bootstrap = $mini ? ' col-12 col-sm-6 col-md-6 col-lg-4' : ' col-12';
+		if (!$class) {
+			$class = ($pics_in_row == 1) ? 'post-gallery' : 'pre-gallery';
+		}
+		if (!$size) {
+			$size = ($pics_in_row == 1) ? 'large' : 'medium_large';
+		}
+		// $bootstrap = $mini ? ' col-12 col-sm-6 col-md-6 col-lg-4' : ' col-12';
+		switch ($pics_in_row) {
+			case 1: $bootstrap = 'col-12'; break;
+			case 3: $bootstrap = 'col-12 col-sm-6 col-md-4 col-lg-4'; break;
+			default: $bootstrap = 'col-12 col-sm-6';
+		}
 		
 		$images_counter = 0;
 		if ($nums) {
@@ -1775,7 +1789,7 @@ function gallery_func( $atts ){
 				$figcaption_html = image_description_parse( $image['caption'], $permalink ); //The caption (Description!)
 			}
 
-			$echo .= '<div class="'.$item.$bootstrap.'">';
+			$echo .= '<div class="'.$item.' '.$bootstrap.'">';
 			// Get picture item in markup_figure() func. 1st two ($images_counter == 0 || 1) are not lazy 
 			$print_lazy = $lazy && $images_counter > 2;
 			$echo .= markup_fancy_figure($id, $fancybox, $full_image_url, $title, $size, $print_lazy, $title, null, $figcaption_html);
@@ -1839,25 +1853,34 @@ function guidebook_map_func( $atts ) {
 	return $echo;
 }
 
-// [guidebook_sections content=""] 
+// [guidebook_sections content="" show='sights museums documents'] 
 add_shortcode( 'guidebook_sections', 'guidebook_sections_func' );
 
 function guidebook_sections_func( $atts ) {
 	// белый список параметров и значения по умолчанию
 	$atts = shortcode_atts( array(
-		'content' => null,
-		// 'form' 		=> false,
-		// 'size' 	=> 'thumbnail',
+		'content' 	=> null,
+		'show' 		=> null,
 	), $atts );
 
 	$gb_content = $atts['content'];
-	// $form 	= $atts['form'];
-	// $size 	= $atts['size'];
+	$show_terms = explode(' ', $atts['show']);
 	$echo = '';
 
 	// $taxonomy_names = get_object_taxonomies('guidebook');
 	$tax_name = 'sections';
-	$terms = get_terms($tax_name);
+	$sections_terms = get_terms($tax_name);
+	$terms = [];
+	foreach ($show_terms as $term) {
+		foreach ($sections_terms as $s_term) {
+			if ($term == $s_term->slug) {
+				$terms[] = $s_term;
+				break;
+			}
+		}
+	}
+
+	// $terms = get_terms($tax_name);
 	if ($terms && ! is_wp_error($terms)) :
 		$term_counter = 0;
 		foreach ($terms as $term) :
@@ -1894,7 +1917,7 @@ function guidebook_sections_func( $atts ) {
 					$title = esc_html( get_the_title() );
 					// $title = get_field('gba_rating').' '.$title;
 					$echo .= '<div class="anno-card col-6 col-sm-6 col-md-4 col-lg-3">';
-					$echo .= '<a href="'.$permalink.'" title="Ссылка на: <?=$title?>" tabindex="-1">';
+					$echo .= '<a href="'.$permalink.'" title="Ссылка на '.$title.'" tabindex="-1">';
 					// the_post_thumbnail('medium'); 
 					$thumb_id = get_post_thumbnail_id();
 					$echo .= get_attachment_picture( $thumb_id, 'medium', false, null, true, true ); // medium_large 
@@ -2173,10 +2196,10 @@ function get_sights() {
 function get_guidebook_posts( $term_slug='', $numberposts=0 ) {
 	$posts 			= array();
 	$tax_name 		= 'sections';
-	$term_slug_0 	= get_terms( array('taxonomy' => $tax_name) )[0]->slug; // 'sights'
+	$term_slug_0 	= 'sights'; // get_terms( array('taxonomy' => $tax_name) )[0]->slug;
 
 	if(!$term_slug){
-		$term_slug 	= $term_slug_0; // 'sights'
+		$term_slug 	= $term_slug_0;
 	}
 	$check_filter 	= $term_slug == $term_slug_0;
 
