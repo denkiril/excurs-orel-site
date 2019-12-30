@@ -1575,7 +1575,7 @@ function gb_images_func( $atts ) {
 			$id 			= $image['id']; // The attachment id of the media
 			$title 			= $image['title']; //The title
 			$full_image_url = $image['full_image_url']; //Full size image url
-			$figcaption_html = wiki_parse($image['caption']);
+			$figcaption_html = wiki_parse_text($image['caption']);
 
 			if ($id) {
 				// $ahref_pre = '<a href="'.wp_get_attachment_image_url($id, 'full').'" title="'.get_the_title($id).'" target="_blank">';
@@ -1628,38 +1628,40 @@ function markup_url_permalink($url, $text, $permalink = true) {
 	return $text;
 }
 
-function markup_post_permalink($postid, $text, $permalink = true) {
+function markup_post_permalink($postid, $text, $permalink, $title = null) {
 	$post_id = (int) $postid;
+	$title = $title ? $title : esc_html(get_the_title($post_id));
+	$title = $title ? ' title="'.$title.'"' : '';
 	$post_link = $post_id > 0 ? get_permalink($post_id) : false;
 	if ($permalink && $post_link) {
-		$text = '<a href="'.$post_link.'" title="'.esc_html(get_the_title($post_id)).'">'.$text.'</a>';
+		$text = '<a href="'.$post_link.'"'.$title.'">'.$text.'</a>';
 	}
 	return $text;
 }
 
-function markup_link($link, $text, $permalink = true) {
-	if (preg_match('/url=([^\\|]*)/u', $link, $matches)) {
-		$url = $matches[1];
-		if ($permalink && $url) {
-			$ret = parse_url($url);
-			if (!isset($ret['scheme'])) {
-				$url = "http://{$url}";
-			}
-			$text = '<a href="'.$url.'" target="_blank" rel="noopener noreferrer">'.$text.'</a>';
-		}
-	} elseif (preg_match('/post[id]*=(\\d+)/u', $link, $matches)) {
+function get_post_id($post_name) {
+	// if (preg_match('/url=([^\\|]*)/u', $link, $matches)) {
+	// 	$url = $matches[1];
+	// 	if ($permalink && $url) {
+	// 		$ret = parse_url($url);
+	// 		if (!isset($ret['scheme'])) {
+	// 			$url = "http://{$url}";
+	// 		}
+	// 		$text = '<a href="'.$url.'" target="_blank" rel="noopener noreferrer">'.$text.'</a>';
+	// 	}
+	// } else
+	if (preg_match('/post[id]*=(\\d+)/u', $post_name, $matches)) {
 		$post_id = (int) $matches[1];
 	} else {
-		$post_id = (int) get_page_by_path($link, OBJECT, 'guidebook')->ID;
+		$post_id = (int) get_page_by_path($post_name, OBJECT, 'guidebook')->ID;
 	}
 
-	$post_link = $post_id > 0 ? get_permalink($post_id) : false;
-	if ($permalink && $post_link) {
-		$text = '<a href="'.$post_link.'" title="'.esc_html(get_the_title($post_id)).'">'.$text.'</a>';
-	}
-
+	// $post_link = $post_id > 0 ? get_permalink($post_id) : false;
+	// if ($permalink && $post_link) {
+	// 	$text = '<a href="'.$post_link.'" title="'.esc_html(get_the_title($post_id)).'">'.$text.'</a>';
+	// }
 	// $text .= ' (' . ($post_id ? $post_id : '') . ($url ? 'url' : '') . ')';
-	return $text;
+	return $post_id;
 }
 
 /**
@@ -1667,11 +1669,25 @@ function markup_link($link, $text, $permalink = true) {
  */
 function wiki_parse($str, $permalink = true) {
 	$text = $str;
-	// $matches = [];
+	$geolocations = [];
 	$dbl_count = preg_match_all('/\\[{2}([^\\|]*)\\|([^\\]]*)\\]{2}/u', $text, $matches);
 	for ($i = 0; $i < $dbl_count; $i++) {
-		$text = str_replace($matches[0][$i], markup_link($matches[1][$i], $matches[2][$i], $permalink), $text);
+		if ($post_id = get_post_id($matches[1][$i])) {
+			$title = esc_html(get_the_title($post_id));
+			$link_text = markup_post_permalink($post_id, $matches[2][$i], $permalink, $title);
+			$text = str_replace($matches[0][$i], $link_text, $text);
+			$geolocation = get_field('obj_info', $post_id)['geolocation'];
+			if ($geolocation) {
+				$geolocations[] = [
+					'lat' => $geolocation['lat'],
+					'lng' => $geolocation['lng'],
+					'title' => $title,
+					'id' => $post_id,
+				];
+			}
+		}
 	}
+
 	$url_count = preg_match_all('/\\[url=([^\\|]*)\\|([^\\]]*)\\]/u', $text, $matches);
 	for ($i = 0; $i < $url_count; $i++) {
 		$text = str_replace($matches[0][$i], markup_url_permalink($matches[1][$i], $matches[2][$i], $permalink), $text);
@@ -1699,7 +1715,12 @@ function wiki_parse($str, $permalink = true) {
 	// }
 
 	// $text .= '<p>[counts: dbls: '.$dbl_count.' / urls: '.$url_count.' / posts:'.$post_count.' ]</p>';
-	return $text;
+	// if ($geolocations) print_r2($geolocations);
+	return ['text' => $text, 'geolocations' => $geolocations];
+}
+
+function wiki_parse_text($str, $permalink = true) {
+	return wiki_parse($str, $permalink)['text'];
 }
 
 function markup_fancy_figure($id, $fancybox, $full_image_url, $fancy_caption, $size='thumbnail', $lazy=false, $title=null, $img_class=null, $figcaption_html=null){
@@ -1821,7 +1842,7 @@ function gallery_func( $atts ){
 			}
 			// Иначе берем подпись из БД и парсим ее
 			if (!$figcaption_html && ($figcaption == 'image_description' || $figcaption == 'parent_href')) {
-				$figcaption_html = wiki_parse( $image['caption'], $permalink ); //The caption (Description!)
+				$figcaption_html = wiki_parse_text($image['caption'], $permalink); //The caption (Description!)
 			}
 
 			$echo .= '<div class="'.$item.' '.$bootstrap.'">';

@@ -53,122 +53,129 @@ $OKN_TXT = 'Сведения из Единого госреестра ОКН (с
 	<hr />
 	<?php 
 	$obj_info = get_field('obj_info');
+
+	$obj_info_text = '';
+	if ($obj_info['is_okn']) {
+		// $event_date_html = markup_event_date();
+		$obj_info_text .= '<h2>Является объектом культурного наследия (ОКН)</h2>';
+	}
+	if ($obj_info['okn_type']) {
+		$label = '<span class="ei_label">Тип объекта:</span> ';
+		switch ($obj_info['okn_type']) {
+			case 'a': $okn_type = 'Памятник археологии'; 						break;
+			case 'g': $okn_type = 'Памятник архитектуры и градостроительства'; 	break;
+			case 'h': $okn_type = 'Памятник истории'; 							break;
+			case 'i': $okn_type = 'Памятник искусства'; 						break;
+		}
+		$obj_info_text .= $label . $okn_type . '<br />';
+	}
+	if ($obj_info['protection_category']) {
+		$label = '<span class="ei_label">Категория охраны:</span> ';
+		switch ($obj_info['protection_category']) {
+			case 'f': $protection_category = 'Федерального значения'; 	break;
+			case 'r': $protection_category = 'Регионального значения'; 	break;
+			case 'm': $protection_category = 'Местного значения'; 		break;
+			case 'v': $protection_category = 'Выявленный объект'; 		break;
+		}
+		$obj_info_text .= $label . $protection_category . '<br />';
+	}
+	if ($obj_info['registry_name']) {
+		$label = '<span class="ei_label">Наименование ОКН:</span> ';
+		$obj_info_text .= $label . esc_html($obj_info['registry_name']) . '<br />';
+	}
+	if ($obj_info['okn_date']) {
+		$label = '<span class="ei_label">Датировка (по реестру ОКН):</span> ';
+		$obj_info_text .= $label . esc_html($obj_info['okn_date']) . '<br />';
+	}
+	if ($obj_info['location']) {
+		$label = '<span class="ei_label">Местонахождение:</span> ';
+		$obj_info_text .= $label . esc_html($obj_info['location']) . '<br />';
+	}
+	if ($obj_info['district']) {
+		$label = '<span class="ei_label">Район:</span> ';
+		switch ($obj_info['district']) {
+			case '1': $district = 'Заводской'; 			break;
+			case '2': $district = 'Железнодорожный'; 	break;
+			case '3': $district = 'Советский'; 			break;
+		}
+		$obj_info_text .= $label . $district . '<br />';
+	}
+	if ($obj_info['registry_date']) {
+		$label = '<span class="ei_label">Год постановки на охрану:</span> ';
+		$obj_info_text .= $label . esc_html( $obj_info['registry_date'] ) . '<br />';
+	}
+	if ($obj_info['okn_id']) {
+		$label = '<span class="ei_label">Номер в реестре ОКН:</span> ';
+		$obj_info_text .= $label . esc_html( $obj_info['okn_id'] ) . '<br />';
+	}
+	if ($obj_info['founding_date']) {
+		$label = '<span class="ei_label">Дата основания:</span> ';
+		$obj_info_text .= $label . esc_html( $obj_info['founding_date'] ) . '<br />';
+	}
+	$site_url = esc_html(trim($obj_info['site']));
+	if ($site_url) {
+		$label = '<span class="ei_label">Официальный сайт:</span> ';
+		$url = $site_url;
+		$ret = parse_url($url);
+		if (!isset($ret['scheme'])) {
+			$url = "http://{$url}";
+		} else {
+			// $site_url = preg_replace("(^https?://)", "", $site_url );
+			$site_url = $ret['host'] . $ret['path'];
+		}
+		$obj_info_text .= $label . '<a href="'.$url.'" target="_blank" rel="noopener noreferrer">'.$site_url.'</a><br />';
+	}
+	if ($obj_info['more_info']) {
+		$more_lines = explode(PHP_EOL, $obj_info['more_info']);
+		foreach ($more_lines as $line) {
+			$sublines = explode(':', $line, 2);
+			$label = '<span class="ei_label">'.esc_html( trim($sublines[0]) ).':</span> ';
+			$obj_info_text .= $label . esc_html( trim($sublines[1]) ) . '<br />';
+		}
+	}
+	
+	if ($obj_info_text) {
+		$obj_info_text = '<p>' . $obj_info_text . '</p>';
+	}
+	
 	$geolocation = $obj_info['geolocation'];
-	$col_sfx = $geolocation ? '-lg-6' : '';
-	?>
-	<div class="event-info row">
-		<div class="col<?=$col_sfx?>">
-			<?php
-			$obj_info_is = false;
-			$echo = '';
-			if ($obj_info['is_okn']) {
-				// $event_date_html = markup_event_date();
-				echo '<h2>Является объектом культурного наследия (ОКН)</h2>';
-				$obj_info_is = true;
-			}
-			if ($obj_info['okn_type']) {
-				$label = '<span class="ei_label">Тип объекта:</span> ';
-				switch ($obj_info['okn_type']) {
-					case 'a': $okn_type = 'Памятник археологии'; 						break;
-					case 'g': $okn_type = 'Памятник архитектуры и градостроительства'; 	break;
-					case 'h': $okn_type = 'Памятник истории'; 							break;
-					case 'i': $okn_type = 'Памятник искусства'; 						break;
-				}
-				$echo .= $label . $okn_type . '<br />';
-			}
-			if ($obj_info['protection_category']) {
-				$label = '<span class="ei_label">Категория охраны:</span> ';
-				switch ($obj_info['protection_category']) {
-					case 'f': $protection_category = 'Федерального значения'; 	break;
-					case 'r': $protection_category = 'Регионального значения'; 	break;
-					case 'm': $protection_category = 'Местного значения'; 		break;
-					case 'v': $protection_category = 'Выявленный объект'; 		break;
-				}
-				$echo .= $label . $protection_category . '<br />';
-			}
-			if ($obj_info['registry_name']) {
-				$label = '<span class="ei_label">Наименование ОКН:</span> ';
-				$echo .= $label . esc_html($obj_info['registry_name']) . '<br />';
-			}
-			if ($obj_info['okn_date']) {
-				$label = '<span class="ei_label">Датировка (по реестру ОКН):</span> ';
-				$echo .= $label . esc_html($obj_info['okn_date']) . '<br />';
-			}
-			if ($obj_info['location']) {
-				$label = '<span class="ei_label">Местонахождение:</span> ';
-				$echo .= $label . esc_html($obj_info['location']) . '<br />';
-			}
-			if ($obj_info['district']) {
-				$label = '<span class="ei_label">Район:</span> ';
-				switch ($obj_info['district']) {
-					case '1': $district = 'Заводской'; 			break;
-					case '2': $district = 'Железнодорожный'; 	break;
-					case '3': $district = 'Советский'; 			break;
-				}
-				$echo .= $label . $district . '<br />';
-			}
-			if ($obj_info['registry_date']) {
-				$label = '<span class="ei_label">Год постановки на охрану:</span> ';
-				$echo .= $label . esc_html( $obj_info['registry_date'] ) . '<br />';
-			}
-			if ($obj_info['okn_id']) {
-				$label = '<span class="ei_label">Номер в реестре ОКН:</span> ';
-				$echo .= $label . esc_html( $obj_info['okn_id'] ) . '<br />';
-			}
-			if ($obj_info['founding_date']) {
-				$label = '<span class="ei_label">Дата основания:</span> ';
-				$echo .= $label . esc_html( $obj_info['founding_date'] ) . '<br />';
-			}
-			$site_url = esc_html(trim($obj_info['site']));
-			if ($site_url) {
-				$label = '<span class="ei_label">Официальный сайт:</span> ';
-				$url = $site_url;
-				$ret = parse_url($url);
-				if (!isset($ret['scheme'])) {
-					$url = "http://{$url}";
-				} else {
-					// $site_url = preg_replace("(^https?://)", "", $site_url );
-					$site_url = $ret['host'] . $ret['path'];
-				}
-				$echo .= $label . '<a href="'.$url.'" target="_blank" rel="noopener noreferrer">'.$site_url.'</a><br />';
-			}
-			if ($obj_info['more_info']) {
-				$more_lines = explode(PHP_EOL, $obj_info['more_info']);
-				foreach ($more_lines as $line) {
-					$sublines = explode(':', $line, 2);
-					$label = '<span class="ei_label">'.esc_html( trim($sublines[0]) ).':</span> ';
-					$echo .= $label . esc_html( trim($sublines[1]) ) . '<br />';
-				}
-			}
-			
-			if ($echo) {
-				$echo = '<p>' . $echo . '</p>';
-				$obj_info_is = true;
-			}
-			
-			echo $echo; 
-			?>
-		</div>
-		<?php // $show_map id="map" 
-		if ($geolocation) :
-			do_action('event_map_scripts'); ?>
-			<div class="col<?=$col_sfx?>">
-				<button id="OpenMap_btn" class="ref_btn">[ Показать карту ]</button>
-				<div class="acf-map">
-					<div class="marker" data-lat="<?php echo $geolocation['lat']; ?>" data-lng="<?php echo $geolocation['lng']; ?>"></div>
-				</div>
+	$gba_content = wiki_parse(get_field('gba_content'));
+	$geolocations = $gba_content['geolocations'];
+	// if ($geolocations) print_r2($geolocations);
+	$col_sfx = ($obj_info_text && ($geolocation || $geolocations)) ? '-lg-6' : '';
+
+	if ($obj_info_text || $geolocation || $geolocations) : ?>
+		<div class="event-info row">
+			<?php if ($obj_info_text) : ?>
+			<div class="col<?php echo $col_sfx?>">
+				<?php echo $obj_info_text; ?>
 			</div>
-		<?php endif; ?>
-	</div> <!-- event_info row -->
+			<?php endif;
+			if ($geolocation || $geolocations) :
+				do_action('event_map_scripts'); ?>
+				<div class="col<?php echo $col_sfx ?>">
+					<button id="OpenMap_btn" class="ref_btn">[ Показать карту ]</button>
+					<div class="acf-map">
+					<?php if ($geolocation) : ?>
+						<div class="marker" data-lat="<?php echo $geolocation['lat']; ?>" data-lng="<?php echo $geolocation['lng']; ?>"></div>
+					<?php else : foreach ($geolocations as $geo) : ?>
+						<div class="marker" data-lat="<?php echo $geo['lat']; ?>" data-lng="<?php echo $geo['lng']; ?>"></div>
+					<?php endforeach; ?>
+					<?php endif; ?>
+					</div>
+				</div>
+			<?php endif; ?>
+		</div> <!-- event_info row -->
+	<?php endif; ?>
 
-	<?php if ($obj_info_is || $geolocation) echo '<hr />'; ?>
+	<?php if ($obj_info_text || $geolocation || $geolocations) echo '<hr />'; ?>
 
-	<?php 
-	$gba_content = get_field('gba_content');
-	if ($gba_content) : ?>
+	<?php
+	$gba_content_text = $gba_content['text'];
+	if ($gba_content_text) : ?>
 		<div class="row info-block">
 			<div class="col">
-				<?php echo wiki_parse($gba_content); ?>
+				<?php echo $gba_content_text ?>
 			</div>
 		</div> <!-- row -->
 	<?php endif; ?>
