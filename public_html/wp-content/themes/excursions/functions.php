@@ -1014,8 +1014,21 @@ function custom_shortcode_atts_wpcf7( $out, $pairs, $atts ) {
 // "Sender email address does not belong to the site domain." avoid
 // add_filter( 'wpcf7_validate_configuration', '__return_false' );
 
-remove_action('wp_head', 'print_emoji_detection_script', 7);
-remove_action('wp_print_styles', 'print_emoji_styles');
+/**
+ * Disable the emoji's
+ */
+function disable_emojis() {
+	remove_action('wp_head', 'print_emoji_detection_script', 7);
+	remove_action('admin_print_scripts', 'print_emoji_detection_script');
+	remove_action('wp_print_styles', 'print_emoji_styles');
+	remove_action('admin_print_styles', 'print_emoji_styles');
+	remove_filter('the_content_feed', 'wp_staticize_emoji');
+	remove_filter('comment_text_rss', 'wp_staticize_emoji');
+	remove_filter('wp_mail', 'wp_staticize_emoji_for_email');
+	// add_filter('tiny_mce_plugins', 'disable_emojis_tinymce');
+	// add_filter('wp_resource_hints', 'disable_emojis_remove_dns_prefetch', 10, 2);
+}
+add_action('init', 'disable_emojis');
 
 ## Удаляет "Рубрика: ", "Метка: " и т.д. из заголовка архива
 add_filter( 'get_the_archive_title', function( $title ){
@@ -1562,7 +1575,7 @@ function gb_images_func( $atts ) {
 			$id 			= $image['id']; // The attachment id of the media
 			$title 			= $image['title']; //The title
 			$full_image_url = $image['full_image_url']; //Full size image url
-			$figcaption_html = image_description_parse($image['caption']);
+			$figcaption_html = wiki_parse($image['caption']);
 
 			if ($id) {
 				// $ahref_pre = '<a href="'.wp_get_attachment_image_url($id, 'full').'" title="'.get_the_title($id).'" target="_blank">';
@@ -1591,62 +1604,83 @@ function gb_images_func( $atts ) {
 	return $echo;
 }
 
-function markup_post_permalink($post_id, $text, $permalink=true){
-	$post_id = (int) $post_id;
+// function markup_url_text($url_text, $permalink = true) {
+// 	if ($permalink && $url_text) {
+// 		$ret = parse_url($url_text);
+// 		if (!isset($ret['scheme'])) {
+// 			$url = "http://{$url_text}";
+// 		} else {
+// 			$url = $url_text;
+// 		}
+// 		$url_text = '<a href="'.$url.'" target="_blank" rel="noopener noreferrer">'.$url_text.'</a>';
+// 	}
+// 	return $url_text;
+// }
 
-	if($permalink && $post_id > 0){
-		$post_link = get_permalink($post_id);
-		if( $post_link ){
-			$text = '<a href="'.$post_link.'" title="'.get_the_title( $post_id ).'">'.$text.'</a>';
-		}
-	}
-
-	return $text;
-}
-
-function markup_url_permalink($url, $text, $permalink=true){
-	if($permalink && $url){
+function markup_url_permalink($url, $text, $permalink = true) {
+	if ($permalink && $url) {
 		$ret = parse_url($url);
-		if( !isset($ret['scheme']) ){
+		if (!isset($ret['scheme'])) {
 			$url = "http://{$url}";
 		}
 		$text = '<a href="'.$url.'" target="_blank" rel="noopener noreferrer">'.$text.'</a>';
 	}
-
 	return $text;
 }
 
-function markup_url_text($url_text, $permalink=true){
-	if($permalink && $url_text){
-		$ret = parse_url($url_text);
-		if( !isset($ret['scheme']) ){
-			$url = "http://{$url_text}";
+function markup_post_permalink($postid, $text, $permalink = true) {
+	$post_id = (int) $postid;
+	$post_link = $post_id > 0 ? get_permalink($post_id) : false;
+	if ($permalink && $post_link) {
+		$text = '<a href="'.$post_link.'" title="'.esc_html(get_the_title($post_id)).'">'.$text.'</a>';
+	}
+	return $text;
+}
+
+function markup_link($link, $text, $permalink = true) {
+	if (preg_match('/url=([^\\|]*)/u', $link, $matches)) {
+		$url = $matches[1];
+		if ($permalink && $url) {
+			$ret = parse_url($url);
+			if (!isset($ret['scheme'])) {
+				$url = "http://{$url}";
+			}
+			$text = '<a href="'.$url.'" target="_blank" rel="noopener noreferrer">'.$text.'</a>';
 		}
-		else{
-			$url = $url_text;
-		}
-		$url_text = '<a href="'.$url.'" target="_blank" rel="noopener noreferrer">'.$url_text.'</a>';
+	} elseif (preg_match('/post[id]*=(\\d+)/u', $link, $matches)) {
+		$post_id = (int) $matches[1];
+	} else {
+		$post_id = (int) get_page_by_path($link, OBJECT, 'guidebook')->ID;
 	}
 
-	return $url_text;
+	$post_link = $post_id > 0 ? get_permalink($post_id) : false;
+	if ($permalink && $post_link) {
+		$text = '<a href="'.$post_link.'" title="'.esc_html(get_the_title($post_id)).'">'.$text.'</a>';
+	}
+
+	// $text .= ' (' . ($post_id ? $post_id : '') . ($url ? 'url' : '') . ')';
+	return $text;
 }
 
 /**
- * Parse wiki-style refs in image description field 
+ * Parse wiki-style refs in text
  */
-function image_description_parse($str, $permalink=true){
+function wiki_parse($str, $permalink = true) {
 	$text = $str;
-	$matches = [];
-	$count = preg_match_all('/\\[post=(\\d+)\\|([^\\]]*)\\]/u', $str, $matches);
-	for($i = 0; $i < $count; $i++){
-		$text = str_replace($matches[0][$i], markup_post_permalink($matches[1][$i], $matches[2][$i], $permalink), $text);
+	// $matches = [];
+	$dbl_count = preg_match_all('/\\[{2}([^\\|]*)\\|([^\\]]*)\\]{2}/u', $text, $matches);
+	for ($i = 0; $i < $dbl_count; $i++) {
+		$text = str_replace($matches[0][$i], markup_link($matches[1][$i], $matches[2][$i], $permalink), $text);
 	}
-	$count = 0;
-	$count = preg_match_all('/\\[url=([^\\|]*)\\|([^\\]]*)\\]/u', $str, $matches);
-	for($i = 0; $i < $count; $i++){
+	$url_count = preg_match_all('/\\[url=([^\\|]*)\\|([^\\]]*)\\]/u', $text, $matches);
+	for ($i = 0; $i < $url_count; $i++) {
 		$text = str_replace($matches[0][$i], markup_url_permalink($matches[1][$i], $matches[2][$i], $permalink), $text);
 	}
-	$count = 0;
+	$post_count = preg_match_all('/\\[post[id]*=(\\d+)\\|([^\\]]*)\\]/u', $text, $matches);
+	for ($i = 0; $i < $post_count; $i++) {
+		$text = str_replace($matches[0][$i], markup_post_permalink($matches[1][$i], $matches[2][$i], $permalink), $text);
+	}
+	// $count = 0;
 	// $count = preg_match_all('/^(https?|ftp)://[^\s/$.?#].[^\s]*$/u', $str, $matches);
 	// $count = preg_match_all('/(https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.[^\s]{2,}|www\\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.[^\s]{2,}|https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9]+\\.[^\s]{2,}|www\\.[a-zA-Z0-9]+\\.[^\s]{2,})/', $str, $matches);
 	// $count = preg_match_all('/(https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.[^\s]{2,}|www\\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.[^\s]{2,}|https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9]+\\.[^\s]{2,}|www\\.[a-zA-Z0-9]+\\.[^\s]{2,})|[a-zA-Z0-9]+\\.[^\s]{2,})/', $str, $matches);
@@ -1658,12 +1692,13 @@ function image_description_parse($str, $permalink=true){
 	// for($i = 0; $i < $count; $i++){
 	// 	$text = str_replace($matches[0][$i], markup_url_permalink($matches[0][$i], $matches[1][$i], $permalink), $text);
 	// }
-	// $count = 0;
-	$count = preg_match_all('/\\S+\\.(ru|com)(\\S+)?/u', $str, $matches);
-	for($i = 0; $i < $count; $i++){
-		$text = str_replace($matches[0][$i], markup_url_text($matches[0][$i], $permalink), $text);
-	}
 
+	// $count = preg_match_all('/\\S+\\.(ru|com)(\\S+)?/u', $str, $matches);
+	// for ($i = 0; $i < $count; $i++) {
+	// 	$text = str_replace($matches[0][$i], markup_url_text($matches[0][$i], $permalink), $text);
+	// }
+
+	// $text .= '<p>[counts: dbls: '.$dbl_count.' / urls: '.$url_count.' / posts:'.$post_count.' ]</p>';
 	return $text;
 }
 
@@ -1786,7 +1821,7 @@ function gallery_func( $atts ){
 			}
 			// Иначе берем подпись из БД и парсим ее
 			if (!$figcaption_html && ($figcaption == 'image_description' || $figcaption == 'parent_href')) {
-				$figcaption_html = image_description_parse( $image['caption'], $permalink ); //The caption (Description!)
+				$figcaption_html = wiki_parse( $image['caption'], $permalink ); //The caption (Description!)
 			}
 
 			$echo .= '<div class="'.$item.' '.$bootstrap.'">';

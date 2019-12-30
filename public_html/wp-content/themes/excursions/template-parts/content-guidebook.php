@@ -168,7 +168,7 @@ $OKN_TXT = 'Сведения из Единого госреестра ОКН (с
 	if ($gba_content) : ?>
 		<div class="row info-block">
 			<div class="col">
-				<?php echo $gba_content; ?>
+				<?php echo wiki_parse($gba_content); ?>
 			</div>
 		</div> <!-- row -->
 	<?php endif; ?>

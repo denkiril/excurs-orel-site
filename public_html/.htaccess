@@ -17,7 +17,7 @@ php_value error_reporting -1;
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule . strtolower.php [L]
 
-    # http -> https - in /excurs-orel.ru/
+    # http -> https - in /https excurs-orel.ru/ folder!!!
 
 </IfModule>
 
