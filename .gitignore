@@ -4,11 +4,14 @@
 /node_modules/
 /public_html/wp-admin/
 /public_html/wp-includes/
-/public_html/wp-content/
-!/public_html/wp-content/themes/excursions/
+/public_html/wp-content/languages/
+/public_html/wp-content/plugins/
+/public_html/wp-content/upgrade/
+/public_html/wp-content/uploads/
+# !/public_html/wp-content/themes/excursions/
 # builded
-/public_html/wp-content/themes/excursions/assets/
+/public_html/wp-content/themes/excursions/assets/css/
+/public_html/wp-content/themes/excursions/assets/js/
 /public_html/wp-content/themes/excursions/map/
 # gitignore
 /dev/gitignore/
-

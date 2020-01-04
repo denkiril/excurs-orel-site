@@ -1,0 +1,1 @@
+E:/OSPanel/domains/excurs-orel/public_html/wp-content/plugins/query-monitor/wp-content/db.php
