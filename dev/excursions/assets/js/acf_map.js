@@ -1,93 +1,209 @@
 /* global getScript */
 /* global ymapsApiUrl */
 /* global ymaps */
-const OpenMapButton = document.querySelector('#OpenMap_btn');
+/* global myajax */
 
+const miniMapWidget = (() => {
+  const baseColor = '#005281'; // 015a8d
+  const activeColor = '#bc3134'; // ffd649
 
-function acfMapInit() {
-  function addMarker($marker, map) {
-    // const { lat } = $marker.dataset;
-    // const { lng } = $marker.dataset;
-    const lat = $marker.getAttribute('data-lat');
-    const lng = $marker.getAttribute('data-lng');
+  const $openMapButton = document.querySelector('#OpenMap_btn');
+  const $miniMap = document.querySelector('.mini-map');
+  const $mapCover = $miniMap ? $miniMap.querySelector('.map-cover') : null;
+  const $markerArr = $miniMap ? $miniMap.querySelectorAll('.marker') : null;
 
-    // Создание геообъекта с типом точка (метка)
-    const marker = new ymaps.Placemark(
-      [lat, lng],
-      {},
-      {
-        preset: 'islands#Icon',
-        iconColor: '#005281', // 015a8d
-      },
-    );
+  const autoopen = $openMapButton && $openMapButton.classList.contains('autoopen');
+  const bigScreen = window.screen.width > 768;
 
-    // Размещение геообъекта на карте.
-    map.geoObjects.add(marker);
-
-    // add to array
-    map.markers.push(marker);
+  function wait(ms) {
+    return new Promise((resolve) => {
+      if (ms) {
+        setTimeout(() => resolve(), ms);
+      } else {
+        resolve();
+      }
+    });
   }
 
-  function newMap($el) {
-    // var $markers = $el.find('.marker');
-    // var $markers = $el.querySelectorAll('.marker');
+  function addMarker(obj, geoObjectCollection) {
+    // console.log('addMarker:', obj);
+    const lat = obj.lat || null;
+    const lng = obj.lng || null;
+    // const postId = obj.post_id || null;
+    const url = obj.permalink || null;
+    const title = obj.title || null;
+    const thumbUrl = obj.thumb_url || null;
+    const isMarker = obj.marker || false;
 
-    const map = new ymaps.Map($el, { // var ... $el[0]
-      center: [0, 0],
-      zoom: 16,
+    if (lat && lng) {
+      // Макеты балуна и хинта (одинаковые)
+      let titleStr = title ? '{{ properties.title }}' : null;
+      titleStr = (titleStr && url) ? '<a href="{{ properties.url }}">{{ properties.title }}</a>' : titleStr;
+      let template = titleStr ? `<h3>${titleStr}</h3>` : '';
+      if (thumbUrl) template += '<img src="{{ properties.thumbUrl }}" />';
+      const balloonContentLayout = template ? ymaps.templateLayoutFactory.createClass(template) : null;
+      const hintContentLayout = template ? ymaps.templateLayoutFactory.createClass(template) : null;
+
+      // Создание геообъекта с типом точка (метка)
+      const marker = new ymaps.Placemark(
+        [lat, lng],
+        {
+          url,
+          title,
+          thumbUrl,
+        },
+        {
+          preset: 'islands#Icon',
+          iconColor: isMarker ? activeColor : baseColor,
+          balloonContentLayout,
+          hintContentLayout,
+        },
+      );
+
+      // Размещение геообъекта на карте
+      // map.geoObjects.add(marker);
+      geoObjectCollection.add(marker);
+    }
+  }
+
+  function newMap($el, objects) {
+    console.log('--- newMap');
+    const map = new ymaps.Map($el, {
+      center: [52.967631, 36.069584],
+      zoom: 12,
     });
 
     map.behaviors.disable('scrollZoom');
 
-    map.markers = [];
+    // objects.forEach(obj => addMarker(obj, map));
+    const nomarkers = objects.filter(obj => !obj.marker);
+    // console.log('nomarkers', nomarkers);
+    nomarkers.forEach(obj => addMarker(obj, map.geoObjects));
+    let bounds = map.geoObjects.getBounds();
+    // console.log('nomarkers bounds', bounds);
 
-    // $markers.each(function(){ addMarker( $(this), map ); });
-    [].forEach.call($el.querySelectorAll('.marker'), ($marker) => {
-      addMarker($marker, map);
-    });
+    const markers = objects.filter(obj => obj.marker);
+    if (markers.length) {
+      // console.log('markers', markers);
+      const markersGOC = new ymaps.GeoObjectCollection({}, {});
+      markers.forEach(obj => addMarker(obj, markersGOC));
+      map.geoObjects.add(markersGOC);
+      bounds = markersGOC.getBounds();
+      // console.log('markers bounds', bounds);
+    }
 
-    // center_map( map );
-    // console.log(map.getZoom()+'\n');
-    map.setBounds(
-      map.geoObjects.getBounds(),
-      { checkZoomRange: true },
-    ).then(() => {
-      const zoom = map.getZoom();
-      if (zoom < 12 || zoom > 16) map.setZoom(16);
-    });
+    // console.log('1', map.getZoom());
+    map.setBounds(bounds, {
+      checkZoomRange: true,
+      duration: 600,
+    }).then(() => {
+      // console.log('2', map.getZoom());
+      if (map.getZoom() < 12) map.setZoom(12);
+      if (map.getZoom() > 16) map.setZoom(16);
+      // console.log('3', map.getZoom());
+    }, err => console.err('setBounds error', err));
 
     return map;
   }
 
-  // $('.acf-map').each(function(){ map = newMap( $(this) ); });
-  [].forEach.call(document.querySelectorAll('.acf-map'), (elem) => {
-    newMap(elem);
-    // elem.style.display = 'block';
-    elem.setAttribute('style', 'display: block;');
-  });
-}
+  function makeMiniMap(objects) {
+    if ($openMapButton && autoopen && !bigScreen) {
+      $openMapButton.classList.add('rotate');
+    }
 
-function OpenEventMap() {
-  OpenMapButton.style.display = 'none';
-
-  getScript(ymapsApiUrl).then(() => {
-    // Функция ymaps.ready() будет вызвана, когда загрузятся все компоненты API,
-    // а также когда будет готово DOM-дерево.
-    ymaps.ready(acfMapInit);
-  });
-}
-
-function initOpenEventMap() {
-  if (window.screen.width > 768) {
-    // console.log('screen.width > 768');
-
-    // acf-map only for big screens
-    OpenEventMap();
-  } else if (OpenMapButton) {
-    OpenMapButton.style.display = 'block';
-    // $('#OpenMap_btn').click(function() { OpenEventMap(); })
-    OpenMapButton.addEventListener('click', OpenEventMap);
+    if (objects) {
+      getScript(ymapsApiUrl)
+        .then(() => {
+          if ($openMapButton) $openMapButton.style.display = 'none';
+          let animDuration = 0;
+          if (!autoopen) {
+            $miniMap.classList.add('grow');
+            animDuration = 700; // .grow dur +
+            if ($mapCover) {
+              $mapCover.classList.add('fadeout');
+              wait(2000).then(() => $mapCover.classList.add('hide'));
+            }
+          }
+          return wait(animDuration);
+        })
+        .then(() => {
+          if (!autoopen) $miniMap.style.height = 'auto';
+          // Функция ymaps.ready() будет вызвана, когда загрузятся все компоненты API, а также когда будет готово DOM-дерево
+          ymaps.ready(() => newMap($miniMap, objects));
+        });
+    }
   }
-}
 
-window.addEventListener('load', initOpenEventMap);
+  function init() {
+    let objects = [];
+    if ($markerArr.length) {
+      $markerArr.forEach(($marker) => {
+        const obj = {
+          lat: $marker.getAttribute('data-lat') || null,
+          lng: $marker.getAttribute('data-lng') || null,
+          post_id: Number($marker.getAttribute('data-post_id')) || null,
+          marker: true,
+        };
+        objects.push(obj);
+      });
+    }
+
+    const checkSights = new Promise((resolve) => {
+      if ($miniMap) {
+        const dataSights = $miniMap.getAttribute('data-sights');
+        // console.log(dataSights);
+        if (dataSights) {
+          const getSights = new Promise((resolve2) => {
+            if (dataSights === 'sights') {
+              const searchStr = window.location.search ? `${window.location.search}&` : '?';
+              const requestUrl = `${myajax.url + searchStr}action=get_sights`;
+              // console.log(requestUrl);
+              fetch(requestUrl, { headers: { 'content-type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
+                .then(response => resolve2(response.json()));
+            } else {
+              resolve2(JSON.parse(dataSights));
+            }
+          });
+
+          getSights
+            .then((sights) => {
+              // console.log(sights);
+              if (sights && sights.length) {
+                const objectsIds = objects.map(obj => obj.post_id);
+                // console.log(objectsIds);
+                const sightsArr = sights.filter(s => objectsIds.indexOf(s.post_id) === -1);
+                // console.log(sightsArr);
+                // objects.push(...sightsArr);
+                objects = sightsArr.concat(objects);
+              }
+              resolve();
+            });
+        } else {
+          resolve();
+        }
+      } else {
+        resolve();
+      }
+    });
+
+    checkSights
+      .then(() => {
+        // console.log(objects);
+        if (objects.length) {
+          if (autoopen && bigScreen) {
+            // console.log('autoopen && screen.width > 768');
+            makeMiniMap(objects);
+          } else if ($openMapButton) {
+            $openMapButton.style.display = 'block';
+            $openMapButton.addEventListener('click', () => makeMiniMap(objects), { ones: true });
+          }
+        }
+      });
+  }
+
+  return {
+    init,
+  };
+})();
+
+window.addEventListener('load', miniMapWidget.init);

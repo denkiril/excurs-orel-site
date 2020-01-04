@@ -99,8 +99,8 @@
 			if( $show_map ):
 				do_action( 'event_map_scripts' ); ?>
 				<div class="col<?=$col_sfx?>">
-					<button id="OpenMap_btn" class="ref_btn">[ Показать карту ]</button>
-					<div class="acf-map">
+					<button id="OpenMap_btn" class="ref_btn autoopen">[ Показать карту ]</button>
+					<div class="mini-map">
 						<div class="marker" data-lat="<?php echo $location['lat']; ?>" data-lng="<?php echo $location['lng']; ?>"></div>
 					</div>
 				</div>

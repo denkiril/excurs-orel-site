@@ -124,8 +124,8 @@ add_action( 'widgets_init', 'excursions_widgets_init' );
 $LINKS = array();
 // $SCRIPTS = array();
 $consolelog = '';
-$SCRIPTS_VER = '20190701';
-$STYLES_VER = '20190723';
+$SCRIPTS_VER = '20200104';
+$STYLES_VER = '20200104';
 $WEBP_ON = !(home_url() == 'http://excurs-orel');
 // $WEBP_ON = true;
 if(!$WEBP_ON) console_log('WEBP_OFF');
@@ -389,7 +389,9 @@ add_action( 'event_map_scripts', 'event_map_scripts_func', 10, 0);
 function event_map_scripts_func() {
 	// wp_enqueue_script( 'ymap-api?apikey=6ebdbbc2-3779-4216-9d88-129e006559bd&lang=ru_RU', '//api-maps.yandex.ru/2.1/', array(), false, 'in_footer' );
 	wp_enqueue_script( 'acf_map-js' );
+	wp_localize_script( 'acf_map-js', 'myajax', array( 'url' => admin_url('admin-ajax.php') ) );
 	wp_enqueue_script( 'acf_map-legacy' );
+	wp_localize_script( 'acf_map-legacy', 'myajax', array( 'url' => admin_url('admin-ajax.php') ) );
 	// add_script('//api-maps.yandex.ru/2.1/?lang=ru_RU');
 	// add_script( get_template_directory_uri().'/assets/js/acf_map.js' );
 }
@@ -1617,8 +1619,8 @@ function gb_images_func( $atts ) {
 // 	return $url_text;
 // }
 
-function markup_url_permalink($url, $text, $permalink = true) {
-	if ($permalink && $url) {
+function markup_url_permalink($url, $text, $add_link = true) {
+	if ($add_link && $url) {
 		$ret = parse_url($url);
 		if (!isset($ret['scheme'])) {
 			$url = "http://{$url}";
@@ -1628,13 +1630,14 @@ function markup_url_permalink($url, $text, $permalink = true) {
 	return $text;
 }
 
-function markup_post_permalink($postid, $text, $permalink, $title = null) {
+function markup_post_permalink($postid, $text, $permalink = null, $title = null) {
 	$post_id = (int) $postid;
+	$permalink 	= $permalink ? $permalink : ($post_id > 0 ? get_permalink($post_id) : null);
+	// $permalink = (!$permalink && $post_id > 0) ? get_permalink($post_id) : null;
 	$title = $title ? $title : esc_html(get_the_title($post_id));
 	$title = $title ? ' title="'.$title.'"' : '';
-	$post_link = $post_id > 0 ? get_permalink($post_id) : false;
-	if ($permalink && $post_link) {
-		$text = '<a href="'.$post_link.'"'.$title.'">'.$text.'</a>';
+	if ($permalink) {
+		$text = '<a href="'.$permalink.'"'.$title.'">'.$text.'</a>';
 	}
 	return $text;
 }
@@ -1667,22 +1670,27 @@ function get_post_id($post_name) {
 /**
  * Parse wiki-style refs in text
  */
-function wiki_parse($str, $permalink = true) {
+function wiki_parse($str, $add_link = true) {
 	$text = $str;
-	$geolocations = [];
+	$sights = [];
 	$dbl_count = preg_match_all('/\\[{2}([^\\|]*)\\|([^\\]]*)\\]{2}/u', $text, $matches);
 	for ($i = 0; $i < $dbl_count; $i++) {
 		if ($post_id = get_post_id($matches[1][$i])) {
 			$title = esc_html(get_the_title($post_id));
+			$permalink 	= get_permalink($post_id);
 			$link_text = markup_post_permalink($post_id, $matches[2][$i], $permalink, $title);
 			$text = str_replace($matches[0][$i], $link_text, $text);
-			$geolocation = get_field('obj_info', $post_id)['geolocation'];
-			if ($geolocation) {
-				$geolocations[] = [
-					'lat' => $geolocation['lat'],
-					'lng' => $geolocation['lng'],
+
+			$location = get_field('obj_info', $post_id)['geolocation'];
+			if ($location) {
+				$thumb_url 	= get_the_post_thumbnail_url($post_id, 'thumbnail');
+				$sights[] = [
+					'lat' => $location['lat'],
+					'lng' => $location['lng'],
+					'post_id' => $post_id,
+					'permalink' => $permalink,
 					'title' => $title,
-					'id' => $post_id,
+					'thumb_url' => $thumb_url,
 				];
 			}
 		}
@@ -1690,11 +1698,11 @@ function wiki_parse($str, $permalink = true) {
 
 	$url_count = preg_match_all('/\\[url=([^\\|]*)\\|([^\\]]*)\\]/u', $text, $matches);
 	for ($i = 0; $i < $url_count; $i++) {
-		$text = str_replace($matches[0][$i], markup_url_permalink($matches[1][$i], $matches[2][$i], $permalink), $text);
+		$text = str_replace($matches[0][$i], markup_url_permalink($matches[1][$i], $matches[2][$i], $add_link), $text);
 	}
 	$post_count = preg_match_all('/\\[post[id]*=(\\d+)\\|([^\\]]*)\\]/u', $text, $matches);
 	for ($i = 0; $i < $post_count; $i++) {
-		$text = str_replace($matches[0][$i], markup_post_permalink($matches[1][$i], $matches[2][$i], $permalink), $text);
+		$text = str_replace($matches[0][$i], markup_post_permalink($matches[1][$i], $matches[2][$i]), $text);
 	}
 	// $count = 0;
 	// $count = preg_match_all('/^(https?|ftp)://[^\s/$.?#].[^\s]*$/u', $str, $matches);
@@ -1715,12 +1723,12 @@ function wiki_parse($str, $permalink = true) {
 	// }
 
 	// $text .= '<p>[counts: dbls: '.$dbl_count.' / urls: '.$url_count.' / posts:'.$post_count.' ]</p>';
-	// if ($geolocations) print_r2($geolocations);
-	return ['text' => $text, 'geolocations' => $geolocations];
+	// if ($sights) print_r2($sights);
+	return ['text' => $text, 'sights' => $sights];
 }
 
-function wiki_parse_text($str, $permalink = true) {
-	return wiki_parse($str, $permalink)['text'];
+function wiki_parse_text($str, $add_link = true) {
+	return wiki_parse($str, $add_link)['text'];
 }
 
 function markup_fancy_figure($id, $fancybox, $full_image_url, $fancy_caption, $size='thumbnail', $lazy=false, $title=null, $img_class=null, $figcaption_html=null){
@@ -1783,7 +1791,7 @@ function gallery_func( $atts ){
 	$nums 			= $atts['nums'];
 	$figcaption 	= $atts['figcaption'];
 	$mini 			= $atts['mini']; // will be deprecated by pics_in_row
-	$permalink 		= $atts['permalink'];
+	$add_link 		= $atts['permalink'];
 	$pics_in_row 	= $atts['pics_in_row'];
 
 	$echo = '';
@@ -1842,7 +1850,7 @@ function gallery_func( $atts ){
 			}
 			// Иначе берем подпись из БД и парсим ее
 			if (!$figcaption_html && ($figcaption == 'image_description' || $figcaption == 'parent_href')) {
-				$figcaption_html = wiki_parse_text($image['caption'], $permalink); //The caption (Description!)
+				$figcaption_html = wiki_parse_text($image['caption'], $add_link); //The caption (Description!)
 			}
 
 			$echo .= '<div class="'.$item.' '.$bootstrap.'">';
@@ -2216,14 +2224,14 @@ function get_sights() {
 		$myposts 	= get_guidebook_posts($slug, -1); 
 	}
 
-	if( $myposts ){
+	if ($myposts) {
 		global $post;
 		// foreach( $myposts as $counter => $post ){
-		foreach( $myposts as $post ){
-			setup_postdata( $post );
+		foreach ($myposts as $post) {
+			setup_postdata($post);
 			$post_id 	= get_the_ID();
 			$permalink 	= get_the_permalink();
-			$title 		= esc_html( get_the_title() );
+			$title 		= esc_html(get_the_title());
 			$location 	= get_field('obj_info_geolocation');
 			// $thumb_url 	= wp_get_attachment_thumb_url( get_post_thumbnail_id() );
 			$thumb_url 	= get_the_post_thumbnail_url( $post_id, 'thumbnail' );
@@ -2244,7 +2252,7 @@ function get_sights() {
 		wp_reset_postdata();		
 	}
 
-	echo json_encode( $sights );
+	echo json_encode($sights);
 
 	wp_die(); // выход нужен для того, чтобы в ответе не было ничего лишнего, только то что возвращает функция
 }

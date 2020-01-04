@@ -236,7 +236,7 @@ p {
     align-items: center !important;
     -ms-flex-align: center !important;
     /* background: #ffd649; */
-    max-width: 150px;
+    max-width: 180px;
 }
 
 @media screen and (max-width: 768px) {
@@ -307,6 +307,7 @@ p {
 #nav-adaptive {
     padding: 10px 15px;
     display: none;
+    z-index: 100;
 }
 
 @media screen and (max-width: 768px) {

@@ -52,26 +52,99 @@
     }
 }
 
-.acf-map {
+.mini-map {
     width: 100%;
     height: 300px;
     border: #ccc solid 1px;
-    display: none;
+    overflow: hidden;
+    text-align: right;
+    position: relative;
+}
+.mini-map-pregrow {
+    height: 30px;
+}
+.map-cover {
+    width: 100%;
+    height: 100%;
+    background-image: url(../img/old_map_big.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    pointer-events: none;
+    position: absolute;
+    z-index: 3;
 }
 @media (max-width: 768px) {
-    .acf-map {
+    .mini-map {
+        height: 200px;
+    }
+    .mini-map-pregrow {
+        height: 30px;
+    }
+}
+
+@keyframes growTo300 {
+    to {
+        height: 300px;
+    }
+}
+@keyframes growTo200 {
+    to {
         height: 200px;
     }
 }
+.grow {
+    animation: growTo300 600ms linear forwards;
+}
+@media (max-width: 768px) {
+    .grow {
+        animation: growTo200 600ms linear forwards;
+    }
+}
+
+@keyframes fadeout {
+    to {
+        opacity: 0;
+    }
+}
+.fadeout {
+    animation: fadeout 1600ms linear forwards;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.rotate {
+    animation: rotate 2000ms linear infinite;
+}
+
 /* fixes potential theme css conflict */
-.acf-map img {
+.mini-map img {
    max-width: inherit !important;
 }
 
-#OpenMap_btn,
-#ShowVideo_btn{
+#OpenMap_btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    z-index: 5;
+    display: none;
+}
+#ShowVideo_btn {
     margin: 0 auto;
     display: none;
+}
+#OpenMap_btn:hover,
+#OpenMap_btn:focus {
+    font-weight: bolder;
+    outline: none;
+}
+.mini-map-pregrow #OpenMap_btn {
+    left: auto;
 }
 /* @media (max-width: 768px) {
     #OpenMap_btn{
@@ -184,7 +257,8 @@
     margin-bottom: 1em;
     font-weight: normal;
 }
-.info-block{
+.info-block {
+    margin-top: 1em;
     margin-bottom: 2em;
 }
 
@@ -220,4 +294,8 @@
 }
 .prevnext-card p {
     margin-bottom: 10px;
+}
+
+.hide {
+    display: none;
 }

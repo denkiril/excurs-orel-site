@@ -140,35 +140,36 @@ $OKN_TXT = 'Сведения из Единого госреестра ОКН (с
 	
 	$geolocation = $obj_info['geolocation'];
 	$gba_content = wiki_parse(get_field('gba_content'));
-	$geolocations = $gba_content['geolocations'];
-	// if ($geolocations) print_r2($geolocations);
-	$col_sfx = ($obj_info_text && ($geolocation || $geolocations)) ? '-lg-6' : '';
+	$sights = $gba_content['sights'];
+	// if ($sights) print_r2($sights);
+	$col_sfx = ($obj_info_text && ($geolocation || $sights)) ? '-lg-6' : '';
 
-	if ($obj_info_text || $geolocation || $geolocations) : ?>
+	if ($obj_info_text || $geolocation || $sights) : ?>
 		<div class="event-info row">
 			<?php if ($obj_info_text) : ?>
 			<div class="col<?php echo $col_sfx?>">
 				<?php echo $obj_info_text; ?>
 			</div>
 			<?php endif;
-			if ($geolocation || $geolocations) :
+			if ($geolocation || $sights) :
 				do_action('event_map_scripts'); ?>
 				<div class="col<?php echo $col_sfx ?>">
-					<button id="OpenMap_btn" class="ref_btn">[ Показать карту ]</button>
-					<div class="acf-map">
 					<?php if ($geolocation) : ?>
-						<div class="marker" data-lat="<?php echo $geolocation['lat']; ?>" data-lng="<?php echo $geolocation['lng']; ?>"></div>
-					<?php else : foreach ($geolocations as $geo) : ?>
-						<div class="marker" data-lat="<?php echo $geo['lat']; ?>" data-lng="<?php echo $geo['lng']; ?>"></div>
-					<?php endforeach; ?>
+						<div class="mini-map" data-sights="sights">
+							<button id="OpenMap_btn" class="ref_btn autoopen">[ Показать на карте ]</button>
+							<div class="marker" data-lat="<?php echo $geolocation['lat']; ?>" data-lng="<?php echo $geolocation['lng']; ?>" data-post_id="<?php the_ID(); ?>"></div>
+					<?php else : ?>
+						<div class="mini-map mini-map-pregrow" data-sights="<?php echo esc_html(json_encode($sights)); ?>">
+							<div class="map-cover"></div>
+							<button id="OpenMap_btn" class="ref_btn">[ Показать на карте ]</button>
 					<?php endif; ?>
-					</div>
+						</div>
 				</div>
 			<?php endif; ?>
 		</div> <!-- event_info row -->
 	<?php endif; ?>
 
-	<?php if ($obj_info_text || $geolocation || $geolocations) echo '<hr />'; ?>
+	<?php if ($obj_info_text) echo '<hr />'; ?>
 
 	<?php
 	$gba_content_text = $gba_content['text'];
@@ -195,7 +196,7 @@ $OKN_TXT = 'Сведения из Единого госреестра ОКН (с
 					foreach ($lines as $line) {
 						$sublines = explode('=', $line, 2);
 						$text = esc_html(trim($sublines[0]));
-						$url = esc_html(trim($sublines[1]));
+						$url = count($sublines) > 1 ? esc_html(trim($sublines[1])) : null;
 						// print_r("url=".$url);
 						if ($url) {
 							$ret = parse_url($url);
