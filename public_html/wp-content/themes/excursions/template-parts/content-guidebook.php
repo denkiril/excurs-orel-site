@@ -166,7 +166,7 @@ $OKN_TXT = 'Сведения из Единого госреестра ОКН (с
 						</div>
 				</div>
 			<?php endif; ?>
-		</div> <!-- event_info row -->
+		</div> <!-- .event-info -->
 	<?php endif; ?>
 
 	<?php if ($obj_info_text) echo '<hr />'; ?>
@@ -178,12 +178,12 @@ $OKN_TXT = 'Сведения из Единого госреестра ОКН (с
 			<div class="col">
 				<?php echo $gba_content_text ?>
 			</div>
-		</div> <!-- row -->
+		</div> <!-- .info-block -->
 	<?php endif; ?>
 
 	<?php 
 	$gba_sources = get_field('gba_sources');
-	$gba_sources_posts = get_field('gba_sources_posts');
+	$gba_sources_posts = get_field('gba-sources-posts');
 	if ($gba_sources || $gba_sources_posts || $obj_info['is_okn']) :
 	?>
 		<div class="row info-block">
@@ -210,11 +210,19 @@ $OKN_TXT = 'Сведения из Единого госреестра ОКН (с
 					}
 				}
 				if ($gba_sources_posts) {
+					$echo = '';
+					global $post;
 					foreach ($gba_sources_posts as $post) {
-						if ($permalink = get_the_permalink($post->ID)) {
-							echo '<li><a href="'.$permalink.'">'.esc_html($post->post_title).'</a></li>';
+						setup_postdata($post);
+						// $post_id = $post->ID;
+						$permalink = get_permalink();
+						if ($permalink) {
+							$title = esc_html(get_the_title());
+							$echo .= '<li><a href="'.$permalink.'">'.$title.'</a></li>';
 						}
 					}
+					wp_reset_postdata();
+					echo $echo;
 				}
 				if ($obj_info['is_okn']) {
 					echo '<li><a href="'.$OKN_URL.'" target="_blank" rel="noopener noreferrer">'.$OKN_TXT.'</a></li>';
@@ -222,25 +230,36 @@ $OKN_TXT = 'Сведения из Единого госреестра ОКН (с
 				?>
 				</ul>
 			</div>
-		</div> <!-- row -->
+		</div> <!-- .info-block -->
 	<?php endif; ?>
 
-	<?php 
-	if ($posts = get_field('see_also')) : ?>
-		<div class="row info-block">
-			<div class="col">
-				<h2>См. также</h2>
-				<ul>
-				<?php
-				foreach ($posts as $post) {
-					if ($permalink = get_the_permalink($post->ID)) {
-						echo '<li><a href="'.$permalink.'">'.esc_html($post->post_title).'</a></li>';
-					}
+	<?php
+	$posts = get_field('see_also');
+	if ($posts) : ?>
+		<div class="info-block">
+			<h2>См. также</h2>
+			<div class="row">
+			<?php
+			$echo = '';
+			global $post;
+			foreach ($posts as $post) {
+				setup_postdata($post);
+				// $post_id = $post->ID;
+				$permalink = get_permalink();
+				if ($permalink) {
+					$title = esc_html(get_the_title());
+					$thumb_id = get_post_thumbnail_id();
+					$echo .= '<div class="anno-card col-6 col-sm-6 col-md-4 col-lg-3">';
+					$echo .= '<a href="'.$permalink.'" title="Ссылка на '.$title.'" tabindex="-1">';
+					$echo .= get_attachment_picture( $thumb_id, 'medium', false, null, true, true ); // medium_large 
+					$echo .= '</a><h3 class="annocard-caption"><a href="'.$permalink.'" title="'.$title.'">'.$title.'</a></h3></div>';
 				}
-				?>
-				</ul>
+			}
+			wp_reset_postdata();
+			echo $echo;
+			?>
 			</div>
-		</div> <!-- row -->
+		</div> <!-- .info-block -->
 	<?php endif; ?>
 
 </div><!-- .entry-content -->

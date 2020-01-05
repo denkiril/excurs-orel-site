@@ -1988,7 +1988,7 @@ function guidebook_sections_func( $atts ) {
 					$echo .= '</a><h3 class="annocard-caption"><a href="'.$permalink.'" title="Ссылка на: '.$title.'">'.$title.'</a></h3></div>';
 				}
 				wp_reset_postdata();
-				$echo .= '</div> <!-- .anno-card -->';
+				$echo .= '</div>';
 
 				// После первой секции (Достопримечательности) выводим её пагинацию
 				if ($term_counter == 0) {
@@ -2249,7 +2249,7 @@ function get_sights() {
 				'thumb_url' => $thumb_url,
 			);
 		}
-		wp_reset_postdata();		
+		wp_reset_postdata();
 	}
 
 	echo json_encode($sights);
