@@ -14,22 +14,22 @@ get_header();
 
 	<?php
 	if (have_posts()) {
-		while (have_posts()) {
-			the_post();
+		// while (have_posts()) {
+		the_post();
 
-			$post_type = get_post_type();
+		$post_type = get_post_type();
 
-			get_template_part( 'template-parts/content', $post_type );
+		get_template_part( 'template-parts/content', $post_type );
 
-			// if ( $post_type == 'events' && ( comments_open() || get_comments_number() ) ) :
-			// if ( $post->ID == 400 ) :
-			if ( $post_type == 'events' ) {
-				// echo '<hr />';
-				comments_template();
-				// echo do_shortcode('[anycomment include="true"]');
-			}
+		// if ( $post_type == 'events' && ( comments_open() || get_comments_number() ) ) :
+		// if ( $post->ID == 400 ) :
+		if ( $post_type == 'events' ) {
+			// echo '<hr />';
+			comments_template();
+			// echo do_shortcode('[anycomment include="true"]');
+		}
 
-		} // End of the loop.
+		// } // End of the loop.
 	}
 	?>
 

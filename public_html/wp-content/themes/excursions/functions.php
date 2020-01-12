@@ -1653,12 +1653,15 @@ function get_post_id($post_name) {
 	// 		$text = '<a href="'.$url.'" target="_blank" rel="noopener noreferrer">'.$text.'</a>';
 	// 	}
 	// } else
+	$post_id = null;
 	if (preg_match('/post[id]*=(\\d+)/u', $post_name, $matches)) {
 		$post_id = (int) $matches[1];
 	} else {
-		$post_id = (int) get_page_by_path($post_name, OBJECT, 'guidebook')->ID;
+		$post_obj = get_page_by_path($post_name, OBJECT, 'guidebook');
+		if ($post_obj) {
+			$post_id = (int) $post_obj->ID;
+		}
 	}
-
 	// $post_link = $post_id > 0 ? get_permalink($post_id) : false;
 	// if ($permalink && $post_link) {
 	// 	$text = '<a href="'.$post_link.'" title="'.esc_html(get_the_title($post_id)).'">'.$text.'</a>';
