@@ -55,10 +55,13 @@ $OKN_TXT = 'Сведения из Единого госреестра ОКН (с
 	$obj_info = get_field('obj_info');
 
 	$obj_info_text = '';
-	if ($obj_info['is_okn']) {
+
+	$is_okn = $obj_info['is_okn'];
+	if ($is_okn) {
 		// $event_date_html = markup_event_date();
 		$obj_info_text .= '<h2>Является объектом культурного наследия (ОКН)</h2>';
 	}
+
 	if ($obj_info['okn_type']) {
 		$label = '<span class="ei_label">Тип объекта:</span> ';
 		switch ($obj_info['okn_type']) {
@@ -69,6 +72,7 @@ $OKN_TXT = 'Сведения из Единого госреестра ОКН (с
 		}
 		$obj_info_text .= $label . $okn_type . '<br />';
 	}
+
 	if ($obj_info['protection_category']) {
 		$label = '<span class="ei_label">Категория охраны:</span> ';
 		switch ($obj_info['protection_category']) {
@@ -79,18 +83,22 @@ $OKN_TXT = 'Сведения из Единого госреестра ОКН (с
 		}
 		$obj_info_text .= $label . $protection_category . '<br />';
 	}
+
 	if ($obj_info['registry_name']) {
 		$label = '<span class="ei_label">Наименование ОКН:</span> ';
 		$obj_info_text .= $label . esc_html($obj_info['registry_name']) . '<br />';
 	}
+
 	if ($obj_info['okn_date']) {
 		$label = '<span class="ei_label">Датировка (по реестру ОКН):</span> ';
 		$obj_info_text .= $label . esc_html($obj_info['okn_date']) . '<br />';
 	}
+
 	if ($obj_info['location']) {
 		$label = '<span class="ei_label">Местонахождение:</span> ';
 		$obj_info_text .= $label . esc_html($obj_info['location']) . '<br />';
 	}
+
 	if ($obj_info['district']) {
 		$label = '<span class="ei_label">Район:</span> ';
 		switch ($obj_info['district']) {
@@ -100,31 +108,58 @@ $OKN_TXT = 'Сведения из Единого госреестра ОКН (с
 		}
 		$obj_info_text .= $label . $district . '<br />';
 	}
-	if ($obj_info['registry_date']) {
+
+	$doc_link = null;
+	$doc_title = null;
+	$registry_date = esc_html(trim($obj_info['registry_date']));
+	if ($registry_date) {
+		switch ($registry_date) {
+			case '1974': $doc_path = 'postanovlenie-sovmina-rsfsr-4-dek-1974-n624'; break;
+			default: $doc_path = null;
+		}
+		if ($doc_path) {
+			$post_obj = get_page_by_path($doc_path, OBJECT, 'guidebook');
+			if ($post_obj) {
+				$post_id = (int) $post_obj->ID;
+				$doc_title = esc_html(get_the_title($post_id));
+				$doc_link = get_permalink($post_id);
+
+				$title = $doc_title ? ' title="'.$doc_title.'"' : '';
+				if ($doc_link) {
+					$registry_date = '<a href="'.$doc_link.'"'.$title.'">'.$registry_date.'</a>';
+				}
+			}
+		}
 		$label = '<span class="ei_label">Год постановки на охрану:</span> ';
-		$obj_info_text .= $label . esc_html( $obj_info['registry_date'] ) . '<br />';
+		$obj_info_text .= $label . $registry_date . '<br />';
 	}
+
 	if ($obj_info['okn_id']) {
 		$label = '<span class="ei_label">Номер в реестре ОКН:</span> ';
-		$obj_info_text .= $label . esc_html( $obj_info['okn_id'] ) . '<br />';
+		$obj_info_text .= $label . esc_html($obj_info['okn_id']) . '<br />';
 	}
+
 	if ($obj_info['founding_date']) {
 		$label = '<span class="ei_label">Дата основания:</span> ';
-		$obj_info_text .= $label . esc_html( $obj_info['founding_date'] ) . '<br />';
+		$obj_info_text .= $label . esc_html($obj_info['founding_date']) . '<br />';
 	}
-	$site_url = esc_html(trim($obj_info['site']));
-	if ($site_url) {
-		$label = '<span class="ei_label">Официальный сайт:</span> ';
-		$url = $site_url;
-		$ret = parse_url($url);
-		if (!isset($ret['scheme'])) {
-			$url = "http://{$url}";
-		} else {
-			// $site_url = preg_replace("(^https?://)", "", $site_url );
-			$site_url = $ret['host'] . $ret['path'];
+
+	if ($obj_info['site']) {
+		$site_url = esc_html(trim($obj_info['site']));
+		if ($site_url) {
+			$label = '<span class="ei_label">Официальный сайт:</span> ';
+			$url = $site_url;
+			$ret = parse_url($url);
+			if (!isset($ret['scheme'])) {
+				$url = "http://{$url}";
+			} else {
+				// $site_url = preg_replace("(^https?://)", "", $site_url );
+				$site_url = $ret['host'] . $ret['path'];
+			}
+			$obj_info_text .= $label.'<a href="'.$url.'" target="_blank" rel="noopener noreferrer">'.$site_url.'</a><br />';
 		}
-		$obj_info_text .= $label.'<a href="'.$url.'" target="_blank" rel="noopener noreferrer">'.$site_url.'</a><br />';
 	}
+
 	if ($obj_info['more_info']) {
 		$more_lines = explode(PHP_EOL, $obj_info['more_info']);
 		foreach ($more_lines as $line) {
@@ -185,33 +220,41 @@ $OKN_TXT = 'Сведения из Единого госреестра ОКН (с
 	<?php 
 	$gba_sources = get_field('gba_sources');
 	$gba_sources_posts = get_field('gba-sources-posts');
-	if ($gba_sources || $gba_sources_posts || $obj_info['is_okn']) :
+	if ($gba_sources || $gba_sources_posts || ($doc_link && $doc_title) || $is_okn) :
 	?>
 		<div class="row info-block">
 			<div class="col">
 				<h2>Источники</h2>
 				<ul>
 				<?php
+				$echo = '';
+				$egrkn_printed = false;
 				if ($gba_sources) {
 					$lines = explode(PHP_EOL, trim($gba_sources));
 					foreach ($lines as $line) {
 						$sublines = explode('=', $line, 2);
 						$text = esc_html(trim($sublines[0]));
-						$url = count($sublines) > 1 ? esc_html(trim($sublines[1])) : null;
-						// print_r("url=".$url);
-						if ($url) {
-							$ret = parse_url($url);
-							if (!isset($ret['scheme'])) {
-								$url = "http://{$url}";
+						$parse_url = false;
+						switch ($text) {
+							case '[egrkn]': $text = $OKN_TXT; $url = $OKN_URL; $egrkn_printed = true; break;
+							default: $parse_url = true;
+						}
+						if ($parse_url) {
+							$url = count($sublines) > 1 ? esc_html(trim($sublines[1])) : null;
+							if ($url) {
+								$ret = parse_url($url);
+								if (!isset($ret['scheme'])) {
+									$url = "http://{$url}";
+								}
 							}
+						}
+						if ($url) {
 							$text = '<a href="'.$url.'" target="_blank" rel="noopener noreferrer">'.$text.'</a>';
 						}
-						// echo '<li><a href="'.$href.'" target="_blank" rel="noopener noreferrer">'.$title.'</a></li>';
-						echo '<li>'.$text.'</li>';
+						$echo .= '<li>'.$text.'</li>';
 					}
 				}
 				if ($gba_sources_posts) {
-					$echo = '';
 					global $post;
 					foreach ($gba_sources_posts as $post) {
 						setup_postdata($post);
@@ -223,11 +266,13 @@ $OKN_TXT = 'Сведения из Единого госреестра ОКН (с
 						}
 					}
 					wp_reset_postdata();
-					echo $echo;
 				}
-				if ($obj_info['is_okn']) {
-					echo '<li><a href="'.$OKN_URL.'" target="_blank" rel="noopener noreferrer">'.$OKN_TXT.'</a></li>';
+				if ($doc_link && $doc_title) {
+					$echo .= '<li><a href="'.$doc_link.'" title="'.$doc_title.'">'.$doc_title.'</a></li>';
+				} elseif ($is_okn && !$egrkn_printed) {
+					$echo .= '<li><a href="'.$OKN_URL.'" target="_blank" rel="noopener noreferrer">'.$OKN_TXT.'</a></li>';
 				}
+				echo $echo;
 				?>
 				</ul>
 			</div>
