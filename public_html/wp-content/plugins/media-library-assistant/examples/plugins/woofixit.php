@@ -76,8 +76,12 @@
  * opened on 10/18/2018 by "alx359".
  * https://wordpress.org/support/topic/wc-fixit-tools-replace-all-item-name-slug/
  *
+ * Enhanced for support topic "Product categories thumbnails"
+ * opened on 9/18/2019 by "wimvl".
+ * https://wordpress.org/support/topic/product-categories-thumbnails-2/
+ *
  * @package WooCommerce Fixit
- * @version 2.04
+ * @version 2.05
  */
 
 /*
@@ -85,10 +89,10 @@ Plugin Name: WooCommerce Fixit
 Plugin URI: http://davidlingren.com/
 Description: Adds "product:" and "product_terms:" custom substitution prefixes and adds a Tools/Woo Fixit submenu with buttons to perform a variety of MLA/WooCommerce repair and enhancement operations.
 Author: David Lingren
-Version: 2.04
+Version: 2.05
 Author URI: http://davidlingren.com/
 
-Copyright 2014-2018 David Lingren
+Copyright 2014-2019 David Lingren
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -118,7 +122,7 @@ class Woo_Fixit {
 	 *
 	 * @var	string
 	 */
-	const CURRENT_VERSION = '2.04';
+	const CURRENT_VERSION = '2.05';
 
 	/**
 	 * Slug prefix for registering and enqueueing submenu pages, style sheets and scripts
@@ -753,7 +757,7 @@ class Woo_Fixit {
 
 	/**
 	 * Array of Attachments giving Product assignments:
-	 * attachment_id => array( '_thumbnail_id' => array( thumbnail_ids ), '_product_image_gallery' => array( gallery_ids )
+	 * attachment_id => array( '_thumbnail_id' => array( thumbnail_ids ), '_product_image_gallery' => array( gallery_ids ), 'category_thumbnail' => array( term_id => name ) )
 	 *
 	 * @since 1.00
 	 *
@@ -785,12 +789,27 @@ class Woo_Fixit {
 			$upper_bound = 0x7FFFFFFF;
 		}
 
+		self::$product_attachments = array();
+		self::$attachment_products = array();
+
+		$query = sprintf( 'SELECT t.term_id, t.name, tm.meta_value FROM %1$s as t INNER JOIN %2$s as tt ON t.term_id = tt.term_id INNER JOIN %3$s as tm ON t.term_id = tm.term_id  WHERE ( ( tt.taxonomy = \'product_cat\' ) AND ( tm.meta_key = \'thumbnail_id\' ) AND ( tm.meta_value > 0 ) AND ( tm.meta_value >= %4$d ) AND ( tm.meta_value <= %5$d) ) ORDER BY tm.meta_value, t.term_id', $wpdb->terms, $wpdb->term_taxonomy, $wpdb->termmeta, $lower_bound, $upper_bound );
+		$results = $wpdb->get_results( $query );
+//error_log( __LINE__ . ' Woo_Fixit::_build_product_attachments() $results = ' . var_export( $results, true ), 0 );
+		foreach ( $results as $result ) {
+			$key = (integer) $result->meta_value;
+			if ( isset( self::$attachment_products[ $key ] ) ) {
+				self::$attachment_products[ $key ]['category_thumbnail'][ (integer) $result->term_id ] = $result->name;
+			} else {
+				self::$attachment_products[ $key ]['category_thumbnail'] = array( (integer) $result->term_id => $result->name );
+			}
+		}
+//error_log( __LINE__ . ' Woo_Fixit::_build_product_attachments() self::$attachment_products = ' . var_export( self::$attachment_products, true ), 0 );
+		
+		unset( $results );
+		
 		$query = sprintf( 'SELECT m.*, p.post_title FROM %1$s as m INNER JOIN %2$s as p ON m.post_id = p.ID WHERE ( p.post_type = \'product\' ) AND ( p.ID >= %3$d ) AND ( p.ID <= %4$d) AND ( m.meta_key IN ( \'_product_image_gallery\', \'_thumbnail_id\' ) ) GROUP BY m.post_id, m.meta_id ORDER BY m.post_id', $wpdb->postmeta, $wpdb->posts, $lower_bound, $upper_bound );
 		$results = $wpdb->get_results( $query );
 //error_log( __LINE__ . ' Woo_Fixit::_build_product_attachments() $results = ' . var_export( $results, true ), 0 );
-
-		self::$product_attachments = array();
-		self::$attachment_products = array();
 
 		foreach ( $results as $result ) {
 			if ( $build_pa ) {
@@ -1731,6 +1750,8 @@ VALUES ( {$attachment},'_wp_attachment_image_alt','{$text}' )";
 		$insert_count = 0;
 		$thumbnail_count = 0;
 		$gallery_count = 0;
+		$category_count = 0;
+		
 		foreach( self::$attachment_products as $post_id => $result ) {
 			if ( empty( $result['_thumbnail_id'] ) ) {
 				$thumbnails = array();
@@ -1742,6 +1763,12 @@ VALUES ( {$attachment},'_wp_attachment_image_alt','{$text}' )";
 				$galleries = array();
 			} else {
 				$galleries = $result['_product_image_gallery'];
+			}
+
+			if ( empty( $result['category_thumbnail'] ) ) {
+				$categories = array();
+			} else {
+				$categories = $result['category_thumbnail'];
 			}
 
 			// Compose references
@@ -1766,9 +1793,22 @@ VALUES ( {$attachment},'_wp_attachment_image_alt','{$text}' )";
 				$references .= 'Galleries: ' . $gallery_text;
 			}
 
+			$category_text = '';
+			foreach ( $categories as $term_id => $category ) {
+				$category_text .= sprintf( '(%1$d) %2$s,', $term_id, $category );
+			}
+			if ( !empty( $category_text ) ) {
+				if ( !empty( $references ) ) {
+					$references .= '; ';
+				}
+
+				$references .= 'Categories: ' . $category_text;
+			}
+
 			if ( !empty( $references ) ) {
 				$thumbnail_count += count( $thumbnails );
 				$gallery_count += count( $galleries );
+				$category_count += count( $categories );
 
 				// Insert the new values
 				$insert_query = "INSERT INTO {$wpdb->postmeta} ( `post_id`,`meta_key`,`meta_value` )
@@ -1778,7 +1818,7 @@ VALUES ( {$attachment},'_wp_attachment_image_alt','{$text}' )";
 			} // found references
 		} // foreach product
 
-		return "_where_used() deleted {$delete_count} items(s) in &quot;Woo Used In&quot;, then inserted {$insert_count} items(s) with {$thumbnail_count} thumbnail(s) and {$gallery_count} gallery(s).\n";
+		return "_where_used() deleted {$delete_count} items(s) in &quot;Woo Used In&quot;, then inserted {$insert_count} items(s) with {$thumbnail_count} thumbnail(s), {$gallery_count} gallery(s) and {$category_count} category thumbnails.\n";
 	} // _where_used
 
 	/**

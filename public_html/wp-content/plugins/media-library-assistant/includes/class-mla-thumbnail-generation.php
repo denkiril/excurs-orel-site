@@ -265,6 +265,10 @@ class MLA_Thumbnail {
 	private static function _generate_wordpress_thumbnail( $post_id, $file, $args, $old_sizes = NULL ) {
 		// Get the metadata for the original (PDF) attachment.
 		$item_data = wp_get_attachment_metadata( $post_id );
+		MLACore::mla_debug_add( __LINE__ . " MLA_Thumbnail::_generate_wordpress_thumbnail( $post_id, $file ) item_data = " . var_export( $item_data, true ), MLACore::MLA_DEBUG_CATEGORY_THUMBNAIL );
+		if ( !is_array( $item_data ) ) {
+			$item_data = array();
+		}
 
 		// Make the file path relative to the upload dir.
 		$item_relative_path = _wp_relative_upload_path( $file );

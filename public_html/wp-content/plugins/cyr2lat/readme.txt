@@ -2,9 +2,9 @@
 Contributors: SergeyBiryukov, mihdan, karevn, webvitaly, kaggdesign
 Tags: cyrillic, belorussian, ukrainian, bulgarian, macedonian, georgian, kazakh, latin, l10n, russian, cyr-to-lat, cyr2lat, rustolat, slugs, translations, transliteration
 Requires at least: 5.1
-Tested up to: 5.2
-Stable tag: 4.2.3
-Requires PHP: 5.6
+Tested up to: 5.3
+Stable tag: 4.3.2
+Requires PHP: 5.6.20
 
 Converts Cyrillic characters in post, page and term slugs to Latin characters.
 
@@ -37,7 +37,7 @@ Based on the original Rus-To-Lat plugin by Anton Skorobogatov.
 
 Add this code to your theme's `functions.php` file:
 
-```
+`
 function my_cyr_to_lat_table( $ctl_table ) {
    $ctl_table['Ъ'] = 'U';
    $ctl_table['ъ'] = 'u';
@@ -45,13 +45,13 @@ function my_cyr_to_lat_table( $ctl_table ) {
    return $ctl_table;
 }
 add_filter( 'ctl_table', 'my_cyr_to_lat_table' );
-```
+`
 
 = How can I redefine non-standard locale ? =
 
 For instance, if your non-standard locale is uk_UA, you can redefine it to `uk` by adding the following code to your theme's `function.php` file:
 
-```
+`
 /**
  * Use conversion table for non-standard locale.
  *
@@ -67,17 +67,16 @@ function my_ctl_table( $table ) {
 
 	return $table;
 }
-
 add_filter( 'ctl_table', 'my_ctl_table' );
-```
+`
 
 = How can I convert a large number of posts/terms using wp-cli? =
 
 Use the following command in console:
 
-```
+`
 wp cyr2lat regenerate [--post_type=<post_type>] [--post_status=<post_status>]
-```
+`
 
 Where
   `-post_type` is list of post types,
@@ -92,8 +91,22 @@ Yes you can!
 
 == Changelog ==
 
+= 4.3.2 (29.12.2019) =
+* Fixed problems with setting of max_input_vars on some hostings
+
+= 4.3.1 (27.12.2019) =
+* Added requirement to have max_input_vars >= 5000
+* Added automatic plugin deactivation if requirements are not met
+* Added attempt to auto-fix max_input_variable value
+
+= 4.3 (14.12.2019) =
+* Added Chinese table
+* Tested up to WordPress 5.3
+* Tested up to PHP 7.4
+* External library wp-background-processing scoped into own namespace to prevent errors in some cases
+
 = 4.2.3 (29.08.2019) =
-* Scoped Symfony polyfill to avoid problems with composer autoloader on some sites.
+* Scoped Symfony Mbstring polyfill to avoid problems with composer autoloader on some sites.
 
 = 4.2.2 (28.08.2019) =
 * Added ACF (Advanced Custom Fields) plugin support

@@ -123,19 +123,20 @@ $OKN_TXT = 'Сведения из Единого госреестра ОКН (с
 			// $site_url = preg_replace("(^https?://)", "", $site_url );
 			$site_url = $ret['host'] . $ret['path'];
 		}
-		$obj_info_text .= $label . '<a href="'.$url.'" target="_blank" rel="noopener noreferrer">'.$site_url.'</a><br />';
+		$obj_info_text .= $label.'<a href="'.$url.'" target="_blank" rel="noopener noreferrer">'.$site_url.'</a><br />';
 	}
 	if ($obj_info['more_info']) {
 		$more_lines = explode(PHP_EOL, $obj_info['more_info']);
 		foreach ($more_lines as $line) {
 			$sublines = explode(':', $line, 2);
-			$label = '<span class="ei_label">'.esc_html( trim($sublines[0]) ).':</span> ';
-			$obj_info_text .= $label . esc_html( trim($sublines[1]) ) . '<br />';
+			$label = '<span class="ei_label">'.esc_html(trim($sublines[0])).':</span> ';
+			$value = count($sublines) > 1 ? esc_html(trim($sublines[1])) : '';
+			$obj_info_text .= $label . $value.'<br />';
 		}
 	}
 	
 	if ($obj_info_text) {
-		$obj_info_text = '<p>' . $obj_info_text . '</p>';
+		$obj_info_text = '<p>'.$obj_info_text.'</p>';
 	}
 	
 	$geolocation = $obj_info['geolocation'];

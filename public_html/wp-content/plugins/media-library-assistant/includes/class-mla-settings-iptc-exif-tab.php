@@ -2119,6 +2119,7 @@ class MLA_IPTC_EXIF_Query {
 			$value['option'] = 'text';
 			$value['no_null'] = false;
 			$value['read_only'] = false;
+			$value['changed'] = false;
 			$value['deleted'] = false;
 
 			if ( isset( $value['active'] ) && $value['active'] ) {

@@ -4316,6 +4316,37 @@ MLA adds three fields of its own to the XMP metadata information:
 		<br />&nbsp;</td>
 	</tr>
 	<tr>
+		<td class="mla-doc-table-label">mso</td>
+		<td>
+For Microsoft Office documents, data defined by the <a href="https://en.wikipedia.org/wiki/Office_Open_XML_file_formats#Document_properties" title="Wikipedia Article" target="_blank">Office Open XML file formats</a>, if present. The formats (e.g., docx, xlsx, pptx) were developed by Microsoft and first appeared in Microsoft Office 2007. MLA provides access to the "Document Properties" data in three ways:
+<ol>
+<li>
+MLA will copy appropriate values from the Document Properties data into the nine "<a href="#pdf_metadata">PDF Document Information Dictionary</a>" fields to populate them as often as possible. For example, the "creator" value(s) in the "dc" namespace ("dc.creator") might be copied to an empty "Author" field, or the "cp.keywords" and "cp.category" value(s) might be copied to an empty Keywords field.
+</li>
+<li>
+Additional values in the "cp", "dc", "dcterms" and "app" namespaces are copied up to the root level for easier access. For example, the "cp.description" value can be accessed as "description", without the "cp." portion of the compound name.
+</li>
+<li>
+The "Extended Properties" are copied to the "app." array at the root level. For example, Word documents contain information such as "app.Pages", "app.Words" and "app.Characters". The native values of some fields, e.g., "app.HeadingPairs", can be an array.
+</li>
+</ol>
+MLA adds two fields of its own to the MS Office metadata information:
+<br />&nbsp;<br />
+<table>
+	<tr>
+		<td class="mla-doc-table-label">xmlns</td>
+		<td>an array of the namespaces found in the document, such as <code>'dc' => 'http://purl.org/dc/elements/1.1/'</code></td>
+	</tr>
+	<tr>
+		<td class="mla-doc-table-label">ALL_MSO</td>
+		<td>a special "pseudo value" that returns a string representation of all the metadata. You can use this pseudo-value to examine the metadata in a document, find field names and see what values are present.</td>
+	</tr>
+</table>
+&nbsp;<br />
+		The ALL_MSO value is altered in two ways. First, values of more than 256 characters are truncated to 256 characters. This prevents large fields from dominating the display. Second, array values are replaced by an "(ARRAY)" placeholder, e.g., <code>'Keywords' => '(ARRAY)'</code>. You can explore array values individually by coding something like <code>[+mso:TitlesOfParts,export+]</code> to expand all levels within the array or <code>[+mso:Keywords,unpack+]</code> to expand one level within the array. You can go deeper in the array hierarchy with compound names, e.g., <code>[+mso:HeadingPairs.vector,unpack+]</code>.
+		<br />&nbsp;</td>
+	</tr>
+	<tr>
 		<td class="mla-doc-table-label">id3</td>
 		<td>
 		<a href="https://en.wikipedia.org/wiki/ID3" title="Wikipedia page for ID3" target="_blank">Wikipedia</a> says "ID3 is a metadata container most often used in conjunction with the MP3 audio file format. It allows information such as the title, artist, album, track number and other information about the file to be stored in the file itself."

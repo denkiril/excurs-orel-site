@@ -3,9 +3,9 @@ Contributors: dglingren
 Donate link: http://davidlingren.com/#two
 Tags: attachments, gallery, images, media, media library, tags, categories, IPTC, EXIF, XMP, GPS, PDF, metadata, photos, photographs, photo albums, MIME, mime-type, icon, upload, file extensions, WPML, Polylang
 Requires at least: 3.5.0
-Tested up to: 5.2.2
+Tested up to: 5.3
 Requires PHP: 5.3
-Stable tag: 2.80
+Stable tag: 2.81
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -181,6 +181,19 @@ All of the MLA source code has been annotated with "DocBlocks", a special type o
 
 == Changelog ==
 
+= 2.81 =
+* New: For the "Field-level Substitution Parameters", a new "mso:" prefix gives access to the Document Properties embedded in Office Open XML file formats (e.g., docx, xlsx, pptx). More information is given in the "Prefix values" section of the Settings/Media Library Assistant Documentation tab.
+* New: For the Bulk Edit, a new `[+reverse_index+]` substitution parameter counts down from the number of selected items to one. More informatin is in the Help menu for the Media/Assistant admin screen.
+* New: For the "WooCommerce Fixit" example plugin, product category thumbnail information is added to the "Woo Used In" Media/Assistant table column.
+* Fix: IPTC/EXIF and Custom Field mapping logic updated for compatibility with WordPress 5.3.
+* Fix: Updated Media Manager Modal Window and Media/Library Grid view styles for compatibility with WordPress 5.3.
+* Fix: For the Settings/Media Library Assistant Example Plugins page, update the `MLA_Upgrader_Skin` code for compatibility with WordPress 5.3.
+* Fix: For the Settings/Media Library Assistant IPTC/EXIF tab, PHP Notices for invalid taxonomy rules have been resolved.
+* Fix: For the "replace()" option/format value, empty replacement values are now allowed.
+* Fix: For custom field mapping rules, "Option: Array" now works with multi-level nested subarrays.
+* Fix: For custom field mapping rules, "Delete NULL Values" now works with "Format: Raw".
+* Fix: For "WordPress-style" PDF thumbnail generation, occasional PHP "Illegal string offset 'sizes'" errors have been resolved.
+
 = 2.80 =
 * New: A new "MLA Phoenix Media Rename Example" plugin has been added to the "Examples" family in the Settings/Media Library Assistant Documentation tab. It adds support for the Phoenix Media Rename plugin's "Filename" column to the Media/Assistant submenu table.
 * Fix: For the Media/Assistant admin submenu screen, avoid "headers already sent" error with JoomUnited's WP Media Folders.
@@ -315,8 +328,8 @@ All of the MLA source code has been annotated with "DocBlocks", a special type o
 
 == Upgrade Notice ==
 
-= 2.80 =
-A new "MLA Phoenix Media Rename Example" plugin supports the Phoenix Media Rename plugin. MLA Insert Fixit example plugin improvements, improved support for other plugins and themes. One enhancement, twelve fixes.
+= 2.81 =
+Compatibility updates for WordPress 5.3. New "mso:" prefix gives access to the Document Properties embedded in Office Open XML file formats (e.g., docx, xlsx, pptx). Three enhancements, eight fixes.
 
 == Other Notes ==
 

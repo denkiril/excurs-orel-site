@@ -32,6 +32,7 @@ class MLAOptions {
 			add_filter( 'wp_handle_upload', 'MLAOptions::mla_wp_handle_upload_filter', 1, 1 );
 
 			add_action( 'add_attachment', 'MLAOptions::mla_add_attachment_action', 0x7FFFFFFF, 1 );
+			add_filter( 'wp_generate_attachment_metadata', 'MLAOptions::mla_generate_attachment_metadata_filter', 0x7FFFFFFF, 2 );
 			add_filter( 'wp_update_attachment_metadata', 'MLAOptions::mla_update_attachment_metadata_filter', 0x7FFFFFFF, 2 );
 
 			MLACore::mla_debug_add( __LINE__ . " MLAOptions::initialize( " . $_SERVER['REQUEST_URI'] . " ) hooks set", MLACore::MLA_DEBUG_CATEGORY_REST );
@@ -403,7 +404,7 @@ class MLAOptions {
 						unset( $tax_checklist_add_term[ $tax_name ] );
 					}
 				}
-				
+
 				$value = array (
 					'tax_support' => $tax_support,
 					'tax_quick_edit' => $tax_quick_edit,
@@ -539,7 +540,7 @@ class MLAOptions {
 				if ( empty( $current_value ) ) {
 					$current_value = get_option( 'posts_per_page', $value['std'] );
 				}
-				
+
 				$option_values = array(
 					'key' => $key,
 					'value' => $value['name'],
@@ -554,14 +555,14 @@ class MLAOptions {
 				$new_value = isset( $args[ $key ] ) ? $args[ $key ] : get_option( 'posts_per_page', $value['std'] );
 
 				$result = update_user_option( $user_id, $key, $new_value, true );
-				
+
 				/* translators: 1: option name, e.g., taxonomy_support */
 				return '<br>' . sprintf( __( 'Update custom %1$s', 'media-library-assistant' ), $key ) . "\r\n";
 			case 'delete':
 			case 'reset':
 				$user_id = get_current_user_id();
 				delete_user_option( $user_id, $key, true );
-				
+
 				/* translators: 1: option name, e.g., taxonomy_support */
 				return '<br>' . sprintf( __( 'Reset custom %1$s', 'media-library-assistant' ), $key ) . "\r\n";
 			default:
@@ -644,6 +645,18 @@ class MLAOptions {
 	private static $add_attachment_id = 0;
 
 	/**
+	 * Identifies when attachments are first added to the Media Library.
+	 *
+	 * Ensures that IPTC/EXIF and Custom Field mapping is only performed when the attachment is first
+	 * added to the Media Library, after intermediate sizes are generated (WP 5.3+).
+	 *
+	 * @since 1.70
+	 *
+	 * @var	string
+	 */
+	private static $upload_status = '';
+
+	/**
 	 * Set $add_attachment_id to just-inserted attachment
  	 *
 	 * All of the actual processing is done later, in mla_update_attachment_metadata_filter.
@@ -659,6 +672,7 @@ class MLAOptions {
 	public static function mla_add_attachment_action( $post_ID ) {
 		MLACore::mla_debug_add( __LINE__ . " MLAOptions::mla_add_attachment_action( $post_ID )", MLACore::MLA_DEBUG_CATEGORY_METADATA );
 		MLAOptions::$add_attachment_id = $post_ID;
+		MLAOptions::$upload_status = 'started';
 		do_action('mla_add_attachment', $post_ID);
  	} // mla_add_attachment_action
 
@@ -696,6 +710,29 @@ class MLAOptions {
  	} // _update_attachment_metadata
 
 	/**
+	 * This filter tests the MLAOptions::$upload_status variable set by the mla_add_attachment_action
+	 * to ensure that mapping is only performed after the generation of all intermediate sizes is complete.
+	 *
+	 * The filter is applied by function wp_generate_attachment_metadata() in /wp-includes/image.php
+	 *
+	 * @since 2.81
+	 *
+	 * @param	array	Attachment metadata for just-inserted attachment
+	 * @param	integer	ID of just-inserted attachment
+	 *
+	 * @return	array	Updated attachment metadata
+	 */
+	public static function mla_generate_attachment_metadata_filter( $data, $post_id ) {
+		if ( 'started' === MLAOptions::$upload_status ) {
+			MLAOptions::$upload_status = 'complete';
+		}
+
+		$upload_status = MLAOptions::$upload_status;
+		MLACore::mla_debug_add( __LINE__ . " MLAOptions::mla_generate_attachment_metadata_filter( $post_id, $upload_status ) \$data = " . var_export( $data, true ), MLACore::MLA_DEBUG_CATEGORY_METADATA );
+		return $data;
+ 	} // mla_generate_attachment_metadata_filter
+
+	/**
 	 * Perform IPTC/EXIF and Custom Field mapping on just-inserted attachment
  	 *
 	 * This filter tests the $add_attachment_id variable set by the mla_add_attachment_action
@@ -712,8 +749,16 @@ class MLAOptions {
 	 */
 	public static function mla_update_attachment_metadata_filter( $data, $post_id ) {
 		$options = array ();
-		$options['is_upload'] = MLAOptions::$add_attachment_id == $post_id;
+		$options['is_upload'] = MLAOptions::$add_attachment_id === $post_id;
+		$options['upload_complete'] = MLAOptions::$upload_status === 'complete';
+
+		// WP 5.3+ calls this filter each time an intermediate size is generated; ignore those calls
+		if ( $options['is_upload'] && !$options['upload_complete'] ) {
+			return $data;
+		}
+
 		MLAOptions::$add_attachment_id = 0;
+		MLAOptions::$upload_status = '';
 
 		$options['enable_iptc_exif_mapping'] = 'checked' == MLACore::mla_get_option( 'enable_iptc_exif_mapping' );
 		$options['enable_custom_field_mapping'] = 'checked' == MLACore::mla_get_option( 'enable_custom_field_mapping' );
@@ -854,9 +899,7 @@ class MLAOptions {
 
 		$custom_updates = array();
 		foreach ( $settings as $setting_key => $setting_value ) {
-			/*
-			 * Convert checkbox value(s)
-			 */
+			// Convert checkbox value(s)
 			$setting_value['no_null'] = isset( $setting_value['no_null'] ) && ( false !== $setting_value['no_null'] );
 
 			$setting_value['key'] = $setting_key;
@@ -916,7 +959,7 @@ class MLAOptions {
 						$custom_updates[ $setting_value['name'] ] = $new_text;
 					}
 				} else { // } keep_existing
-					if ( ' ' == $new_text && $setting_value['no_null'] ) {
+					if ( $setting_value['no_null'] && ( ( ' ' === $new_text ) || ( ( 'raw' == $setting_value['format'] ) && empty( $new_text ) ) ) ) {
 						$new_text = NULL;
 					}
 
@@ -1271,8 +1314,8 @@ class MLAOptions {
 	 * @return	string	HTML table row markup for 'render' else message(s) reflecting the results of the operation.
 	 */
 	public static function mla_custom_field_option_handler( $action, $key, $value, $args = NULL ) {
-error_log( __LINE__ . " MLAOptions::mla_custom_field_option_handler( $action, $key )", 0 );
-return "MLAOptions::mla_custom_field_option_handler( $action, $key ) deprecated.";
+		MLACore::mla_debug_add( __LINE__ . " MLAOptions::mla_custom_field_option_handler( $action, $key )", MLACore::MLA_DEBUG_CATEGORY_ANY );
+		return "MLAOptions::mla_custom_field_option_handler( $action, $key ) deprecated.";
 
 		// Added in 2.63
 		MLAOptions::_load_option_templates();
@@ -1872,6 +1915,11 @@ return "MLAOptions::mla_custom_field_option_handler( $action, $key ) deprecated.
 	 * @return	string	HTML markup with select field options
 	 */
 	public static function mla_compose_parent_option_list( $taxonomy, $selection = 0 ) {
+		// Return empty list for invalid taxonomies
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			return '<option value="0" selected="selected">&mdash; ' . __( 'None (select a value)', 'media-library-assistant' ) . ' &mdash;</option>';
+		} 
+
 		$dropdown_options = array(
 			'show_option_all' => '',
 			'show_option_none' => '&mdash; ' . __( 'None (select a value)', 'media-library-assistant' ) . ' &mdash;',
@@ -2346,8 +2394,8 @@ return "MLAOptions::mla_custom_field_option_handler( $action, $key ) deprecated.
 	 * @return	string	HTML table row markup for 'render' else message(s) reflecting the results of the operation.
 	 */
 	public static function mla_iptc_exif_option_handler( $action, $key, $value, $args = NULL ) {
-error_log( __LINE__ . " MLAOptions::mla_iptc_exif_option_handler( $action, $key )", 0 );
-return " MLAOptions::mla_iptc_exif_option_handler( $action, $key ) deprecated.";
+		MLACore::mla_debug_add( __LINE__ . " MLAOptions::mla_iptc_exif_option_handler( $action, $key )", MLACore::MLA_DEBUG_CATEGORY_ANY );
+		return " MLAOptions::mla_iptc_exif_option_handler( $action, $key ) deprecated.";
 
 		// Added in 2.63
 		MLAOptions::_load_option_templates();

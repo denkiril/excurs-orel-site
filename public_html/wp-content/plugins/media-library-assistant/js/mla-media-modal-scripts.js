@@ -875,13 +875,15 @@ console.log( 'listening to controller events' );
 			},
 
 			hideDefaultSearch: function() {
-				var defaultSearch = $( '#media-search-input', mlaModal.settings.$el );
+				var defaultSearch = $( '#media-search-input', mlaModal.settings.$el ),
+					defaultSearchLabel = $( '.media-search-input-label', mlaModal.settings.$el );
 
 				if ( 0 === defaultSearch.length ) {
 					defaultSearch = $( 'div.media-toolbar-primary > input.search', mlaModal.settings.$el )
 				}
 
 				defaultSearch.hide();
+				defaultSearchLabel.hide();
 			},
 
 			updateFilters: function( taxonomy, selectMarkup ) {
