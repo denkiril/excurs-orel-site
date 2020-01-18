@@ -111,27 +111,34 @@ $OKN_TXT = 'Сведения из Единого госреестра ОКН (с
 
 	$doc_link = null;
 	$doc_title = null;
-	$registry_date = esc_html(trim($obj_info['registry_date']));
+	$registry_date = esc_html($obj_info['registry_date']);
 	if ($registry_date) {
-		switch ($registry_date) {
-			case '1974': $doc_path = 'postanovlenie-sovmina-rsfsr-4-dek-1974-n624'; break;
-			default: $doc_path = null;
-		}
-		if ($doc_path) {
-			$post_obj = get_page_by_path($doc_path, OBJECT, 'guidebook');
-			if ($post_obj) {
-				$post_id = (int) $post_obj->ID;
-				$doc_title = esc_html(get_the_title($post_id));
-				$doc_link = get_permalink($post_id);
-
-				$title = $doc_title ? ' title="'.$doc_title.'"' : '';
-				if ($doc_link) {
-					$registry_date = '<a href="'.$doc_link.'"'.$title.'">'.$registry_date.'</a>';
+		$dates = explode(',', $registry_date);
+		$registry_dates = [];
+		foreach ($dates as $date) {
+			$date = trim($date);
+			switch ($date) {
+				case '1960': $doc_path = 'postanovlenie-sovmina-rsfsr-ot-30-avg-1960-1327'; break;
+				case '1974': $doc_path = 'postanovlenie-sovmina-rsfsr-4-dek-1974-n624'; break;
+				default: $doc_path = null;
+			}
+			if ($doc_path) {
+				$post_obj = get_page_by_path($doc_path, OBJECT, 'guidebook');
+				if ($post_obj) {
+					$post_id = (int) $post_obj->ID;
+					$doc_title = esc_html(get_the_title($post_id));
+					$doc_link = get_permalink($post_id);
+	
+					$title = $doc_title ? ' title="'.$doc_title.'"' : '';
+					if ($doc_link) {
+						$date = '<a href="'.$doc_link.'"'.$title.'">'.$date.'</a>';
+					}
 				}
 			}
+			$registry_dates[] = $date;
 		}
 		$label = '<span class="ei_label">Год постановки на охрану:</span> ';
-		$obj_info_text .= $label . $registry_date . '<br />';
+		$obj_info_text .= $label . implode(', ', $registry_dates) . '<br />';
 	}
 
 	if ($obj_info['okn_id']) {
