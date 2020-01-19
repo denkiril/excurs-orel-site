@@ -2,6 +2,9 @@
 /public_html/photo/*.jpg*
 # node.js
 /node_modules/
+# secrets
+/public_html/wp-config.php
+# WP
 /public_html/wp-admin/
 /public_html/wp-includes/
 /public_html/wp-content/languages/

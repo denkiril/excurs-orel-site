@@ -40,6 +40,7 @@
 		</div> <!-- row -->
 		<hr /> 
 		<?php 
+		$post_gallery_array = gallery_func(['acf_field' => 'post-gallery', 'return_array' => true]);
 		$location = $event_info['event_place_map'];
 		$show_map = $event_info['show_map'] && !empty($location);
 		$col_sfx = $show_map ? '-lg-6' : '';
@@ -97,11 +98,14 @@
 			</div>
 			<?php // $show_map id="map" 
 			if( $show_map ):
-				do_action( 'event_map_scripts' ); ?>
-				<div class="col<?=$col_sfx?>">
-					<button id="OpenMap_btn" class="ref_btn autoopen">[ Показать карту ]</button>
-					<div class="mini-map">
-						<div class="marker" data-lat="<?php echo $location['lat']; ?>" data-lng="<?php echo $location['lng']; ?>"></div>
+				do_action( 'event_map_scripts' );
+				$sights = $post_gallery_array['sights'];
+				$sights = empty($sights) ? '' : 'data-sights="'.esc_html(json_encode($sights)).'"';
+				?>
+				<div class="col<?php echo $col_sfx ?>">
+					<div class="mini-map" <?php echo $sights ?>>
+						<button id="OpenMap_btn" class="ref_btn autoopen">[ Показать на карте ]</button>
+						<div class="marker" data-lat="<?php echo $location['lat']; ?>" data-lng="<?php echo $location['lng']; ?>" data-post_id="<?php the_ID(); ?>"></div>
 					</div>
 				</div>
 			<?php endif; ?>
@@ -198,7 +202,8 @@
 			<?php endif; ?>
 
 			<?php 
-			$post_gallery = do_shortcode('[gallery acf_field=post-gallery ]');
+			// $post_gallery = do_shortcode('[gallery acf_field=post-gallery]');
+			$post_gallery = $post_gallery_array['html'];
 			if ( $post_gallery ) {
 				$gallery = true;
 				echo $post_gallery;

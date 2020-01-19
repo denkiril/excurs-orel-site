@@ -1783,6 +1783,7 @@ function gallery_func( $atts ){
 		'mini' 			=> false, // will be deprecated by pics_in_row
 		'permalink' 	=> true,
 		'pics_in_row'	=> 1,
+		'return_array'	=> false,
 	), $atts );
 
 	$acf_field 		= $atts['acf_field'];
@@ -1796,8 +1797,10 @@ function gallery_func( $atts ){
 	$mini 			= $atts['mini']; // will be deprecated by pics_in_row
 	$add_link 		= $atts['permalink'];
 	$pics_in_row 	= $atts['pics_in_row'];
+	$return_array 	= $atts['return_array'];
 
 	$echo = '';
+	$sights = [];
 
 	global $post;
 	//Get the images ids from the post_metadata
@@ -1856,11 +1859,27 @@ function gallery_func( $atts ){
 				$figcaption_html = wiki_parse_text($image['caption'], $add_link); //The caption (Description!)
 			}
 
-			$echo .= '<div class="'.$item.' '.$bootstrap.'">';
+			$item_anchor = $class.'-'.$id;
+			$echo .= '<div class="'.$item.' '.$bootstrap.'"><a name="'.$item_anchor.'"></a>';
 			// Get picture item in markup_figure() func. 1st two ($images_counter == 0 || 1) are not lazy 
 			$print_lazy = $lazy && $images_counter > 2;
 			$echo .= markup_fancy_figure($id, $fancybox, $full_image_url, $title, $size, $print_lazy, $title, null, $figcaption_html);
 			$echo .= '</div>';
+
+			if ($return_array) {
+				$location = null;
+				// $location = get_field('photogeoloc', $id);
+				if ($location) {
+					// print_r2($location);
+					$sights[] = [
+						'lat' => $location['lat'],
+						'lng' => $location['lng'],
+						'permalink' => '#'.$item_anchor,
+						'title' => $title,
+						'thumb_url' => wp_get_attachment_image_url($id, 'thumbnail'),
+					];
+				}
+			}
 
 		endforeach;
 		$echo .= '</div> <!-- row '.$class.' -->';
@@ -1869,7 +1888,7 @@ function gallery_func( $atts ){
 
 	endif;
 
-	return $echo;
+	return $return_array ? ['html' => $echo, 'sights' => $sights] : $echo;
 }
 
 // [guidebook_map class="" id=1 size="medium_large" title=false href=1 lazy=0] 
@@ -2399,30 +2418,30 @@ function get_url_wo_pagenum() {
  * "ACF Photo Gallery Field" Plugin extension - add post_parent to attachment.
  * Fires off when the WordPress update button is clicked 
  */
-function acf_photo_gallery_addPostParent( $post_id ){
+function acf_photo_gallery_addPostParent($post_id) {
 	
-	if ( ! wp_is_post_revision( $post_id ) ){
+	if (!wp_is_post_revision($post_id)) {
 		// unhook this function so it doesn't loop infinitely
 		// remove_action( 'save_post', 'acf_photo_gallery_save' );
-		remove_action( 'save_post', 'acf_photo_gallery_addPostParent' );
+		remove_action('save_post', 'acf_photo_gallery_addPostParent');
 
 		$field = isset($_POST['acf-photo-gallery-groups'])? $_POST['acf-photo-gallery-groups']: null;
-		if( !empty($field) ){
-			foreach($field as $k => $v ){
+		if (!empty($field)) {
+			foreach ($field as $k => $v) {
 				$field_id = isset($_POST['acf-photo-gallery-groups'][$k])? $_POST['acf-photo-gallery-groups'][$k]: null;
-				if(!empty($field_id)) {
+				if (!empty($field_id)) {
 					$ids = !empty($field) && isset($_POST[$field_id])? $_POST[$field_id]: null;
-					if(!empty($ids)) {
+					if (!empty($ids)) {
 						$post_type = get_post($post_id)->post_type;
 						// $ids = implode(',', $ids);
 						// update_post_meta($post_id, $field_id, $ids);
-						foreach($ids as $attachment_id) {
+						foreach ($ids as $attachment_id) {
 							$attachment_parent = get_post($attachment_id)->post_parent;
 							// Если у вложения нет post_parent, устанавливаем его равным id текущего поста 
 							// Без проверки $post_type работает некорректно 
-							if( ($post_type == 'events' || $post_type == 'post' || $post_type == 'guidebook') &&  $attachment_parent == 0 ){
+							if (($post_type == 'events' || $post_type == 'post' || $post_type == 'guidebook') && $attachment_parent == 0) {
 								// Обновляем данные в БД
-								wp_update_post( array( 'ID' => $attachment_id, 'post_parent' => $post_id ) );
+								wp_update_post(array('ID' => $attachment_id, 'post_parent' => $post_id));
 							}
 						}
 					}
@@ -2432,10 +2451,17 @@ function acf_photo_gallery_addPostParent( $post_id ){
 
 		// re-hook this function
 		// add_action( 'save_post', 'acf_photo_gallery_save' );
-		add_action( 'save_post', 'acf_photo_gallery_addPostParent' );
+		add_action('save_post', 'acf_photo_gallery_addPostParent');
 	}
 }
-add_action( 'save_post', 'acf_photo_gallery_addPostParent' );
+add_action('save_post', 'acf_photo_gallery_addPostParent');
+
+// Add Google Maps API key to ACF Plugin
+function my_acf_google_map_api($api) {
+    $api['key'] = GOOGLE_MAPS_API;
+    return $api;
+}
+add_filter('acf/fields/google_map/api', 'my_acf_google_map_api');
 
 
 function console_log( $str ){
