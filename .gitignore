@@ -3,7 +3,7 @@
 # node.js
 /node_modules/
 # secrets
-/public_html/wp-config.php
+wp-config.php
 # WP
 /public_html/wp-admin/
 /public_html/wp-includes/

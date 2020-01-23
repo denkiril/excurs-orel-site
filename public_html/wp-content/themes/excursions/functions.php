@@ -179,7 +179,7 @@ function excursions_scripts() {
 	// wp_enqueue_script( 'bootstrap-js', get_template_directory_uri() . '/assets/include/bootstrap.min.js', array('jquery'), null, 'in_footer' );
 	// wp_enqueue_script( 'script-es5', get_template_directory_uri() . '/assets/js/script-es5.js', array(), $SCRIPTS_VER, 'in_footer' );
 	// wp_register_script( 'googlemap-api?key=YOUR_API_KEY', '//maps.googleapis.com/maps/api/js', array(), false, 'in_footer' );
-	// wp_register_script( 'ymap-api?apikey=6ebdbbc2-3779-4216-9d88-129e006559bd&lang=ru_RU', '//api-maps.yandex.ru/2.1/', array(), false, 'in_footer' );
+	// wp_register_script( 'ymap-api?apikey='.YANDEX_MAPS_API.'&lang=ru_RU', '//api-maps.yandex.ru/2.1/', array(), false, 'in_footer' );
 	// wp_register_script( 'ymap-api', '//api-maps.yandex.ru/2.1/' );
 	wp_register_script( 'acf_map-js', $scripts_dirname.'acf_map.js', array('script-js'), $SCRIPTS_VER, 'in_footer' );
 	wp_register_script( 'acf_map-legacy', $scripts_dirname.'acf_map-legacy.js', array('script-legacy'), $SCRIPTS_VER, 'in_footer' );
@@ -387,7 +387,6 @@ function guidebook_map_scripts_func() {
 // if( $show_map ) do_action( 'event_map_scripts' );
 add_action( 'event_map_scripts', 'event_map_scripts_func', 10, 0);
 function event_map_scripts_func() {
-	// wp_enqueue_script( 'ymap-api?apikey=6ebdbbc2-3779-4216-9d88-129e006559bd&lang=ru_RU', '//api-maps.yandex.ru/2.1/', array(), false, 'in_footer' );
 	wp_enqueue_script( 'acf_map-js' );
 	wp_localize_script( 'acf_map-js', 'myajax', array( 'url' => admin_url('admin-ajax.php') ) );
 	wp_enqueue_script( 'acf_map-legacy' );
@@ -401,28 +400,7 @@ function event_map_scripts_func() {
 function add_social_scripts() {
 	wp_enqueue_script( 'widgets-js' );
 	wp_enqueue_script( 'widgets-legacy' );
-	// add_script('widgets');
-	// if($vk) add_script( '//vk.com/js/api/openapi.js?160', 'async' );
-	// $('<script async defer src="https://connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v3.2&appId=330469164341166&autoLogAppEvents=1"></script>').insertAfter('#fb-root');
-	// if($fb) add_script( '//connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v3.2&appId=330469164341166&autoLogAppEvents=1', 'async' );
 }
-
-// do_action( 'add_social_scripts' );
-// add_action( 'wp_footer', 'preload_social_scripts' );
-// function preload_social_scripts( $vk=true, $fb=true ){ 
-// 	// <link rel="preload" href="AO.js" as="script">
-// 	$onload = 'if(screen.width > 768){ var script = document.createElement(\'script\'); script.src = this.href; document.body.appendChild(script); }';
-// 	if( $vk ){
-// 		$href = '//vk.com/js/api/openapi.js?160';
-// 		echo '<link rel="preload" href="'.$href.'" as="script" onload="'.$onload.'" />'.PHP_EOL;
-// 	}
-// 	if( $fb ){
-// 		$href = '//connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v3.2&appId=330469164341166&autoLogAppEvents=1';
-// 		echo '<link rel="preload" href="'.$href.'" as="script" onload="'.$onload.'" />'.PHP_EOL;
-// 	}
-
-// 	wp_enqueue_script( 'cssrelpreload-js' );
-// }
 
 // do_action( 'add_share_scripts' );
 add_action( 'add_share_scripts', 'add_share_scripts_func', 10, 0);

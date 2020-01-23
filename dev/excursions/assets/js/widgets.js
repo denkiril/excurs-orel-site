@@ -34,7 +34,6 @@ function socialMount() {
   }
 
   if (fbRoot) {
-    // $('<script async defer src="https://connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v3.2&appId=330469164341166&autoLogAppEvents=1"></script>').insertAfter('#fb-root');
     getScript(fbSdkUrl);
   }
 
