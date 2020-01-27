@@ -124,7 +124,7 @@ add_action( 'widgets_init', 'excursions_widgets_init' );
 $LINKS = array();
 // $SCRIPTS = array();
 $consolelog = '';
-$SCRIPTS_VER = '20200104';
+$SCRIPTS_VER = '20200127';
 $STYLES_VER = '20200104';
 $WEBP_ON = !(home_url() == 'http://excurs-orel');
 // $WEBP_ON = true;
@@ -153,6 +153,7 @@ function excursions_scripts() {
 
 	wp_enqueue_script( 'script-js', $scripts_dirname.'script.js', array(), $SCRIPTS_VER, 'in_footer' );
 	wp_enqueue_script( 'script-legacy', $scripts_dirname.'script-legacy.js', array(), $SCRIPTS_VER, 'in_footer' );
+	wp_localize_script( 'script-js', 'myajax', array( 'url' => admin_url('admin-ajax.php') ) );
 
 	if( is_singular('events') || is_singular('guidebook') ){
 		wp_enqueue_style( 'events', get_template_directory_uri() . '/assets/css/events.css', array(), $STYLES_VER );
@@ -1847,6 +1848,7 @@ function gallery_func( $atts ){
 			if ($return_array) {
 				$location = null;
 				// $location = get_field('photogeoloc', $id);
+				$location = get_post_meta($id, 'photo_location', true);
 				if ($location) {
 					// print_r2($location);
 					$sights[] = [
@@ -2441,6 +2443,23 @@ function my_acf_google_map_api($api) {
 }
 add_filter('acf/fields/google_map/api', 'my_acf_google_map_api');
 
+// подключаем AJAX обработчики, только когда в этом есть смысл
+if (wp_doing_ajax()) {
+	add_action('wp_ajax_get_apikey', 'get_apikey');
+	add_action('wp_ajax_nopriv_get_apikey', 'get_apikey');
+}
+function get_apikey() {
+	$apikey = null;
+	if (isset($_GET['apikeyname'])) {
+		switch ($_GET['apikeyname']) {
+			case 'GOOGLE_MAPS_API': $apikey = GOOGLE_MAPS_API; break;
+			case 'YANDEX_MAPS_API': $apikey = YANDEX_MAPS_API; break;
+			case 'FB_APPID': $apikey = FB_APPID; break;
+		}
+	}
+	echo json_encode($apikey);
+	wp_die(); // выход нужен для того, чтобы в ответе не было ничего лишнего, только то что возвращает функция
+}
 
 function console_log( $str ){
 	global $consolelog;

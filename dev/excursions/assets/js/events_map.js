@@ -1,13 +1,12 @@
 import '../css/events_map.css';
 
-const baseColor = '#005281'; // 015a8d
-const activeColor = '#bc3134'; // ffd649
 /* global NavBlock */
-/* global getScript */
-/* global ymapsApiUrl */
+/* global getApi */
 /* global myajax */
 /* global ymaps */
 
+const baseColor = '#005281'; // 015a8d
+const activeColor = '#bc3134'; // ffd649
 
 function addMarker(event, map) {
   const { lat } = event;
@@ -204,8 +203,7 @@ function NewEventsMap(eventsMap) {
     body: 'action=get_events',
   };
 
-  // $.getScript(api_url).then(function(){
-  getScript(ymapsApiUrl).then(() => {
+  getApi('ymaps').then(() => {
     fetch(myajax.url, fetchInit)
       .then(response => response.json())
       .then((events) => {

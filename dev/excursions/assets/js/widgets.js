@@ -1,25 +1,16 @@
-const vkApiUrl 		= '//vk.com/js/api/openapi.js?160';
-const fbSdkUrl 		= 'https://connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v3.2&appId=330469164341166&autoLogAppEvents=1';
-const SocialSection = document.querySelector('#soc-section');
-const vkGroups 		= document.querySelector('#vk_groups');
-const fbRoot 		= document.querySelector('#fb-root');
-const glideEl 	= document.querySelector('.glide');
 /* global VK */
-/* global getScript */
+/* global getApi */
 /* global Glide */
 /* global isInViewport */
 
-function socialMount() {
-  // if(SocialSection && screen.width > 768){
-  if (vkGroups) {
-    // const mode 		= vk_groups.dataset.mode 	 || 3; 		//? vk_groups.dataset.mode 	  : 3;
-    // const width 	= vk_groups.dataset.width 	 || 300; 	//? vk_groups.dataset.width 	  : 300;
-    // const height 	= vk_groups.dataset.height 	 || 300; 	//? vk_groups.dataset.height   : 300;
-    // const no_cover 	= vk_groups.dataset.no_cover || 0; 		//? vk_groups.dataset.no_cover : 0;
-    // console.log(mode+' '+width+' '+height+' '+no_cover);
+const SocialSection = document.getElementById('soc-section');
+const vkGroups = document.getElementById('vk_groups');
+const fbRoot = document.getElementById('fb-root');
+const glideEl = document.querySelector('.glide');
 
-    // $.getScript("//vk.com/js/api/openapi.js?160").then(function() {
-    getScript(vkApiUrl).then(() => {
+function socialMount() {
+  if (vkGroups) {
+    getApi('vk').then(() => {
       VK.Widgets.Group(
         'vk_groups',
         {
@@ -33,11 +24,7 @@ function socialMount() {
     });
   }
 
-  if (fbRoot) {
-    getScript(fbSdkUrl);
-  }
-
-  // if (vkGroups || fbRoot) SocialSection.style.display = 'block';
+  if (fbRoot) getApi('fb');
 }
 
 function socialLazyLoad() {

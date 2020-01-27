@@ -103,7 +103,7 @@
 				$sights = empty($sights) ? '' : 'data-sights="'.esc_html(json_encode($sights)).'"';
 				?>
 				<div class="col<?php echo $col_sfx ?>">
-					<div class="mini-map" <?php echo $sights ?>>
+					<div class="mini-map event-map" <?php echo $sights ?>>
 						<button id="OpenMap_btn" class="ref_btn autoopen">[ Показать на карте ]</button>
 						<div class="marker" data-lat="<?php echo $location['lat']; ?>" data-lng="<?php echo $location['lng']; ?>" data-post_id="<?php the_ID(); ?>"></div>
 					</div>

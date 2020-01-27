@@ -8,11 +8,9 @@ const activeColor = '#bc3134'; // ffd649
 // let objects              = [];
 const placeholderUrl = '/wp-content/themes/excursions/assets/img/placeholder_3x2.png';
 /* global NavBlock */
-/* global getScript */
-/* global ymapsApiUrl */
+/* global getApi */
 /* global myajax */
 /* global ymaps */
-
 
 function addMarker(obj, map) {
   const { lat } = obj;
@@ -415,7 +413,7 @@ function NewObjMap(objectsMap) {
   // const searchParams = new URLSearchParams(window.location.search);
   // requestUrl += '&' + searchParams.toString();
 
-  getScript(ymapsApiUrl).then(() => {
+  getApi('ymaps').then(() => {
     fetch(requestUrl, fetchInit)
       .then(response => response.json())
       .then((objects) => {

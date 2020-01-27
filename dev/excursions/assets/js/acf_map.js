@@ -1,5 +1,4 @@
-/* global getScript */
-/* global ymapsApiUrl */
+/* global getApi */
 /* global ymaps */
 /* global myajax */
 
@@ -13,6 +12,7 @@ const miniMapWidget = (() => {
   const $markerArr = $miniMap ? $miniMap.querySelectorAll('.marker') : null;
 
   const autoopen = $openMapButton && $openMapButton.classList.contains('autoopen');
+  const boundsAll = $miniMap.classList.contains('event-map');
   const bigScreen = window.screen.width > 768;
 
   function wait(ms) {
@@ -83,12 +83,12 @@ const miniMapWidget = (() => {
     // console.log('nomarkers bounds', bounds);
 
     const markers = objects.filter(obj => obj.marker);
-    if (markers.length) {
+    if (markers.length > 0) {
       // console.log('markers', markers);
       const markersGOC = new ymaps.GeoObjectCollection({}, {});
       markers.forEach(obj => addMarker(obj, markersGOC));
       map.geoObjects.add(markersGOC);
-      bounds = markersGOC.getBounds();
+      bounds = boundsAll ? map.geoObjects.getBounds() : markersGOC.getBounds();
       // console.log('markers bounds', bounds);
     }
 
@@ -112,7 +112,7 @@ const miniMapWidget = (() => {
     }
 
     if (objects) {
-      getScript(ymapsApiUrl)
+      getApi('ymaps')
         .then(() => {
           if ($openMapButton) $openMapButton.style.display = 'none';
           let animDuration = 0;

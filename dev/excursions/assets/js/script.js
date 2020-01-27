@@ -1,35 +1,80 @@
-const NavBlock = document.querySelector('#nav-block'); // ID шапки
+const NavBlock = document.getElementById('nav-block'); // ID шапки
 const NavBlockTop = NavBlock.getBoundingClientRect().top + window.pageYOffset;
-const Menu = document.querySelector('#menu');
+const Menu = document.getElementById('menu');
 const NavMenu = document.querySelector('.nav-menu');
-const Up = document.querySelector('#up');
-const yandexRtb = document.querySelector('#yandex_rtb_R-A-414612-1');
+const Up = document.getElementById('up');
+const yandexRtb = document.getElementById('yandex_rtb_R-A-414612-1');
 
 let NavMenuHeight;
 let menuStateOpen = false;
+window.NavBlock = NavBlock;
 
 /* global Ya */
+/* global myajax */
 /* exported ymapsApiUrl */
 // eslint-disable-next-line no-unused-vars
-const ymapsApiUrl 	= 'https://api-maps.yandex.ru/2.1/?lang=ru_RU';
+// const ymapsApiUrl 	= 'https://api-maps.yandex.ru/2.1/?lang=ru_RU';
+// const vkApiUrl 		= '//vk.com/js/api/openapi.js?160';
+// const fbSdkUrl 		= 'https://connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v3.2&appId=330469164341166&autoLogAppEvents=1';
+// window.ymapsApiUrl = ymapsApiUrl;
 
-window.NavBlock = NavBlock;
-window.ymapsApiUrl = ymapsApiUrl;
 
-function getScript(src) {
-  const scriptPromise = new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    document.body.appendChild(script);
-    script.onload = resolve;
-    script.onerror = reject;
-    script.async = true;
-    script.src = src;
+function getApi(apiname) {
+  let apiUrl = null;
+  let apikeyName = null;
+  let paramName = null;
+  switch (apiname) {
+    case 'ymaps':
+      apiUrl = 'https://api-maps.yandex.ru/2.1/?lang=ru_RU';
+      apikeyName = window.location.hostname === 'excurs-orel.ru' ? 'YANDEX_MAPS_API' : null;
+      paramName = 'apikey';
+      break;
+    case 'ycontext':
+      apiUrl = '//an.yandex.ru/system/context.js';
+      break;
+    case 'vk':
+      apiUrl = '//vk.com/js/api/openapi.js?160';
+      break;
+    case 'fb':
+      apiUrl = 'https://connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v3.2&appId=330469164341166&autoLogAppEvents=1';
+      // apiUrl = 'https://connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v3.2&autoLogAppEvents=1';
+      apikeyName = null; // 'FB_APPID';
+      paramName = 'appId';
+      break;
+    default: break;
+  }
+
+  const getApikeyParam = new Promise((resolve) => {
+    if (apikeyName) {
+      const requestUrl = `${myajax.url}?action=get_apikey`;
+      // const requestUrl = `${myajax.url}?action=get_apikey&apikeyname=YANDEX_MAPS_API`;
+      console.log(requestUrl);
+      fetch(requestUrl, { headers: { 'content-type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
+        .then(response => response.json())
+        .then((apikey) => {
+          console.log('apikey:', apikey);
+          const apikeyParam = apikey ? `&${paramName}=${apikey}` : '';
+          resolve(apikeyParam);
+        });
+    } else {
+      resolve('');
+    }
   });
 
-  return scriptPromise;
+  return new Promise((resolve, reject) => {
+    getApikeyParam
+      .then((apikeyParam) => {
+        const script = document.createElement('script');
+        document.body.appendChild(script);
+        script.onload = resolve;
+        script.onerror = reject;
+        script.async = true;
+        script.src = apiUrl + apikeyParam;
+      });
+  });
 }
 
-window.getScript = getScript;
+window.getApi = getApi;
 
 function isInViewport(el) {
   const rect = el.getBoundingClientRect();
@@ -178,19 +223,22 @@ function scrollIt(destination, duration = 350) {
 
 // document.querySelectorAll('a').forEach((el) => {
 [].forEach.call(document.querySelectorAll('a'), (el) => {
-  el.addEventListener('click', (e) => {
-    // console.log(e.target);
-    console.log(e.currentTarget);
-    const href = e.currentTarget.getAttribute('href');
-    if (href && href.match(/^#/)) {
-      e.preventDefault();
-      if (href.match(/^#$/)) {
-        scrollIt(0);
-      } else {
-        scrollIt(document.querySelector(href));
+  const ahref = el.getAttribute('href');
+  if (ahref && ahref.match(/^#/)) {
+    el.addEventListener('click', (e) => {
+      // console.log(e.target);
+      console.log(e.currentTarget);
+      const href = e.currentTarget.getAttribute('href');
+      if (href && href.match(/^#/)) {
+        e.preventDefault();
+        if (href.match(/^#$/)) {
+          scrollIt(0);
+        } else {
+          scrollIt(document.querySelector(href));
+        }
       }
-    }
-  });
+    });
+  }
 });
 
 // <script type="text/javascript">
@@ -223,7 +271,7 @@ function yandexRtbMount() {
     });
   });
 
-  getScript('//an.yandex.ru/system/context.js');
+  getApi('ycontext');
 
   // getScript('//an.yandex.ru/system/context.js').then(() => {
   //   const n = 'yandexContextAsyncCallbacks';
