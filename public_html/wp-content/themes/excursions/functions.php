@@ -124,8 +124,8 @@ add_action( 'widgets_init', 'excursions_widgets_init' );
 $LINKS = array();
 // $SCRIPTS = array();
 $consolelog = '';
-$SCRIPTS_VER = '20200127';
-$STYLES_VER = '20200104';
+$SCRIPTS_VER = '20200128';
+$STYLES_VER = '20200128';
 $WEBP_ON = !(home_url() == 'http://excurs-orel');
 // $WEBP_ON = true;
 if(!$WEBP_ON) console_log('WEBP_OFF');
@@ -1839,10 +1839,10 @@ function gallery_func( $atts ){
 			}
 
 			$item_anchor = $class.'-'.$id;
-			$echo .= '<div class="'.$item.' '.$bootstrap.'"><a name="'.$item_anchor.'"></a>';
+			$echo .= '<div id="'.$item_anchor.'" class="'.$item.' '.$bootstrap.'"><a name="'.$item_anchor.'"></a>';
 			// Get picture item in markup_figure() func. 1st two ($images_counter == 0 || 1) are not lazy 
-			$print_lazy = $lazy && $images_counter > 2;
-			$echo .= markup_fancy_figure($id, $fancybox, $full_image_url, $title, $size, $print_lazy, $title, null, $figcaption_html);
+			// $print_lazy = $lazy && $images_counter > 2;
+			$echo .= markup_fancy_figure($id, $fancybox, $full_image_url, $title, $size, $lazy, $title, null, $figcaption_html);
 			$echo .= '</div>';
 
 			if ($return_array) {

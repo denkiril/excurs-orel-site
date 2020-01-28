@@ -18,7 +18,6 @@ window.NavBlock = NavBlock;
 // const fbSdkUrl 		= 'https://connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v3.2&appId=330469164341166&autoLogAppEvents=1';
 // window.ymapsApiUrl = ymapsApiUrl;
 
-
 function getApi(apiname) {
   let apiUrl = null;
   let apikeyName = null;
@@ -78,12 +77,12 @@ window.getApi = getApi;
 
 function isInViewport(el) {
   const rect = el.getBoundingClientRect();
-  // console.log(rect);
+  // if (log) console.log(rect);
 
   return (
-    rect.bottom >= 0
+    rect.bottom >= -60
     && rect.right >= 0
-    && rect.top <= (window.innerHeight || document.documentElement.clientHeight)
+    && rect.top <= (window.innerHeight || document.documentElement.clientHeight) + 60
     && rect.left <= (window.innerWidth || document.documentElement.clientWidth)
   );
 }
@@ -94,13 +93,6 @@ function init() {
   // Блок, работающий на JS, показываем только если работает JS
   const sb = document.getElementById('soc-buttons');
   if (sb) sb.style.display = 'block';
-
-  // if (window.screen.width > 768 && Up) {
-  //   Up.addEventListener('click', () => {
-  //     document.body.scrollTop = 0; // For Safari
-  //     document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-  //   });
-  // }
 }
 
 function setNavMenu() {
@@ -166,30 +158,57 @@ Menu.addEventListener('click', () => {
   }
 });
 
-function lazyLoad() {
-  [].forEach.call(document.querySelectorAll('[data-src]'), (img) => {
-    // if(isInViewport(lazy[i])){
-    img.setAttribute('src', img.getAttribute('data-src'));
-    // img.setAttribute('src', img.dataset.src);
-    // img.onload = function() {
-    img.removeAttribute('data-src');
-    // };
-  });
+// images lazy load
+let lazyImages = [];
 
-  [].forEach.call(document.querySelectorAll('[data-srcset]'), (img) => {
-    // img.setAttribute('srcset', img.dataset.srcset);
+function swapLazyAttributes(img) {
+  if (img.getAttribute('data-src')) {
+    img.setAttribute('src', img.getAttribute('data-src'));
+    img.removeAttribute('data-src');
+  }
+  if (img.getAttribute('data-srcset')) {
     img.setAttribute('srcset', img.getAttribute('data-srcset'));
     img.removeAttribute('data-srcset');
-  });
-
-  [].forEach.call(document.querySelectorAll('[data-sizes]'), (img) => {
-    // img.setAttribute('sizes', img.dataset.sizes);
+  }
+  if (img.getAttribute('data-sizes')) {
     img.setAttribute('sizes', img.getAttribute('data-sizes'));
     img.removeAttribute('data-sizes');
-  });
+  }
 }
 
-window.addEventListener('load', lazyLoad);
+function lazyImagesWatch() {
+  let filter = false;
+  lazyImages.forEach((img) => {
+    if (isInViewport(img)) {
+      console.log('lazyImages in viewport');
+      swapLazyAttributes(img);
+      filter = true;
+    }
+  });
+
+  if (filter) lazyImages = Array.prototype.filter.call(lazyImages, img => img.getAttribute('data-src'));
+
+  if (lazyImages.length === 0) {
+    window.removeEventListener('scroll', lazyImagesWatch);
+    window.removeEventListener('resize', lazyImagesWatch);
+  }
+}
+
+function lazyImagesInit() {
+  document.querySelectorAll('.glide').forEach((glide) => {
+    glide.querySelectorAll('[data-src]').forEach(img => swapLazyAttributes(img));
+  });
+
+  lazyImages = document.querySelectorAll('[data-src]');
+  console.log(lazyImages);
+  if (lazyImages.length) {
+    window.addEventListener('scroll', lazyImagesWatch);
+    window.addEventListener('resize', lazyImagesWatch);
+    lazyImagesWatch();
+  }
+}
+
+window.addEventListener('load', lazyImagesInit);
 
 function scrollIt(destination, duration = 350) {
   const start = window.pageYOffset;
@@ -197,7 +216,6 @@ function scrollIt(destination, duration = 350) {
   const { body } = document;
   const dele = document.documentElement;
 
-  // eslint-disable-next-line max-len
   const dHeight = Math.max(body.scrollHeight, body.offsetHeight, dele.clientHeight, dele.scrollHeight, dele.offsetHeight);
   const wHeight = window.innerHeight || dele.clientHeight || document.getElementsByTagName('body')[0].clientHeight;
   const dOffset = typeof destination === 'number' ? destination : destination.offsetTop;
@@ -221,25 +239,43 @@ function scrollIt(destination, duration = 350) {
   scroll();
 }
 
+// [].forEach.call(document.querySelectorAll('a'), (el) => {
 // document.querySelectorAll('a').forEach((el) => {
-[].forEach.call(document.querySelectorAll('a'), (el) => {
-  const ahref = el.getAttribute('href');
-  if (ahref && ahref.match(/^#/)) {
-    el.addEventListener('click', (e) => {
-      // console.log(e.target);
-      console.log(e.currentTarget);
-      const href = e.currentTarget.getAttribute('href');
-      if (href && href.match(/^#/)) {
-        e.preventDefault();
-        if (href.match(/^#$/)) {
-          scrollIt(0);
-        } else {
-          scrollIt(document.querySelector(href));
-        }
+//   const ahref = el.getAttribute('href');
+//   if (ahref && ahref.match(/^#/)) {
+//     el.addEventListener('click', (e) => {
+//       // console.log(e.target);
+//       console.log(e.currentTarget);
+//       const href = e.currentTarget.getAttribute('href');
+//       if (href && href.match(/^#/)) {
+//         e.preventDefault();
+//         if (href.match(/^#$/)) {
+//           scrollIt(0);
+//         } else {
+//           scrollIt(document.querySelector(href));
+//         }
+//       }
+//     });
+//   }
+// });
+
+function checkClick(e) {
+  // console.log(e.target);
+  if (e.target.tagName === 'A') {
+    const href = e.target.getAttribute('href');
+    // console.log(href);
+    if (href && href.match(/^#/)) {
+      e.preventDefault();
+      if (href.match(/^#$/)) {
+        scrollIt(0);
+      } else {
+        scrollIt(document.querySelector(href));
       }
-    });
+    }
   }
-});
+}
+
+window.addEventListener('click', checkClick);
 
 // <script type="text/javascript">
 // (function(w, d, n, s, t) {
