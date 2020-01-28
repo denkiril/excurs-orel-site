@@ -162,18 +162,22 @@ Menu.addEventListener('click', () => {
 let lazyImages = [];
 
 function swapLazyAttributes(img) {
-  if (img.getAttribute('data-src')) {
-    img.setAttribute('src', img.getAttribute('data-src'));
-    img.removeAttribute('data-src');
+  let source = img.previousSibling;
+  while (source) {
+    if (source.getAttribute('data-srcset')) {
+      source.setAttribute('srcset', source.getAttribute('data-srcset'));
+      source.removeAttribute('data-srcset');
+    }
+    if (source.getAttribute('data-sizes')) {
+      source.setAttribute('sizes', source.getAttribute('data-sizes'));
+      source.removeAttribute('data-sizes');
+    }
+    source = source.previousSibling;
   }
-  if (img.getAttribute('data-srcset')) {
-    img.setAttribute('srcset', img.getAttribute('data-srcset'));
-    img.removeAttribute('data-srcset');
-  }
-  if (img.getAttribute('data-sizes')) {
-    img.setAttribute('sizes', img.getAttribute('data-sizes'));
-    img.removeAttribute('data-sizes');
-  }
+
+  // if (img.getAttribute('data-src')) {}
+  img.setAttribute('src', img.getAttribute('data-src'));
+  img.removeAttribute('data-src');
 }
 
 function lazyImagesWatch() {
