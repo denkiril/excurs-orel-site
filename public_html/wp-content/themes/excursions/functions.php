@@ -124,7 +124,7 @@ add_action( 'widgets_init', 'excursions_widgets_init' );
 $LINKS = array();
 // $SCRIPTS = array();
 $consolelog = '';
-$SCRIPTS_VER = '20200202_2';
+$SCRIPTS_VER = '20200202_3';
 $STYLES_VER = '20200202_2';
 $WEBP_ON = !(home_url() == 'http://excurs-orel');
 // $WEBP_ON = true;

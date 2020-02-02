@@ -128,7 +128,7 @@
 						<!-- <div class="nav-container"> -->
 						<div>
 							<div id="nav-adaptive" class="flex-container">
-								<button id="menu">
+								<button id="menu" class="hidden">
 									<span></span>
 									<span></span>
 									<span></span>

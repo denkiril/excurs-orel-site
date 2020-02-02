@@ -1,6 +1,6 @@
 const NavBlock = document.getElementById('nav-block'); // ID шапки
 const NavBlockTop = NavBlock.getBoundingClientRect().top + window.pageYOffset;
-const Menu = document.getElementById('menu');
+const menuBtn = document.getElementById('menu');
 // const NavMenu = document.querySelector('.nav-menu');
 const Up = document.getElementById('up');
 const yandexRtb = document.getElementById('yandex_rtb_R-A-414612-1');
@@ -93,6 +93,22 @@ function init() {
   // Блок, работающий на JS, показываем только если работает JS
   const sb = document.getElementById('soc-buttons');
   if (sb) sb.style.display = 'block';
+
+  // Меню-гамбургер для адаптивной версии --- slideToggle
+  if (menuBtn) {
+    menuBtn.classList.remove('hidden');
+    menuBtn.addEventListener('click', () => {
+      menuStateOpen = !menuStateOpen;
+
+      if (menuStateOpen) {
+        NavBlock.classList.add('menu_state_open');
+        // NavMenu.style.height = `${NavMenuHeight}px`;
+      } else {
+        NavBlock.classList.remove('menu_state_open');
+        // NavMenu.style.height = '0px';
+      }
+    });
+  }
 }
 
 // function setNavMenu() {
@@ -145,18 +161,6 @@ window.addEventListener('load', init);
 window.addEventListener('scroll', watchScroll);
 window.addEventListener('resize', watchResize);
 
-// Меню-гамбургер для адаптивной версии --- slideToggle
-Menu.addEventListener('click', () => {
-  menuStateOpen = !menuStateOpen;
-
-  if (menuStateOpen) {
-    NavBlock.classList.add('menu_state_open');
-    // NavMenu.style.height = `${NavMenuHeight}px`;
-  } else {
-    NavBlock.classList.remove('menu_state_open');
-    // NavMenu.style.height = '0px';
-  }
-});
 
 // images lazy load
 let lazyImages = [];
