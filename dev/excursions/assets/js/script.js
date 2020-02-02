@@ -1,11 +1,11 @@
 const NavBlock = document.getElementById('nav-block'); // ID шапки
 const NavBlockTop = NavBlock.getBoundingClientRect().top + window.pageYOffset;
 const Menu = document.getElementById('menu');
-const NavMenu = document.querySelector('.nav-menu');
+// const NavMenu = document.querySelector('.nav-menu');
 const Up = document.getElementById('up');
 const yandexRtb = document.getElementById('yandex_rtb_R-A-414612-1');
 
-let NavMenuHeight;
+// let NavMenuHeight;
 let menuStateOpen = false;
 window.NavBlock = NavBlock;
 
@@ -95,14 +95,14 @@ function init() {
   if (sb) sb.style.display = 'block';
 }
 
-function setNavMenu() {
-  if (window.screen.width <= 768) {
-    NavMenu.style.display = 'block';
-    NavMenuHeight = NavMenu.getBoundingClientRect().height;
-    // console.log(NavMenuHeight);
-    NavMenu.style.height = '0px';
-  }
-}
+// function setNavMenu() {
+//   if (window.screen.width <= 768) {
+//     NavMenu.style.display = 'block';
+//     NavMenuHeight = NavMenu.getBoundingClientRect().height;
+//     console.log(NavMenuHeight);
+//     NavMenu.style.height = '0px';
+//   }
+// }
 
 function watchResize() {
   if (window.screen.width > 768) {
@@ -113,8 +113,8 @@ function watchResize() {
 
   // if(NavBlock.classList.contains('menu_state_open')){}
   NavBlock.classList.remove('menu_state_open');
-  NavMenu.removeAttribute('style');
-  setNavMenu();
+  // NavMenu.removeAttribute('style');
+  // setNavMenu();
 }
 
 function watchScroll() {
@@ -131,7 +131,7 @@ function watchScroll() {
     if (menuStateOpen) {
       menuStateOpen = false;
       NavBlock.classList.remove('menu_state_open');
-      NavMenu.style.height = '0px';
+      // NavMenu.style.height = '0px';
     }
   } else if (scrollTop > 500) {
     Up.style.display = 'block';
@@ -141,7 +141,7 @@ function watchScroll() {
 }
 
 window.addEventListener('load', init);
-window.addEventListener('load', setNavMenu);
+// window.addEventListener('load', setNavMenu);
 window.addEventListener('scroll', watchScroll);
 window.addEventListener('resize', watchResize);
 
@@ -151,10 +151,10 @@ Menu.addEventListener('click', () => {
 
   if (menuStateOpen) {
     NavBlock.classList.add('menu_state_open');
-    NavMenu.style.height = `${NavMenuHeight}px`;
+    // NavMenu.style.height = `${NavMenuHeight}px`;
   } else {
     NavBlock.classList.remove('menu_state_open');
-    NavMenu.style.height = '0px';
+    // NavMenu.style.height = '0px';
   }
 });
 

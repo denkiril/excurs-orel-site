@@ -49,11 +49,18 @@
     display: none;
 }
 
-.obj_map[data-state="init"] .om_content,
-.obj_map[data-state="close"] .om_content{
+.obj_map[data-state="close"] .om_content {
     display: none;
 }
-.obj_map[data-state="open"] .om_content{
+.obj_map[data-state="init"] .om_content {
+    display: block;
+}
+@media (max-width: 768px) {
+    .obj_map[data-state="init"] .om_content {
+        display: none;
+    }
+}
+.obj_map[data-state="open"] .om_content {
     display: block;
 }
 

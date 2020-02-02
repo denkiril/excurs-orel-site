@@ -362,39 +362,24 @@ function NewObjList(objectsMap, objects, storage, clusterer) {
 }
 
 function NewObjMap(objectsMap) {
-  const markup = `
-        <div class="om_flex">
-            <div class="om_block omb_map"></div>
-            <div class="om_aside">
-                <div class="om_block omb_filter">
-                    <input type="search" placeholder="Поиск по названию" id="filterByTitle">
-                    <div class="ctrl_flex">
-                        <label title="Переключение вида">
-                            <input class="hidden_input" type="radio" name="omb_list_view" value="list" checked>
-                            <span class="chb_svg"></span>
-                        </label>
-                        <label title="Переключение вида">
-                            <input class="hidden_input" type="radio" name="omb_list_view" value="imgs">
-                            <span class="chb_svg"></span>
-                        </label>
-                    </div>
-                </div>
-                <div class="om_block omb_list"></div>
-                <div class="om_block omb_info">
-                    <img id="infoImg" src="" />
-                    <a id="infoRef" href=""></a>
-                </div>
-            </div>
-        </div>`;
-
-  // <label>
-  //     <input class="hidden_input" type="checkbox" name="checkbox" id="chb_imgOn">
-  //     <span class="chb_svg"></span>
-  // </label>
-
-  // objectsMap.appendChild(em_content);
-  const omContent = objectsMap.querySelector('.om_content');
-  omContent.insertAdjacentHTML('beforeend', markup);
+  // const markup = `
+  //   <input type="search" placeholder="Поиск по названию" id="filterByTitle">
+  //   <div class="ctrl_flex">
+  //       <label title="Переключение вида">
+  //           <input class="hidden_input" type="radio" name="omb_list_view" value="list" checked>
+  //           <span class="chb_svg"></span>
+  //       </label>
+  //       <label title="Переключение вида">
+  //           <input class="hidden_input" type="radio" name="omb_list_view" value="imgs">
+  //           <span class="chb_svg"></span>
+  //       </label>
+  //   </div>`;
+  // const ombFilter = objectsMap.querySelector('.omb_filter');
+  // ombFilter.insertAdjacentHTML('beforeend', markup);
+  const $filterByTitle = document.getElementById('filterByTitle');
+  if ($filterByTitle) $filterByTitle.classList.remove('hidden');
+  const $ctrlFlex = objectsMap.querySelector('.ctrl_flex');
+  if ($ctrlFlex) $ctrlFlex.classList.remove('hidden');
 
   const fetchInit = {
     // method: 'POST',
@@ -483,13 +468,15 @@ function initGBMap() {
 
   if (objMap) {
     // const omContent = objMap.querySelector('.om_content');
-    const ombPanel = objMap.querySelector('.omb_panel');
-    if (ombPanel) {
-      ombPanel.removeAttribute('style'); // style="display: none;"
-    }
+    // const ombPanel = objMap.querySelector('.omb_panel');
+    // if (ombPanel) {
+    //   ombPanel.removeAttribute('style'); // style="display: none;"
+    // }
 
     const OpenMapBtn = objMap.querySelector('.OpenMap_btn');
     if (OpenMapBtn) {
+      // OpenMapBtn.removeAttribute('style'); // style="display: none;"
+      OpenMapBtn.classList.remove('hidden');
       OpenMapBtn.addEventListener('click', () => changeObjMapState(objMap));
     }
 

@@ -124,8 +124,8 @@ add_action( 'widgets_init', 'excursions_widgets_init' );
 $LINKS = array();
 // $SCRIPTS = array();
 $consolelog = '';
-$SCRIPTS_VER = '20200128';
-$STYLES_VER = '20200128';
+$SCRIPTS_VER = '20200202_2';
+$STYLES_VER = '20200202_2';
 $WEBP_ON = !(home_url() == 'http://excurs-orel');
 // $WEBP_ON = true;
 if(!$WEBP_ON) console_log('WEBP_OFF');
@@ -1894,29 +1894,39 @@ function guidebook_map_func( $atts ) {
 		$pagenum1_checked 		= (!isset($_GET['pagenum']) || $_GET['pagenum'] == 1) ? 'checked' : '';
 		$pagenum2_checked 		= $_GET['pagenum'] == 2 ? 'checked' : '';
 		
-		$form_html .= '<form>';
+		$form_html .= '<div class="om_block omb_topFilter"><form>';
 		$form_html .= '<label><input type="checkbox" name="cat_f" '.$cat_f_checked.'>Ф</label>';
         $form_html .= '<label><input type="checkbox" name="numberposts_1" '.$numberposts_1_checked.'>1</label>';
         $form_html .= '<label><input type="checkbox" name="numberposts_2" '.$numberposts_2_checked.'>2</label>';
 		$form_html .= '<label><input type="radio" name="pagenum" value="1" '.$pagenum1_checked.'>1</label>';
 		$form_html .= '<label><input type="radio" name="pagenum" value="2" '.$pagenum2_checked.'>2</label>';
-        $form_html .= '<button type="submit">Применить</button></form>';
+        $form_html .= '<button type="submit">Применить</button></form></div>';
 	}
 
-	$echo = '<div class="'.$class.'" data-state="init">';
-	$echo .= '<div class="om_block omb_panel" style="display: none;">';
-	$echo .= '<button class="OpenMap_btn">';
-	$echo .= '<span class="state_init">[ Показать на карте ]</span>';
-	$echo .= '<span class="state_open">[ Закрыть карту ]</span>';
-	$echo .= '<span class="state_close">[ Открыть карту ]</span></button></div>';
-	$echo .= '<div class="om_content">';
-	$echo .= '<div class="om_block omb_topFilter" style="display: none;">';
-	$echo .= $form_html;
-	$echo .= '</div></div></div>';
+	$html = '<div class="'.$class.'" data-state="init">';
+	$html .= '<div class="om_block omb_panel"><button class="OpenMap_btn hidden">';
+	$html .= '<span class="state_init">[ Показать на карте ]</span>';
+	$html .= '<span class="state_open">[ Закрыть карту ]</span>';
+	$html .= '<span class="state_close">[ Открыть карту ]</span></button></div>';
+	$html .= '<div class="om_content">';
+	$html .= $form_html;
+	$html .= '<div class="om_flex"><div class="om_block omb_map"></div><div class="om_aside">';
+	$html .= '<div class="om_block omb_filter">';
+	$html .= '<input type="search" placeholder="Поиск по названию" id="filterByTitle" class="hidden">';
+	$html .= '<div class="ctrl_flex hidden">';
+	$html .= '<label title="Переключение вида">';
+	$html .= '<input class="hidden_input" type="radio" name="omb_list_view" value="list" checked>';
+	$html .= '<span class="chb_svg"></span></label>';
+	$html .= '<label title="Переключение вида">';
+	$html .= '<input class="hidden_input" type="radio" name="omb_list_view" value="imgs">';
+	$html .= '<span class="chb_svg"></span></label></div></div>';
+    $html .= '<div class="om_block omb_list"></div>';
+    $html .= '<div class="om_block omb_info"><img id="infoImg" src="" /><a id="infoRef" href=""></a></div>';
+	$html .= '</div></div></div></div>';
 	
 	do_action('guidebook_map_scripts');
 
-	return $echo;
+	return $html;
 }
 
 // [guidebook_sections content="" show='sights museums documents'] 

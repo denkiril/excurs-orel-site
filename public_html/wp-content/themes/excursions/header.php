@@ -47,26 +47,29 @@
 						$nav_title_ref 		= null;
 						$alt_contenttitle 	= null;
 						$alt_headertitle 	= null;
+						$nav_menu_classes 	= '';
 						
-						if ( is_singular('guidebook') || is_tax('sections') ) {
+						if (is_singular('guidebook') || is_tax('sections')) {
 							// $guidebook_id = 789;
 							// if (home_url() == 'http://excurs-orel') $guidebook_id = 697;
 							$guidebook_id 		= get_page_by_path('guidebook')->ID;
 							$alt_headertitle 	= get_post_meta($guidebook_id, 'header-title', true);
-							$term_0 			= 'sights'; // get_terms( array('taxonomy' => 'sections') )[0];
-							$term 				= get_the_terms($post->ID, 'sections')[0];
-							if ( ! $term_0 || ! $term || $term->term_id == $term_0 || is_tax('sections') ) {
+							// $term_0 			= 'sights'; // get_terms( array('taxonomy' => 'sections') )[0];
+							$terms 				= get_the_terms($post->ID, 'sections');
+							$term 				= $terms ? array_shift($terms) : null;
+							if (($term && $term->slug == 'sights') || is_tax('sections')) {
 								// $nav_title 		= $term->name;
 								// $nav_title_ref 	= get_term_link( (int)$term->term_id );
 								$nav_title 			= get_the_title($guidebook_id); // Путеводитель
 								$nav_title_ref 		= get_permalink($guidebook_id);
-								if ( is_tax('sections') ) {
+								$nav_menu_classes 	= 'menu-item-guidebook_hide';
+								if (is_tax('sections')) {
 									$alt_contenttitle = $term->name;
 								}
 							} else {
 								// $term 		= get_queried_object();
 								$nav_title 		= $term->name;
-								$nav_title_ref 	= get_term_link( (int) $term->term_id );
+								$nav_title_ref 	= get_term_link((int)$term->term_id);
 							}
 						} elseif (!is_404()) {
 							$alt_headertitle = get_post_meta($post->ID, 'header-title', true);
@@ -132,11 +135,7 @@
 									<span></span>
 								</button>
 								<div class="nav-title">
-									<?php 
-									if( $nav_title_ref ) echo '<a href="'.$nav_title_ref.'" title="Ссылка на '.$nav_title.'">';
-									echo $nav_title;
-									if( $nav_title_ref ) echo '</a>'; 
-									?>
+									<?php echo $nav_title_ref ? '<a href="'.$nav_title_ref.'">'.$nav_title.'</a>' : $nav_title; ?>
 								</div>
 							</div>
 						</div>
@@ -145,7 +144,7 @@
 								'theme_location'  => 'header_menu',
 								// 'menu'            => 'menu-1',
 								'container'       => false,
-								'menu_class'      => 'nav-menu'
+								'menu_class'      => 'nav-menu '.$nav_menu_classes
 							 ) ); ?>
 						</div>
 					</div>
