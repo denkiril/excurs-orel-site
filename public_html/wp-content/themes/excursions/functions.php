@@ -124,13 +124,15 @@ add_action( 'widgets_init', 'excursions_widgets_init' );
 $LINKS = array();
 // $SCRIPTS = array();
 $consolelog = '';
-$SCRIPTS_VER = '20200202_3';
-$STYLES_VER = '20200202_2';
+$SCRIPTS_VER = '20200205';
+$STYLES_VER = '20200205';
 $WEBP_ON = !(home_url() == 'http://excurs-orel');
 // $WEBP_ON = true;
 if(!$WEBP_ON) console_log('WEBP_OFF');
-$PLACEHOLDER_URL = get_template_directory_uri() . '/assets/img/placeholder_3x2.png';
 // $PLACEHOLDER_URL = '/wp-content/themes/excursions/assets/img/placeholder_3x2.png';
+$PLACEHOLDER_URL_3x2 = get_template_directory_uri() . '/assets/img/placeholder_3x2.png';
+$PLACEHOLDER_URL_4x4 = get_template_directory_uri() . '/assets/img/placeholder_4x4.png';
+$PLACEHOLDER_URL_2x3 = get_template_directory_uri() . '/assets/img/placeholder_2x3.png';
 
 // add_script( get_template_directory_uri().'/assets/include/cssrelpreload.js', false, 'nomodule' );
 // add_script('script');
@@ -629,7 +631,7 @@ function sections_orderby_meta( $query ) {
 		return;
 
 	if( $query->is_tax('sections') ){
-		$query->set( 'posts_per_page', 12 ); // default=10 
+		$query->set( 'posts_per_page', 24 ); // default=10 
 		// $query->set( 'orderby',  'meta_value_num' ); 
 		$query->set( 'orderby',  array( 'meta_value_num' => 'DESC', 'title' => 'ASC' ) ); 
 		$query->set( 'meta_key', 'gba_rating' ); // 1...10
@@ -1173,11 +1175,11 @@ function carousel_func( $atts ){
 		}
 		$echo .= '</ul></div>';
 		// controls
-		$echo .= '<div class="glide__arrows" data-glide-el="controls">
+		$echo .= '<div class="glide__arrows" data-glide-el="controls" style="display: none;">
 			<button class="glide__arrow glide__arrow--left" data-glide-dir="<">&lt;</button>
 			<button class="glide__arrow glide__arrow--right" data-glide-dir=">">&gt;</button></div>';
 		// bullets
-		$echo .= '<div class="glide__bullets" data-glide-el="controls[nav]">';
+		$echo .= '<div class="glide__bullets" data-glide-el="controls[nav]" style="display: none;">';
 		foreach( $images as $counter => $image ){
 			$echo .= '<button class="glide__bullet" data-glide-dir="='.$counter.'"></button>';
 		}
@@ -1263,112 +1265,124 @@ function get_lazy_attachment_image( $attachment_id, $size = 'thumbnail', $icon =
 /*
 	get_attachment_picture() is mod of standart wp_get_attachment_image() 
 */
-function get_attachment_picture( $attachment_id, $size='thumbnail', $icon=false, $attr='', $lazy=true, $placeholder=false ) {
+function get_attachment_picture($attachment_id, $size = 'thumbnail', $icon = false, $attr = '', $lazy = true, $placeholder = false) {
 	$html = '';
-	global $PLACEHOLDER_URL;
+	global $PLACEHOLDER_URL_3x2;
+	global $PLACEHOLDER_URL_4x4;
+	global $PLACEHOLDER_URL_2x3;
 	// $image 		= wp_get_attachment_image_src( $attachment_id, $size, $icon );
 	// anti image_constrain_size_for_editor() to $content_width 
-	$is_image = wp_attachment_is_image( $attachment_id );
-	if( $is_image ){
-		$img_url			= wp_get_attachment_url( $attachment_id );
-		$image_meta 		= wp_get_attachment_metadata( $attachment_id );
+	$is_image = wp_attachment_is_image($attachment_id);
+	if ($is_image) {
+		$img_url			= wp_get_attachment_url($attachment_id);
+		$image_meta 		= wp_get_attachment_metadata($attachment_id);
 		$width  			= $image_meta['width'];
 		$height 			= $image_meta['height'];
-		$img_url_basename 	= wp_basename( $img_url );
+		$img_url_basename 	= wp_basename($img_url);
 		// try for a new style intermediate size
-		if( $intermediate = image_get_intermediate_size( $attachment_id, $size ) ){
-			$img_url        = str_replace( $img_url_basename, $intermediate['file'], $img_url );
+		if ($intermediate = image_get_intermediate_size($attachment_id, $size)) {
+			$img_url        = str_replace($img_url_basename, $intermediate['file'], $img_url);
 			$width          = $intermediate['width'];
 			$height         = $intermediate['height'];
 		}
 		// list($src, $width, $height) = $image;
 		$src				= $img_url;
-		$hwstring           = image_hwstring( $width, $height );
+		$hwstring           = image_hwstring($width, $height);
 		$size_class         = $size;
 		if( is_array( $size_class ) ){
 			$size_class = join( 'x', $size_class );
 		}
-		$attachment   = get_post( $attachment_id );
+		$attachment   = get_post($attachment_id);
 		$default_attr = array(
 			'src' 		=> $src,
 			'class' 	=> "attachment-$size_class size-$size_class",
-			'alt' 		=> trim( strip_tags( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) ),
+			'alt' 		=> trim(strip_tags(get_post_meta($attachment_id, '_wp_attachment_image_alt', true))),
 		);
 
-		if( $lazy ){
-			$def_attr = wp_parse_args( $attr, $default_attr );
+		if ($lazy) {
+			$def_attr = wp_parse_args($attr, $default_attr);
+			$wh_coef = $width / $height;
+			if ($wh_coef >= 1.49) {
+				$placeholder_url = $PLACEHOLDER_URL_3x2;
+			} elseif ($wh_coef >= 0.99) {
+				$placeholder_url = $PLACEHOLDER_URL_4x4;
+			} else {
+				$placeholder_url = $PLACEHOLDER_URL_2x3;
+			}
+			// print_r2([$wh_coef, $placeholder_url]);
 
-			$default_attr = array_merge( $default_attr, array(
-				'src'		=> $PLACEHOLDER_URL, // for validation 
+			$default_attr = array_merge($default_attr, array(
+				'src'		=> $placeholder_url,
 				'data-src' 	=> $src,
 			));
 		}
 
-		$attr = wp_parse_args( $attr, $default_attr );
+		$attr = wp_parse_args($attr, $default_attr);
 
 		// Generate <source>'s
 		// Retrieve the uploads sub-directory from the full size image.
-		$dirname = _wp_get_attachment_relative_path( $image_meta['file'] );
+		$dirname = _wp_get_attachment_relative_path($image_meta['file']);
 	
-		if( $dirname ){
-			$dirname = trailingslashit( $dirname );
+		if ($dirname) {
+			$dirname = trailingslashit($dirname);
 		}
 	
 		$upload_dir    = wp_get_upload_dir();
-		$image_baseurl = trailingslashit( $upload_dir['baseurl'] ) . $dirname;
+		$image_baseurl = trailingslashit($upload_dir['baseurl']) . $dirname;
 	
 		/*
 		 * If currently on HTTPS, prefer HTTPS URLs when we know they're supported by the domain
 		 * (which is to say, when they share the domain name of the current request).
 		 */
-		if ( is_ssl() && 'https' !== substr( $image_baseurl, 0, 5 ) && parse_url( $image_baseurl, PHP_URL_HOST ) === $_SERVER['HTTP_HOST'] ) {
-			$image_baseurl = set_url_scheme( $image_baseurl, 'https' );
+		if (is_ssl() && 'https' !== substr($image_baseurl, 0, 5) && parse_url($image_baseurl, PHP_URL_HOST) === $_SERVER['HTTP_HOST']) {
+			$image_baseurl = set_url_scheme($image_baseurl, 'https');
 		}
 
 		// $html .= $source.$full_image_url.'.webp" media="(min-width: 1200px)" type="image/webp">';
 		// $image_sizes = $image_meta['sizes'];
 		// $image_sizes = array_reverse( $image_sizes );
-		$size_array = array( absint( $width ), absint( $height ) );
-		$sizes 		= wp_calculate_image_sizes( $size_array, $src, $image_meta, $attachment_id );
-		if($sizes) $sizes_html = $lazy ? 'data-sizes="'.$sizes.'"' : 'sizes="'.$sizes.'"';
+		$size_array = [absint($width), absint($height)];
+		$sizes 		= wp_calculate_image_sizes($size_array, $src, $image_meta, $attachment_id);
+		if ($sizes) {
+			$sizes_html = $lazy ? 'data-sizes="'.$sizes.'"' : 'sizes="'.$sizes.'"';
+		}
 
-		$html = '<picture>';
+		$html = '<span class="picture"><picture>';
 
 		global $WEBP_ON;
-		if( $WEBP_ON ){
-			$srcset = generate_image_srcset( $image_meta, $image_baseurl, true );
-			if( $srcset ){
+		if ($WEBP_ON) {
+			$srcset = generate_image_srcset($image_meta, $image_baseurl, true);
+			if ($srcset) {
 				$srcset_html = $lazy ? 'data-srcset="'.$srcset.'"' : 'srcset="'.$srcset.'"';
 				$html .= '<source type="image/webp" '.$srcset_html.' '.$sizes_html.'>';
 			}
 		}
 
 		$srcset = generate_image_srcset( $image_meta, $image_baseurl );
-		if( $srcset ){
+		if ($srcset) {
 			$srcset_html = $lazy ? 'data-srcset="'.$srcset.'"' : 'srcset="'.$srcset.'"';
 			$html .= '<source '.$srcset_html.' '.$sizes_html.'>';
 		}
 
 		// $attr = apply_filters( 'wp_get_attachment_image_attributes', $attr, $attachment, $size );
-		$attr = array_map( 'esc_attr', $attr );
-		$html .= rtrim( "<img $hwstring" );
-		foreach ( $attr as $name => $value ) {
+		$attr = array_map('esc_attr', $attr);
+		$html .= rtrim("<img $hwstring");
+		foreach ($attr as $name => $value) {
 			$html .= " $name=" . '"' . $value . '"';
 		}
 		$html .= ' /></picture>';
 
-		// <noscript> for JS-off clients 
-		if( $lazy ){
-			$def_attr = array_map( 'esc_attr', $def_attr );
-			$html .= rtrim( "<noscript><img $hwstring" );
-			foreach ( $def_attr as $name => $value ) {
+		if ($lazy) {
+			$def_attr = array_map('esc_attr', $def_attr);
+			$html .= rtrim("<noscript><img $hwstring");
+			foreach ($def_attr as $name => $value) {
 				$html .= " $name=" . '"' . $value . '"';
 			}
 			$html .= ' /></noscript>';
 		}
-	}
-	elseif($placeholder){
-		$html = '<img src="'.$PLACEHOLDER_URL.'" alt="Картинки нет" />';
+		$html .= '</span>'; // /.picture
+	} elseif ($placeholder) {
+		$html = '<img src="'.$PLACEHOLDER_URL_3x2.'" alt="Картинки нет" />';
 	}
 
 	return $html;
@@ -1903,10 +1917,11 @@ function guidebook_map_func( $atts ) {
         $form_html .= '<button type="submit">Применить</button></form></div>';
 	}
 
-	$html = '<div class="'.$class.'" data-state="init">';
+	$html = '<noscript><style>.'.$class.'{display:none;}</style><p>Если включите JavaScript, здесь отобразится карта.</p></noscript>';
+	$html .= '<div class="'.$class.'" data-state="init">';
 	$html .= '<div class="om_block omb_panel"><button class="OpenMap_btn hidden">';
 	$html .= '<span class="state_init">[ Показать на карте ]</span>';
-	$html .= '<span class="state_open">[ Закрыть карту ]</span>';
+	$html .= '<span class="state_open">[ Свернуть карту ]</span>';
 	$html .= '<span class="state_close">[ Открыть карту ]</span></button></div>';
 	$html .= '<div class="om_content">';
 	$html .= $form_html;
@@ -1923,7 +1938,7 @@ function guidebook_map_func( $atts ) {
     $html .= '<div class="om_block omb_list"></div>';
     $html .= '<div class="om_block omb_info"><img id="infoImg" src="" /><a id="infoRef" href=""></a></div>';
 	$html .= '</div></div></div></div>';
-	
+
 	do_action('guidebook_map_scripts');
 
 	return $html;
@@ -2138,10 +2153,10 @@ function gd_image_optimization_and_webp_generation($metadata) {
 		}
 		
         $ext = $size['mime-type'];
-        if ( $ext == 'image/jpeg' ) {
+        if ($ext == 'image/jpeg') {
             $image = imagecreatefromjpeg($file); 
             
-        } elseif ( $ext == 'image/png' ) {
+        } elseif ($ext == 'image/png') {
             $image = imagecreatefrompng($file);
             imagepalettetotruecolor($image);
             imagealphablending($image, false);
@@ -2160,7 +2175,7 @@ function gd_image_optimization_and_webp_generation($metadata) {
 add_filter('wp_generate_attachment_metadata', 'gd_image_optimization_and_webp_generation');
 
 // подключаем AJAX обработчики, только когда в этом есть смысл
-if( wp_doing_ajax() ){
+if (wp_doing_ajax()) {
 	add_action('wp_ajax_get_events', 'get_events');
 	add_action('wp_ajax_nopriv_get_events', 'get_events');
 }
@@ -2181,12 +2196,12 @@ function get_events() {
 		'exclude' 	=> '312',
 		'numberposts' => -1, 
 	);
-	$myposts = get_posts( $args );
+	$myposts = get_posts($args);
 
-	if( $myposts ){
+	if ($myposts) {
 		// foreach( $myposts as $counter => $post ){
-		foreach( $myposts as $post ){
-			setup_postdata( $post );
+		foreach ($myposts as $post) {
+			setup_postdata($post);
 			$post_id 	= get_the_ID();
 			$permalink 	= get_the_permalink();
 			$title 		= esc_html( get_field('event_info_event_date') . ' ' . get_the_title() );
@@ -2213,13 +2228,13 @@ function get_events() {
 	// echo "<script> console.log('$str'); </script>";
 	// echo $events_num;
 	// wp_send_json( $events );
-	echo json_encode( $events );
+	echo json_encode($events);
 
 	wp_die(); // выход нужен для того, чтобы в ответе не было ничего лишнего, только то что возвращает функция
 }
 
 // подключаем AJAX обработчики, только когда в этом есть смысл
-if( wp_doing_ajax() ){
+if (wp_doing_ajax()) {
 	add_action('wp_ajax_get_sights', 'get_sights');
 	add_action('wp_ajax_nopriv_get_sights', 'get_sights');
 }
@@ -2247,10 +2262,6 @@ function get_sights() {
 			$location 	= get_field('obj_info_geolocation');
 			// $thumb_url 	= wp_get_attachment_thumb_url( get_post_thumbnail_id() );
 			$thumb_url 	= get_the_post_thumbnail_url( $post_id, 'thumbnail' );
-			// if(!$thumb_url){
-			// 	global $PLACEHOLDER_URL;
-			// 	$thumb_url = $PLACEHOLDER_URL;
-			// }
 			
 			$sights[] = array(
 				'post_id' 	=> $post_id, 
@@ -2269,39 +2280,39 @@ function get_sights() {
 	wp_die(); // выход нужен для того, чтобы в ответе не было ничего лишнего, только то что возвращает функция
 }
 
-function get_guidebook_posts( $term_slug='', $numberposts=0 ) {
+function get_guidebook_posts($term_slug='', $numberposts=0) {
 	$posts 			= array();
 	$tax_name 		= 'sections';
 	$term_slug_0 	= 'sights'; // get_terms( array('taxonomy' => $tax_name) )[0]->slug;
 
-	if(!$term_slug){
-		$term_slug 	= $term_slug_0;
+	if (!$term_slug) {
+		$term_slug = $term_slug_0;
 	}
-	$check_filter 	= $term_slug == $term_slug_0;
+	$check_filter = $term_slug == $term_slug_0;
 
-	if($term_slug){
+	if ($term_slug) {
 		$paged = 1;
 		$meta_query = array();
 
-		if($check_filter){
+		if ($check_filter) {
 			// $url 			= $_SERVER['REQUEST_URI'];
 			// $query_str = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
 			// $query = array();
 			// parse_str($query_str, $query);
 			// unset($query['pagenum']);
 
-			if(!$numberposts){
-				if(isset($_GET['numberposts_1'])){
+			if (!$numberposts) {
+				if (isset($_GET['numberposts_1'])) {
 					$numberposts = 1;
 				}
-				if(isset($_GET['numberposts_2'])){
+				if (isset($_GET['numberposts_2'])) {
 					$numberposts = 2;
 				}				
 			}
-			if(isset($_GET['pagenum'])){
+			if (isset($_GET['pagenum'])) {
 				$paged = $_GET['pagenum'];
 			}
-			if(isset($_GET['cat_f'])){
+			if (isset($_GET['cat_f'])) {
 				$meta_query[] = array('key' => 'obj_info_protection_category', 'value' => 'f');
 			}
 		}
@@ -2322,21 +2333,21 @@ function get_guidebook_posts( $term_slug='', $numberposts=0 ) {
 			'meta_query'	=> $meta_query,
 		);
 
-		$posts = get_posts( $args );
+		$posts = get_posts($args);
 		// посты с category_name = promo поднимаем вверх 
 		$promo_posts = [];
-		foreach( $posts as $counter => $post ){
-			if(in_category('promo', $post->ID)){
+		foreach ($posts as $counter => $post) {
+			if (in_category('promo', $post->ID)) {
 				$promo_posts[] = $post;
-				unset( $posts[$counter] );
+				unset($posts[$counter]);
 				// array_splice($posts, $counter, 1);
 			}
 		}
 
-		$posts = array_merge( $promo_posts, $posts );
+		$posts = array_merge($promo_posts, $posts);
 
-		if($numberposts > 0){
-			$posts = array_slice($posts, $numberposts*($paged-1), $numberposts);
+		if ($numberposts > 0) {
+			$posts = array_slice($posts, $numberposts * ($paged - 1), $numberposts);
 		}
 
 	}

@@ -199,10 +199,12 @@ $OKN_TXT = 'Сведения из Единого госреестра ОКН (с
 				<div class="col<?php echo $col_sfx ?>">
 					<?php if ($geolocation) : ?>
 						<div class="mini-map" data-sights="sights">
+							<noscript>Если включите JavaScript, здесь отобразится карта.</noscript>
 							<button id="OpenMap_btn" class="ref_btn autoopen">[ Показать на карте ]</button>
 							<div class="marker" data-lat="<?php echo $geolocation['lat']; ?>" data-lng="<?php echo $geolocation['lng']; ?>" data-post_id="<?php the_ID(); ?>"></div>
 					<?php else : ?>
 						<div class="mini-map mini-map-pregrow" data-sights="<?php echo esc_html(json_encode($sights)); ?>">
+							<noscript>Если включите JavaScript, здесь отобразится карта.</noscript>
 							<div class="map-cover"></div>
 							<button id="OpenMap_btn" class="ref_btn">[ Показать на карте ]</button>
 					<?php endif; ?>

@@ -104,6 +104,7 @@
 				?>
 				<div class="col<?php echo $col_sfx ?>">
 					<div class="mini-map event-map" <?php echo $sights ?>>
+						<noscript>Если включите JavaScript, здесь отобразится карта.</noscript>
 						<button id="OpenMap_btn" class="ref_btn autoopen">[ Показать на карте ]</button>
 						<div class="marker" data-lat="<?php echo $location['lat']; ?>" data-lng="<?php echo $location['lng']; ?>" data-post_id="<?php the_ID(); ?>"></div>
 					</div>

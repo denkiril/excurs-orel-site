@@ -30,7 +30,8 @@ php_value error_reporting -1;
 </IfModule>
 
 # Setup Cache 
-# Expires Headers — A2592000 = 30 days 
+# Expires Headers — A2592000 = 30 days, A31536000 = 1 year
+# Cache-Control: max-age=31536000 (DANGER!!!)
 
 <FilesMatch "\.(html|htm)$">
     AddDefaultCharset UTF-8
@@ -46,26 +47,24 @@ php_value error_reporting -1;
 <FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|webp|js|css|swf|x-html|css|xml|js|woff|woff2|ttf|svg|eot)(\.gz)?$">
 <IfModule mod_expires.c>
     ExpiresActive On
-    ExpiresByType text/css A2592000
-    ExpiresByType text/javascript A2592000
-    ExpiresByType application/x-javascript A2592000
-    ExpiresByType image/jpeg A2592000
-    ExpiresByType image/png A2592000
-    ExpiresByType image/webp A2592000
-    ExpiresByType image/svg+xml A2592000
-    ExpiresByType image/gif A2592000
-    ExpiresByType image/font-woff A2592000
-    ExpiresByType image/font-woff2 A2592000
+    ExpiresByType text/css A31536000
+    ExpiresByType text/javascript A31536000
+    ExpiresByType application/x-javascript A31536000
+    ExpiresByType image/jpeg A31536000
+    ExpiresByType image/png A31536000
+    ExpiresByType image/webp A31536000
+    ExpiresByType image/svg+xml A31536000
+    ExpiresByType image/gif A31536000
+    ExpiresByType image/font-woff A31536000
+    ExpiresByType image/font-woff2 A31536000
 </IfModule>
 <IfModule mod_headers.c>
-    Header set Expires "max-age=2592000, public"
+    Header set Expires "max-age=31536000, public"
     Header unset ETag
     Header set Connection keep-alive
     FileETag None
 </IfModule>
 </FilesMatch>
-
-# Cache-Control: max-age=31536000 
 
 # BEGIN WordPress
 <IfModule mod_rewrite.c>

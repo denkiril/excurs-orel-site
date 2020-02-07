@@ -6,7 +6,7 @@
 const SocialSection = document.getElementById('soc-section');
 const vkGroups = document.getElementById('vk_groups');
 const fbRoot = document.getElementById('fb-root');
-const glideEl = document.querySelector('.glide');
+const $glide = document.querySelector('.glide');
 
 function socialMount() {
   if (vkGroups) {
@@ -67,7 +67,12 @@ if (SocialSection && window.screen.width > 768) {
 //   }
 // });
 
-if (glideEl) {
+if ($glide) {
+  const $glideArrows = $glide.querySelector('.glide__arrows');
+  if ($glideArrows) $glideArrows.style.display = 'block';
+  const $glideBullets = $glide.querySelector('.glide__bullets');
+  if ($glideBullets) $glideBullets.style.display = 'block';
+
   const glide = new Glide('.glide', {
     // type: 'carousel',
     autoplay: (window.screen.width > 768) ? 5000 : false,
