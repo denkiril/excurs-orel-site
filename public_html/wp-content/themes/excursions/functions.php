@@ -1920,7 +1920,8 @@ function guidebook_map_func($atts) {
         $form_html .= '<button type="submit">Применить</button></form></div>';
 	}
 
-	$html = '<noscript><style>.'.$class.'{display:none;}</style><p>Если включите JavaScript, здесь отобразится карта.</p></noscript>';
+	$html = '';
+	$html .= '<noscript><style>.'.$class.'{display:none;}</style><p>Если включите JavaScript, здесь отобразится карта.</p></noscript>';
 	$html .= '<div class="'.$class.'" data-state="init">';
 	$html .= '<div class="om_block omb_panel"><button class="OpenMap_btn hidden">';
 	$html .= '<span class="state_init">[ Показать на карте ]</span>';
