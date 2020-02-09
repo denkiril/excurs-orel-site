@@ -125,7 +125,7 @@ $LINKS = array();
 // $SCRIPTS = array();
 $consolelog = '';
 $SCRIPTS_VER = '20200205';
-$STYLES_VER = '20200205';
+$STYLES_VER = '20200208';
 $WEBP_ON = !(home_url() == 'http://excurs-orel');
 // $WEBP_ON = true;
 if(!$WEBP_ON) console_log('WEBP_OFF');
@@ -133,6 +133,7 @@ if(!$WEBP_ON) console_log('WEBP_OFF');
 $PLACEHOLDER_URL_3x2 = get_template_directory_uri() . '/assets/img/placeholder_3x2.png';
 $PLACEHOLDER_URL_4x4 = get_template_directory_uri() . '/assets/img/placeholder_4x4.png';
 $PLACEHOLDER_URL_2x3 = get_template_directory_uri() . '/assets/img/placeholder_2x3.png';
+$PLACEHOLDER_URL_MAP = get_template_directory_uri() . '/assets/img/map_loader.svg';
 
 // add_script( get_template_directory_uri().'/assets/include/cssrelpreload.js', false, 'nomodule' );
 // add_script('script');
@@ -1888,7 +1889,7 @@ function gallery_func( $atts ){
 // [guidebook_map class="" id=1 size="medium_large" title=false href=1 lazy=0] 
 add_shortcode( 'guidebook_map', 'guidebook_map_func' );
 
-function guidebook_map_func( $atts ) {
+function guidebook_map_func($atts) {
 	// белый список параметров и значения по умолчанию
 	$atts = shortcode_atts( array(
 		'class' 	=> 'obj_map',
@@ -1899,6 +1900,8 @@ function guidebook_map_func( $atts ) {
 	$class 	= $atts['class'];
 	$form 	= $atts['form'];
 	// $size 	= $atts['size'];
+
+	GLOBAL $PLACEHOLDER_URL_MAP;
 
 	$form_html = '';
 	if ($form) {
@@ -1923,10 +1926,9 @@ function guidebook_map_func( $atts ) {
 	$html .= '<span class="state_init">[ Показать на карте ]</span>';
 	$html .= '<span class="state_open">[ Свернуть карту ]</span>';
 	$html .= '<span class="state_close">[ Открыть карту ]</span></button></div>';
-	$html .= '<div class="om_content">';
-	$html .= $form_html;
-	$html .= '<div class="om_flex"><div class="om_block omb_map"></div><div class="om_aside">';
-	$html .= '<div class="om_block omb_filter">';
+	$html .= '<div class="om_content">'.$form_html.'<div class="om_flex">';
+	$html .= '<div class="om_block omb_map"><img class="map_loader" src="'.$PLACEHOLDER_URL_MAP.'" /></div>';
+	$html .= '<div class="om_aside"><div class="om_block omb_filter">';
 	$html .= '<input type="search" placeholder="Поиск по названию" id="filterByTitle" class="hidden">';
 	$html .= '<div class="ctrl_flex hidden">';
 	$html .= '<label title="Переключение вида">';
