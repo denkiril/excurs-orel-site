@@ -13,7 +13,7 @@ get_header();
 <main id="main" class="site-main single">
 
 	<?php
-	if (have_posts()) {
+	if ( have_posts() ) {
 		// while (have_posts()) {
 		the_post();
 

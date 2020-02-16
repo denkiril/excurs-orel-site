@@ -99,6 +99,13 @@ function excursions_content_width() {
 }
 add_action( 'after_setup_theme', 'excursions_content_width', 0 );
 
+// Load Carbon_Fields
+function crb_load() {
+	require_once( 'vendor/autoload.php' );
+    \Carbon_Fields\Carbon_Fields::boot();
+}
+add_action( 'after_setup_theme', 'crb_load' );
+
 /**
  * Register widget area.
  *
@@ -125,8 +132,8 @@ $LINKS = array();
 // $SCRIPTS = array();
 $consolelog = '';
 $SCRIPTS_VER = '20200205';
-$STYLES_VER = '20200208';
-$WEBP_ON = !(home_url() == 'http://excurs-orel');
+$STYLES_VER = '20200216';
+$WEBP_ON = ! (home_url() == 'http://excurs-orel');
 // $WEBP_ON = true;
 if(!$WEBP_ON) console_log('WEBP_OFF');
 // $PLACEHOLDER_URL = '/wp-content/themes/excursions/assets/img/placeholder_3x2.png';
@@ -1002,17 +1009,18 @@ function custom_shortcode_atts_wpcf7( $out, $pairs, $atts ) {
  * Disable the emoji's
  */
 function disable_emojis() {
-	remove_action('wp_head', 'print_emoji_detection_script', 7);
-	remove_action('admin_print_scripts', 'print_emoji_detection_script');
-	remove_action('wp_print_styles', 'print_emoji_styles');
-	remove_action('admin_print_styles', 'print_emoji_styles');
-	remove_filter('the_content_feed', 'wp_staticize_emoji');
-	remove_filter('comment_text_rss', 'wp_staticize_emoji');
-	remove_filter('wp_mail', 'wp_staticize_emoji_for_email');
+	remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+	remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
+	remove_action( 'wp_print_styles', 'print_emoji_styles' );
+	remove_action( 'admin_print_styles', 'print_emoji_styles' );
+	remove_filter( 'the_content_feed', 'wp_staticize_emoji' );
+	remove_filter( 'comment_text_rss', 'wp_staticize_emoji' );
+	remove_filter( 'wp_mail', 'wp_staticize_emoji_for_email' );
+	// remove_filter( 'the_content', 'convert_smilies', 20 );
 	// add_filter('tiny_mce_plugins', 'disable_emojis_tinymce');
 	// add_filter('wp_resource_hints', 'disable_emojis_remove_dns_prefetch', 10, 2);
 }
-add_action('init', 'disable_emojis');
+add_action( 'init', 'disable_emojis' );
 
 ## Удаляет "Рубрика: ", "Метка: " и т.д. из заголовка архива
 add_filter( 'get_the_archive_title', function( $title ){
@@ -1731,17 +1739,18 @@ function wiki_parse_text($str, $add_link = true) {
 function markup_fancy_figure($id, $fancybox, $full_image_url, $fancy_caption, $size='thumbnail', $lazy=false, $title=null, $img_class=null, $figcaption_html=null){
 	$fancy_hint = '(Нажмите, чтобы увеличить)';
 	$title_attr = $title;
-	if($fancybox){
+
+	if ( $fancybox ) {
 		$title_attr .= ' '.$fancy_hint;
 	}
-	if($fancy_caption){
+	if ( $fancy_caption ) {
 		$fancy_caption = ' data-caption="'.$fancy_caption.'"';
 	}
 	$attr = [];
-	if($title_attr){
+	if ( $title_attr ) {
 		$attr['title'] = $title_attr;
 	}
-	if($img_class){
+	if ( $img_class ) {
 		$attr['class'] = $img_class;
 	}
 
@@ -1751,7 +1760,7 @@ function markup_fancy_figure($id, $fancybox, $full_image_url, $fancy_caption, $s
 	// $echo .= awpwp_get_attachment_picture( $id, $size, false, $attr, $lazy );
 	$echo .= '</a>';
 
-	if( $figcaption_html ){
+	if ( $figcaption_html ) {
 		$echo .= '<figcaption>'.$figcaption_html.'</figcaption>';
 	}
 	$echo .= '</figure>';
@@ -1889,7 +1898,7 @@ function gallery_func( $atts ){
 // [guidebook_map class="" id=1 size="medium_large" title=false href=1 lazy=0] 
 add_shortcode( 'guidebook_map', 'guidebook_map_func' );
 
-function guidebook_map_func($atts) {
+function guidebook_map_func( $atts ) {
 	// белый список параметров и значения по умолчанию
 	$atts = shortcode_atts( array(
 		'class' 	=> 'obj_map',
@@ -1904,7 +1913,7 @@ function guidebook_map_func($atts) {
 	GLOBAL $PLACEHOLDER_URL_MAP;
 
 	$form_html = '';
-	if ($form) {
+	if ( $form ) {
 		$cat_f_checked 			= isset($_GET['cat_f']) ? 'checked' : '';
 		$numberposts_1_checked 	= isset($_GET['numberposts_1']) ? 'checked' : '';
 		$numberposts_2_checked 	= isset($_GET['numberposts_2']) ? 'checked' : '';
@@ -1942,7 +1951,7 @@ function guidebook_map_func($atts) {
     $html .= '<div class="om_block omb_info"><img id="infoImg" src="" /><a id="infoRef" href=""></a></div>';
 	$html .= '</div></div></div></div>';
 
-	do_action('guidebook_map_scripts');
+	do_action( 'guidebook_map_scripts' );
 
 	return $html;
 }
@@ -2507,4 +2516,116 @@ function print_r2($val){
 	echo '<pre>';
 	print_r($val);
 	echo  '</pre>';
+}
+
+// Carbon_Fields for post_type=guidebook, taxonomy=sections, term->slug=routes
+use Carbon_Fields\Container;
+use Carbon_Fields\Field;
+use Carbon_Fields\Field\Complex_Field;
+
+function crb_fields_for_gb_routes() {
+	Container::make( 'post_meta', 'Поля для раздела «Маршруты, тематические подборки»' )
+		->show_on_post_type( 'guidebook' )
+		->show_on_taxonomy_term( 'routes', 'sections' )
+        ->add_fields([
+			Field::make( 'textarea', 'gbr_intro', 'Введение (html и шорткоды)' )
+				->set_rows( 10 ),
+			Field::make( 'separator', 'map_place', '[ Карта ]' ),
+			Field::make( 'textarea', 'gbr_content', 'Контент (html и шорткоды)' )
+				->set_rows( 20 ),
+			Field::make( 'complex', 'gbr_sights', 'Достопримечательности' )
+				->setup_labels([
+					'plural_name' => 'Объекты',
+					'singular_name' => 'Объект',
+				])
+				->add_fields([
+					Field::make( 'text', 'title', 'Название' )
+						->set_width( 75 ),
+					Field::make( 'text', 'latlng_text', 'Координаты (если нет Статьи ПВ)' ) // add to mini-map
+						->set_attribute( 'placeholder', 'lat, lng' )
+						->set_width( 25 ),
+					Field::make( 'association', 'gba', 'Статья ПВ' ) // add <a></a> to title
+						->set_types( [['type' => 'post', 'post_type' => 'guidebook']] )
+						->set_max( 1 ),
+					Field::make( 'image', 'image', 'Картинка' )->set_width( 25 ),
+					Field::make( 'textarea', 'desription', 'Описание' )->set_width( 75 ),
+				])
+				->set_header_template( '<%- title %> <%- latlng_text || gba.length ? "" : "[geo?]" %>' ),
+				// end of complex 'gbr_sights'
+			Field::make( 'text', 'gbr_sort', '№ п/п' ),
+		]);
+}
+add_action( 'carbon_fields_register_fields', 'crb_fields_for_gb_routes' );
+
+// [gbr_sights class="" nums=(1,2,4|1-5)]
+add_shortcode( 'gbr_sights', 'gbr_sights_func' );
+
+function gbr_sights_func( $atts ) {
+	// белый список параметров и значения по умолчанию
+	$atts = shortcode_atts( array(
+		'nums' => null,
+	), $atts );
+
+	$nums = $atts['nums'];
+
+	$nums_arr = [];
+	if ( $nums ) {
+		if ( strpos( $nums, '-' ) !== false ) {
+			$nums_extremes = explode( '-', $nums );
+			if ( count( $nums_extremes ) > 1 ) {
+				for ( $i = $nums_extremes[0]; $i <= $nums_extremes[1]; $i++ ) {
+					$nums_arr[] = $i;
+				}
+			}
+		} else {
+			$nums_arr = explode(',', $nums);
+		}
+		// print_r($nums_arr);
+	}
+
+	$html = '';
+	// $counter = 0;
+	$gallery = false;
+	$gbr_sights = carbon_get_the_post_meta( 'gbr_sights' );
+	// print_r( $gbr_sights );
+	foreach ( $gbr_sights as $key => $obj ) {
+		$num = $key + 1;
+		if ( $nums && ! in_array( $num, $nums_arr ) ) continue;
+
+		$title = esc_html( trim( $obj['title'] ) );
+		$desription = trim( $obj['desription'] );
+		$img_id = $obj['image'];
+
+		$picture = ''; // get_attachment_picture( $obj['image'], 'medium_large' );
+		if ( $img_id ) {
+			$full_img_url = wp_get_attachment_image_url( $img_id, 'full' );
+			$img_title = get_the_title( $img_id );
+			$picture = markup_fancy_figure( $img_id, 'gallery', $full_img_url, $img_title, 'medium_large', 'lazy', $img_title );
+			$gallery = true;
+		}
+
+		$gba_postid = count( $obj['gba'] ) ? $obj['gba'][0]['id'] : null;
+		$gba_link = $gba_postid ? get_permalink( $gba_postid ) : null;
+
+		if ( $gba_link ) {
+			$gba_title = get_the_title( $gba_postid );
+			$title_attr = $gba_title ? 'title="'.$gba_title.'"' : '';
+			// $picture = '<a href="'.$gba_link.'" '.$title_attr.' tabindex="-1">' . $picture . '</a>';
+			$title = $title ? '<a href="'.$gba_link.'" '.$title_attr.'>' . $title . '</a>' : '';
+		}
+
+		$title = $title ? '<h3 class="annocard-title">' . $title . '</h3>' : '';
+		$item_anchor = 'item-'.$num;
+
+		$html .= '<div id="'.$item_anchor.'" class="row anno-card"><a name="'.$item_anchor.'"></a>';
+		$html .= '<div class="col-12 col-md-4">' . $picture . '</div>';
+		$html .= '<div class="col-12 col-md-8">' . $title . $desription . '</div>';
+		$html .= '</div>';
+	}
+
+	if ( $gallery ) {
+		do_action( 'add_gallery_scripts' );
+	}
+
+	return $html;
 }

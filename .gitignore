@@ -16,5 +16,7 @@ wp-config.php
 /public_html/wp-content/themes/excursions/assets/css/
 /public_html/wp-content/themes/excursions/assets/js/
 /public_html/wp-content/themes/excursions/map/
+# composer
+/public_html/wp-content/themes/excursions/vendor/
 # gitignore
 /dev/gitignore/

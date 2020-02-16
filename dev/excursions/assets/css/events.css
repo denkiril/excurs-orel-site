@@ -131,6 +131,7 @@
     bottom: 0;
     left: 0;
     margin: auto;
+    font-weight: 400;
     z-index: 5;
     display: none;
 }
@@ -140,7 +141,7 @@
 }
 #OpenMap_btn:hover,
 #OpenMap_btn:focus {
-    font-weight: bolder;
+    font-weight: bold;
     outline: none;
 }
 .mini-map-pregrow #OpenMap_btn {
@@ -249,14 +250,20 @@
     }
 }
 
-.guidebook h2{
-    font-size: 1.1em;
+.guidebook h2 {
     text-align: left;
     text-transform: none;
-    margin: 0;
+    /* font-size: 1.1em; */
+    /* margin: 0;
     margin-bottom: 1em;
-    font-weight: normal;
+    font-weight: normal; */
 }
+
+.sections-routes h2 {
+    text-align: center;
+    text-transform: uppercase;
+}
+
 .info-block {
     margin-top: 1em;
     margin-bottom: 2em;
@@ -298,4 +305,14 @@
 
 .hide {
     display: none;
+}
+
+@keyframes shake {
+    0% { transform: rotate(0); }
+    5% { transform: rotate(5deg); }
+    10% { transform: rotate(-5deg); }
+    15% { transform: rotate(0); }
+}
+.shake {
+    animation: 20s ease-in-out 2s 5 shake;
 }

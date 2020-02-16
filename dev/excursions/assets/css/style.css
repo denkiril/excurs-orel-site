@@ -114,6 +114,10 @@ p {
     margin-bottom: 1em;
 }
 
+b {
+    font-weight: bolder;
+}
+
 .site-header {
     margin-bottom: 20px;
 }
@@ -741,6 +745,7 @@ figure {
     margin: 0;
     margin-bottom: 0.9em;
     font-weight: normal;
+    hyphens: manual;
 }
 
 .entry-content {
