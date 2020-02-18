@@ -202,7 +202,7 @@ $gallery = false;
 							<button id="OpenMap_btn" class="ref_btn autoopen">[ Показать на карте ]</button>
 							<div class="marker" data-lat="<?php echo $geolocation['lat']; ?>" data-lng="<?php echo $geolocation['lng']; ?>" data-post_id="<?php the_ID(); ?>"></div>
 					<?php else : ?>
-						<div class="mini-map mini-map-pregrow" data-sights="<?php echo esc_html(json_encode($sights)); ?>">
+						<div class="mini-map pregrow" data-sights="<?php echo esc_html(json_encode($sights)); ?>">
 							<noscript>Если включите JavaScript, здесь отобразится карта.</noscript>
 							<div class="map-cover"></div>
 							<button id="OpenMap_btn" class="ref_btn shake">[ Показать на карте ]</button>

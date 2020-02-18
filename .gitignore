@@ -1,5 +1,6 @@
 # игнорировать все .jpg* (в т.ч. .jpg.webp) в каталоге photo/ 
 /public_html/photo/*.jpg*
+/public_html/files/*.jpg*
 # node.js
 /node_modules/
 # secrets

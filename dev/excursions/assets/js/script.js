@@ -268,9 +268,17 @@ function scrollIt(destination, duration = 350) {
 // });
 
 function checkClick(e) {
-  // console.log(e.target);
-  if (e.target.tagName === 'A') {
-    const href = e.target.getAttribute('href');
+  const { target } = e;
+  // console.log(target);
+  let a = null;
+  if (target.tagName === 'A') {
+    a = target;
+  } else if (target.tagName === 'IMG' && target.parentElement.tagName === 'A') {
+    a = target.parentElement;
+  }
+  // if (target.closest('a')) {
+  if (a !== null) {
+    const href = a.getAttribute('href');
     // console.log(href);
     if (href && href.match(/^#/)) {
       e.preventDefault();

@@ -72,7 +72,7 @@
 	if ( count( $sights ) ) :
 		do_action( 'event_map_scripts' ); ?>
 
-		<div class="mini-map mini-map-pregrow" data-sights="<?php echo esc_html( json_encode( $sights ) ) ?>">
+		<div class="mini-map pregrow" data-sights="<?php echo esc_html( json_encode( $sights ) ) ?>">
 			<noscript>Если включите JavaScript, здесь отобразится карта.</noscript>
 			<div class="map-cover"></div>
 			<button id="OpenMap_btn" class="ref_btn shake">[ Показать на карте ]</button>

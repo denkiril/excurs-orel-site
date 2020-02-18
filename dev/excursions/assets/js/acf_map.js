@@ -38,9 +38,12 @@ const miniMapWidget = (() => {
     if (lat && lng) {
       // Макеты балуна и хинта (одинаковые)
       let titleStr = title ? '{{ properties.title }}' : null;
-      titleStr = (titleStr && url) ? '<a href="{{ properties.url }}">{{ properties.title }}</a>' : titleStr;
-      let template = titleStr ? `<h3>${titleStr}</h3>` : '';
-      if (thumbUrl) template += '<img src="{{ properties.thumbUrl }}" />';
+      let img = thumbUrl ? '<img src="{{ properties.thumbUrl }}" />' : '';
+      if (url) {
+        titleStr = titleStr ? `<a href="{{ properties.url }}">${titleStr}</a>` : titleStr;
+        img = img ? `<a href="{{ properties.url }}">${img}</a>` : img;
+      }
+      const template = (titleStr ? `<h3>${titleStr}</h3>` : '') + img;
       const balloonContentLayout = template ? ymaps.templateLayoutFactory.createClass(template) : null;
       const hintContentLayout = template ? ymaps.templateLayoutFactory.createClass(template) : null;
 
@@ -71,9 +74,16 @@ const miniMapWidget = (() => {
     const map = new ymaps.Map($el, {
       center: [52.967631, 36.069584],
       zoom: 12,
+      // Подключаем только: Переключатель слоев карты, Полноэкранный режим, Ползунок масштаба, Линейку
+      controls: ['typeSelector', 'fullscreenControl', 'zoomControl', 'rulerControl'],
     });
 
     map.behaviors.disable('scrollZoom');
+
+    // Удалим с карты Геолокацию, Поиск по карте, Пробки
+    // map.controls.remove('geolocationControl');
+    // map.controls.remove('searchControl');
+    // map.controls.remove('trafficControl');
 
     // objects.forEach(obj => addMarker(obj, map));
     const nomarkers = objects.filter(obj => !obj.marker);
@@ -103,6 +113,8 @@ const miniMapWidget = (() => {
       // console.log('3', map.getZoom());
     }, err => console.err('setBounds error', err));
 
+    window.addEventListener('resize', () => map.container.fitToViewport());
+
     return map;
   }
 
@@ -127,7 +139,11 @@ const miniMapWidget = (() => {
           return wait(animDuration);
         })
         .then(() => {
-          if (!autoopen) $miniMap.style.height = 'auto';
+          if (!autoopen) {
+            $miniMap.style.height = 'auto';
+            // $miniMap.classList.remove('grow');
+            // $miniMap.classList.remove('pregrow');
+          }
           // Функция ymaps.ready() будет вызвана, когда загрузятся все компоненты API, а также когда будет готово DOM-дерево
           ymaps.ready(() => newMap($miniMap, objects));
         });
@@ -153,6 +169,7 @@ const miniMapWidget = (() => {
         const dataSights = $miniMap.getAttribute('data-sights');
         // console.log(dataSights);
         if (dataSights) {
+          $miniMap.removeAttribute('data-sights');
           const getSights = new Promise((resolve2) => {
             if (dataSights === 'sights') {
               const searchStr = window.location.search ? `${window.location.search}&` : '?';
