@@ -2,8 +2,8 @@
 Contributors: navzme
 Tags: acf, advanced, custom, fields, photo, gallery, album, fancybox, litebox, lightbox
 Requires at least: 3.8
-Tested up to: 5.2.1
-Stable tag: 1.6.5
+Tested up to: 5.4
+Stable tag: 1.6.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,13 +61,32 @@ The following example is using Twitter Bootstrap framework to layout. You can us
 = Add Extra Fields =
 To add extra fields add the following to your themes functions.php file.
 
-`//Create extra fields called Altnative Text and Custom Classess
+`//Create extra fields called Altnative Text and Status
 function my_extra_gallery_fields( $args, $attachment_id, $field ){
-	$args['alt'] = array('type' => 'text', 'label' => 'Altnative Text', 'name' => 'alt', 'value' => get_field($field . '_alt', $attachment_id) ); // Creates Altnative Text field
-	$args['class'] = array('type' => 'text', 'label' => 'Custom Classess', 'name' => 'class', 'value' => get_field($field . '_class', $attachment_id) ); // Creates Custom Classess field
+    $args['alt'] = array(
+		'type' => 'text', 
+		'label' => 'Altnative Text', 
+		'name' => 'alt', 
+		'value' => get_field($field . '_alt', $attachment_id)
+	);
+    $args['status'] = array(
+		'type' => 'select', 
+		'label' => 'Status', 
+		'name' => 'status', 
+		'value' => array(
+			array(
+				'1' => 'Active',
+				 '2' => 'Inactive'
+			), 
+			get_field($field . '_status', $attachment_id)
+		)
+	);
 	return $args;
 }
 add_filter( 'acf_photo_gallery_image_fields', 'my_extra_gallery_fields', 10, 3 );`
+
+Supported field types:
+* text, date, color, datetime-local, email, number, tel, time, url, week, range, checkbox, radio, textarea, select
 
 = How to get values of extra fields =
 You can use ACF helper function `get_field`
@@ -107,6 +126,15 @@ Just like any other WordPress plugin, this plugin can also cause issues with oth
 4. Please refer to the description for more info regarding the field type settings
 
 == Changelog ==
+=1.6.7=
+* [Removed] Support to ACF get_field() function due to bug
+
+=1.6.6=
+* [Add] Added support to ACF get_field() function
+* [Add] Added more fields types to extra fields
+* [Add] Added in SweetAlert and images limit options
+* [Add] Added message that ACF Photo Gallery isn't supported on taxonomy
+
 =1.6.5=
 * [Bugfix] Remove not empty condition from checkbox item on edit
 * [Remove] Remove support for ACF to REST API plugin

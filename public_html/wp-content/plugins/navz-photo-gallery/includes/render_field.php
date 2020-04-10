@@ -1,4 +1,10 @@
 <?php
+
+    global $pagenow;
+    if( $pagenow == 'edit-tags.php'){
+        echo 'ACF Photo Gallery Field is not supported on taxonomy.';
+    } else {
+
     // create Field HTML
     global $post;    
     $nonce_acf_photo_gallery = wp_create_nonce( 'nonce_acf_photo_gallery' );
@@ -12,11 +18,14 @@
         $value = $field['value'];
         $key = $field['key'];
         $edit_model = (!empty($field['fields[' . $filename]['edit_modal']))?$field['fields[' . $filename]['edit_modal']:'Default';    
+        $images_limit = (!empty($field['fields[' . $filename]['images_limit']))?$field['fields[' . $filename]['images_limit']:null;    
+        $replace_textarea_editor = (!empty($field['fields[' . $filename]['replace_caption_tinymce']))?$field['fields[' . $filename]['replace_caption_tinymce']:null;    
     }
 ?>
 <div class="acf-photo-gallery-group-<?php echo $key; ?>">
     <input type="hidden" name="acf-photo-gallery-edit-modal" value="<?php echo $edit_model; ?>" />
     <input type="hidden" name="acf-photo-gallery-groups[]" value="<?php echo $field['_name']; ?>"/>
+    <input type="hidden" name="acf-photo-gallery-images_limit" value="<?php echo $images_limit; ?>"/>
     <div id="acf-photo-gallery-metabox-edit">
         <?php
             if( $value ):
@@ -36,7 +45,7 @@
                     } else {
                         $caption = $attachment->post_content;
                     }
-                    acf_photo_gallery_edit($field['_name'], $nonce, $id, $url, $title, $caption, $target, $key);
+                    acf_photo_gallery_edit($field['_name'], $nonce, $id, $url, $title, $caption, $target, $key, $replace_textarea_editor);
                 endforeach;
             endif;
         ?>
@@ -48,7 +57,7 @@
                 $acf_photo_gallery_attachments = explode(',', $acf_photo_gallery_attachments);
                 foreach($acf_photo_gallery_attachments as $image):
         ?>
-        <li class="acf-photo-gallery-mediabox-<?php echo $image; ?>">
+        <li class="acf-photo-gallery-mediabox acf-photo-gallery-mediabox-<?php echo $image; ?>">
             <a class="dashicons dashicons-edit" href="#" title="Edit" data-id="<?php echo $image; ?>" data-field="<?php echo $key; ?>"></a>
             <a class="dashicons dashicons-dismiss" href="#" data-id="<?php echo $image; ?>" data-field="<?php echo $key; ?>" title="Remove this photo from the gallery"></a>
             <input type="hidden" name="<?php echo $field['_name']; ?>[]" value="<?php echo $image; ?>"/>
@@ -58,3 +67,4 @@
     </ul>
     <button class="button button-primary button-large acf-photo-gallery-metabox-add-images" type="button" data-field="<?php echo htmlspecialchars(json_encode($field), ENT_QUOTES, 'UTF-8'); ?>">Add Images</button>
 </div>
+<?php } ?>

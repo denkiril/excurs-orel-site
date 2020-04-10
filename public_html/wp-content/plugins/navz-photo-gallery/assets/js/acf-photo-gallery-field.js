@@ -44,13 +44,12 @@
         caption = attachment.caption;
 
         var JsonField = jQuery.parseJSON(field);
-        console.log('Hello: ' + JsonField.key);
 
         if (typeof attachment.sizes.thumbnail != 'undefined') { url = attachment.sizes.thumbnail.url; }
         html = acf_photo_gallery_edit(id, url, title, caption);
         $('.acf-photo-gallery-group-' + JsonField.key + ' .acf-photo-gallery-metabox-edit').append(html);
         var $list = $('.acf-photo-gallery-group-' + JsonField.key + ' .acf-photo-gallery-metabox-list');
-        html = '<li class="acf-photo-gallery-mediabox-' + id + '" data-id="' + id + '"><a class="dashicons dashicons-dismiss" href="#" data-id="' + id + '" data-field="' + JsonField.key + '" title="Remove this photo from the gallery"></a><input type="hidden" name="' + JsonField._name + '[]" value="' + id + '"/><img src="' + url + '"/></li>';
+        html = '<li class="acf-photo-gallery-mediabox acf-photo-gallery-mediabox-' + id + '" data-id="' + id + '"><a class="dashicons dashicons-dismiss" href="#" data-id="' + id + '" data-field="' + JsonField.key + '" title="Remove this photo from the gallery"></a><input type="hidden" name="' + JsonField._name + '[]" value="' + id + '"/><img src="' + url + '"/></li>';
         if (options.index) {
             var $cursor = $list.children().eq(options.index);
             $cursor.before(html);
@@ -63,16 +62,33 @@
     function acf_photo_gallery_add_media($el) {
         var acf_photo_gallery_ids = new Array();
         if ($('.acf-photo-gallery-metabox-add-images').length > 0) {
+
             if (typeof wp !== 'undefined' && wp.media && wp.media.editor) {
+
                 $(document).on('click', '.acf-photo-gallery-metabox-add-images', function(e) {
                     e.preventDefault();
                     var button = $(this);
                     var id = button.prev();
                     var field = button.attr('data-field');
                     var JsonField = jQuery.parseJSON(field);
+                    
+                    //On click of the add images button, check if the image limit has been reached
+                    var pre_selected_list = $('.acf-photo-gallery-group-' + JsonField.key + ' .acf-photo-gallery-metabox-list li.acf-photo-gallery-mediabox');
+                    var images_limit = $('.acf-photo-gallery-group-' + JsonField.key + ' input[name=\'acf-photo-gallery-images_limit\']').val();
+                    if( pre_selected_list.length == images_limit ){
+                        swal('Limit has been reached', 'Your website administrator has set a limit of ' + images_limit + ' images that can be added to this gallery.', 'error')
+                        return false;
+                    }
 
-                    var pre_selected_list = $('.acf-photo-gallery-group-' + JsonField.key + ' .acf-photo-gallery-metabox-list li');
-                    var pre_selected = pre_selected_list.length;
+                    $(document).on('click', '.media-modal-content .attachments-browser .attachments li', function(){
+                        var selection_list = $('.media-modal-content .attachments-browser .attachments li[aria-checked=true]').length;
+                        var check_image_limit = pre_selected_list.length + selection_list;
+                        if( check_image_limit > images_limit ){
+                            $(this).click();
+                            swal('Limit has been reached', 'Your website administrator has set a limit of ' + images_limit + ' images that can be added to this gallery.', 'error')
+                            return false;
+                        }
+                    });
 
                     wp.media.editor.send.attachment = function(props, attachment){
                         acf_photo_gallery_html(attachment, field, { index: 0, splice: 0 });
@@ -92,20 +108,22 @@
     $(document).on('click', '.acf-photo-gallery-metabox-list .dashicons-dismiss', function(){
         var id = $(this).attr('data-id');
         var field = $(this).attr('data-field');
-        if (confirm('You are about to remove this photo from the gallery. Are you sure?')){
+        if ( confirm('You are about to remove this photo from the gallery. Are you sure?') ){
             acf_photo_gallery_remove_media(id, field);
         }
         return false;
     });
 
-    $(document).on('click', '#acf-photo-gallery-metabox-edit .acf-edit-photo-gallery button.button-close', function() {
+    $(document).on('click', '#acf-photo-gallery-metabox-edit .acf-edit-photo-gallery button.button-close', function(){
         var id;
         id = $(this).attr('data-close');
         $('#acf-photo-gallery-metabox-edit #acf-photo-gallery-metabox-edit-' + id).fadeOut('fast');
+        $('.acf-gallery-backdrop').remove();
+        $('body').css('overflow', 'auto');
         return false;
     });
 
-    $(document).on('click', '#acf-photo-gallery-metabox-edit .acf-edit-photo-gallery button.button-primary', function() {
+    $(document).on('click', '#acf-photo-gallery-metabox-edit .acf-edit-photo-gallery button.button-primary', function(){
         var button, field, data, post, attachment, action, nonce, fieldname, form = {};
         button = $(this);
         url = $(this).attr('data-ajaxurl');
@@ -113,7 +131,7 @@
         attachment = $(this).attr('data-id');
         fieldname = button.attr('data-fieldname');
 
-        $('div.acf-photo-gallery-group-' + fieldname + ' #acf-photo-gallery-metabox-edit-' + attachment + ' .acf-photo-gallery-edit-field').each(function(i, obj) {
+        $('div.acf-photo-gallery-group-' + fieldname + ' #acf-photo-gallery-metabox-edit-' + attachment + ' .acf-photo-gallery-edit-field').each(function(i, obj){
             if (obj.name == 'acf-pg-hidden-action') {
                 form['action'] = obj.value;
             } else if( obj.type == 'checkbox'){
@@ -130,18 +148,21 @@
         button.attr('disabled', true).html('Saving...');
         $.post(url, form, function(data) {
             button.attr('disabled', false).html('Save Changes');
+            $('.acf-gallery-backdrop').remove();
             $('#acf-photo-gallery-metabox-edit #acf-photo-gallery-metabox-edit-' + attachment).fadeOut('fast');
         });
         return false;
     });
 
-    $(document).on('click', '.acf-photo-gallery-metabox-list .dashicons-edit', function() {
+    $(document).on('click', '.acf-photo-gallery-metabox-list .dashicons-edit', function(){
         var $btn = $(this);
         var id = $btn.attr('data-id');
         var field = $btn.attr('data-field');
         var modal = $('.acf-photo-gallery-group-' + field + ' input[name="acf-photo-gallery-edit-modal"]').val();
         var $list = $('.acf-photo-gallery-group-' + field + ' ul.acf-photo-gallery-metabox-list');
         var index = $('.acf-photo-gallery-group-' + field + ' ul.acf-photo-gallery-metabox-list li').index();
+        $('body').prepend('<div class=\'acf-gallery-backdrop\'></div>');
+        $('body').css('overflow', 'hidden');
 
         if (modal === 'Native') {
             wp.media.editor.send.attachment = function(_, attachment){
