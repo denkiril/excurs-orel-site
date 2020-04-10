@@ -5,15 +5,17 @@
   "main": "index.js",
   "scripts": {
     "start": "node index",
+    "dev": "node node/transformSources.js",
+    "prod": "NODE_ENV=production node node/transformSources.js",
     "www": "webpack --config webpack.config.js --mode=development --watch",
-    "dev": "webpack --mode=development && node index",
-    "prod": "NODE_ENV=production webpack --mode=production && node index",
+    "wdev": "webpack --mode=development && node index",
+    "wprod": "NODE_ENV=production webpack --mode=production && node index",
     "mv": "move /dev/excursions/assets/css/style.css /public_html/wp-content/themes/excursions/",
     "build": "webpack --config webpack.build.conf.js",
     "watch": "babel dev/excursions/assets/js --out-dir public_html/wp-content/themes/excursions/assets/js -w",
     "bbb": "NODE_ENV=production babel dev/excursions/assets/js/events_map.js -d public_html/wp-content/themes/excursions/assets/js/"
   },
-  "browserslist": "> 2%, ie 10, safari > 9",
+  "browserslist": "Chrome > 41, last 2 ChromeAndroid versions, last 2 Opera versions, last 2 Edge versions, last 2 Firefox versions, ie 10, safari > 9, > 2%",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denkiril/excurs-orel-site.git"
@@ -27,6 +29,7 @@
   "devDependencies": {
     "@babel/cli": "^7.4.4",
     "@babel/core": "^7.4.4",
+    "@babel/node": "^7.6.3",
     "@babel/preset-env": "^7.4.4",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.5",
@@ -38,6 +41,7 @@
     "eslint-plugin-babel": "^5.3.0",
     "eslint-plugin-import": "^2.17.2",
     "mini-css-extract-plugin": "^0.6.0",
+    "path": "^0.12.7",
     "postcss-loader": "^3.0.0",
     "style-loader": "^0.23.1",
     "webpack": "^4.30.0",
@@ -48,7 +52,6 @@
     "@babel/polyfill": "^7.4.4",
     "autoprefixer": "^9.5.1",
     "core-js": "^2.6.5",
-    "css-mqpacker": "^7.0.0",
     "cssnano": "^4.1.10",
     "postcss-inline-svg": "^3.1.1",
     "url-search-params": "^1.1.0",

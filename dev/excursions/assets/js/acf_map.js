@@ -34,6 +34,7 @@ const miniMapWidget = (() => {
     const title = obj.title || null;
     const thumbUrl = obj.thumb_url || null;
     const isMarker = obj.marker || false;
+    const iconContent = obj.icon_content || '';
 
     if (lat && lng) {
       // Макеты балуна и хинта (одинаковые)
@@ -54,6 +55,7 @@ const miniMapWidget = (() => {
           url,
           title,
           thumbUrl,
+          iconContent,
         },
         {
           preset: 'islands#Icon',

@@ -1,4 +1,4 @@
-import '../css/events_map.css';
+// import '../css/events_map.css';
 
 /* global NavBlock */
 /* global getApi */

@@ -1,6 +1,8 @@
-# игнорировать все .jpg* (в т.ч. .jpg.webp) в каталоге photo/ 
+# игнорировать все .jpg* и .png* (в т.ч. .webp) в каталогах photo/ и files/
 /public_html/photo/*.jpg*
+/public_html/photo/*.png*
 /public_html/files/*.jpg*
+/public_html/files/*.png*
 # node.js
 /node_modules/
 # secrets
@@ -21,3 +23,7 @@ wp-config.php
 /public_html/wp-content/themes/excursions/vendor/
 # gitignore
 /dev/gitignore/
+# https://sridharkatakam.com/set-wordpress-coding-standards-visual-studio-code/
+# https://github.com/WordPress/WordPress-Coding-Standards
+/wpcs/
+/vendor/

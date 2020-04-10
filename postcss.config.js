@@ -4,7 +4,6 @@ module.exports = {
     require('autoprefixer')({
       // browsers: '> 2%, ie 10, safari > 9',
     }),
-    require('css-mqpacker'),
     require('postcss-inline-svg'),
     require('cssnano')({
       preset: [

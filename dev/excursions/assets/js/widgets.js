@@ -47,10 +47,15 @@ function socialInit() {
   }
 }
 
-// social widgets only for big screens
+// Social widgets only for big screens...
 if (SocialSection && window.screen.width > 768) {
-  SocialSection.style.display = 'block';
-  window.addEventListener('load', socialInit);
+  const script = document.createElement('script');
+  const supportsModules = 'noModule' in script;
+  // ...and for module-supports.
+  if (supportsModules) {
+    SocialSection.style.display = 'block';
+    window.addEventListener('load', socialInit);
+  }
 }
 
 // $(document).ready(() => {

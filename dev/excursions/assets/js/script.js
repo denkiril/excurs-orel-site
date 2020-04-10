@@ -90,9 +90,12 @@ function isInViewport(el) {
 window.isInViewport = isInViewport;
 
 function init() {
-  // Блок, работающий на JS, показываем только если работает JS
+  // Блок ya-share показываем только если работает JS, и браузер поддерживает модули.
   const sb = document.getElementById('soc-buttons');
-  if (sb) sb.style.display = 'block';
+  // const msie = navigator.userAgent.indexOf('Trident') !== -1 || navigator.userAgent.indexOf('MSIE') !== -1;
+  const script = document.createElement('script');
+  const supportsModules = 'noModule' in script;
+  if (sb && supportsModules) sb.style.display = 'block';
 
   // Меню-гамбургер для адаптивной версии --- slideToggle
   if (menuBtn) {
@@ -188,7 +191,7 @@ function lazyImagesWatch() {
   let filter = false;
   lazyImages.forEach((img) => {
     if (isInViewport(img)) {
-      console.log('lazyImages in viewport');
+      // console.log('lazyImages in viewport');
       swapLazyAttributes(img);
       filter = true;
     }
@@ -208,7 +211,7 @@ function lazyImagesInit() {
   });
 
   lazyImages = document.querySelectorAll('[data-src]');
-  console.log(lazyImages);
+  // console.log(lazyImages);
   if (lazyImages.length) {
     window.addEventListener('scroll', lazyImagesWatch);
     window.addEventListener('resize', lazyImagesWatch);

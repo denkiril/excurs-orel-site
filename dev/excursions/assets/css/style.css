@@ -717,6 +717,22 @@ img[data-src] {
     margin-bottom: 0.8em;
 }
 
+.num-marker + .annocard-title {
+    margin-left: 2.5rem;
+}
+
+.num-marker {
+    background-color: #ffe794;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    font-weight: 400;
+    text-align: center;
+    line-height: 2rem;
+    position: absolute;
+    top: -0.18rem;
+}
+
 .anno-ref {
     text-align: right;
     margin-top: -20px;

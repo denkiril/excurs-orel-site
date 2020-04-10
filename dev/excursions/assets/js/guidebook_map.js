@@ -1,4 +1,4 @@
-import '../css/guidebook_map.css';
+// import '../css/guidebook_map.css';
 
 // const URLSearchParams = require('url-search-params');
 
