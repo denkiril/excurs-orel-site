@@ -84,7 +84,7 @@
 							$headertitle_html = '<h2 class="header-title">'.$headertitle.'</h2>';
 							$h1_is = false;
 						}
-						
+
 						if ( $is_front_page ) {
 							$headertitle_html .= '<p class="header-subtitle">мы не стоим на месте</p>';
 						} 
@@ -135,7 +135,7 @@
 									<span></span>
 								</button>
 								<div class="nav-title">
-									<?php echo $nav_title_ref ? '<a href="'.$nav_title_ref.'">'.$nav_title.'</a>' : $nav_title; ?>
+									<?php echo $nav_title_ref ? '<a href="' . $nav_title_ref.'">' . $nav_title . '</a>' : $nav_title; ?>
 								</div>
 							</div>
 						</div>
