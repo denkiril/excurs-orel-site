@@ -10,11 +10,11 @@ const cssnano = require('cssnano');
 
 const devMode = process.env.NODE_ENV !== 'production';
 
-const srcDirPath = '../dev/excursions/assets/';
+// const srcDirPath = '../dev/excursions/assets/';
 const themeDirPath = '../public_html/wp-content/themes/excursions/';
 const PATHS = {
-  cssSrc: path.join(__dirname, srcDirPath, 'css/'),
-  jsSrc: path.join(__dirname, srcDirPath, 'js/'),
+  cssSrc: path.join(__dirname, themeDirPath, 'assets/src/css/'),
+  jsSrc: path.join(__dirname, themeDirPath, 'assets/src/js/'),
   themeDir: path.join(__dirname, themeDirPath),
   cssProd: path.join(__dirname, themeDirPath, 'assets/css/'),
   jsProd: path.join(__dirname, themeDirPath, 'assets/js/'),

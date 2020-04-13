@@ -55,6 +55,9 @@
 .obj_map[data-state="init"] .om_content {
     display: block;
 }
+.obj_map[data-state="init"].noautoopen .om_content {
+    display: none;
+}
 @media (max-width: 768px) {
     .obj_map[data-state="init"] .om_content {
         display: none;

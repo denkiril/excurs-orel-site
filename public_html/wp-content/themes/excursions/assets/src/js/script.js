@@ -45,7 +45,7 @@ function getApi(apiname) {
 
   const getApikeyParam = new Promise((resolve) => {
     if (apikeyName) {
-      const requestUrl = `${myajax.url}?action=get_apikey`;
+      const requestUrl = `${myajax.url}?action=get_apikey&nonce_code=${myajax.nonce}`;
       // const requestUrl = `${myajax.url}?action=get_apikey&apikeyname=YANDEX_MAPS_API`;
       console.log(requestUrl);
       fetch(requestUrl, { headers: { 'content-type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
