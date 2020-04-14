@@ -44,15 +44,17 @@ function getApi(apiname) {
   }
 
   const getApikeyParam = new Promise((resolve) => {
-    if (apikeyName) {
-      const requestUrl = `${myajax.url}?action=get_apikey&nonce_code=${myajax.nonce}`;
-      // const requestUrl = `${myajax.url}?action=get_apikey&apikeyname=YANDEX_MAPS_API`;
+    console.log('apikeyName:', apikeyName);
+    console.log('myajax:', myajax);
+    if (apikeyName && myajax.url && myajax.nonce) {
+      // const requestUrl = `${myajax.url}?action=get_apikey&nonce_code=${myajax.nonce}`;
+      const requestUrl = `${myajax.url}?action=get_apikey&nonce_code=${myajax.nonce}&apikeyname=YANDEX_MAPS_API`;
       console.log(requestUrl);
       fetch(requestUrl, { headers: { 'content-type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
         .then(response => response.json())
         .then((apikey) => {
           console.log('apikey:', apikey);
-          const apikeyParam = apikey ? `&${paramName}=${apikey}` : '';
+          const apikeyParam = paramName && apikey ? `&${paramName}=${apikey}` : '';
           resolve(apikeyParam);
         });
     } else {
@@ -343,7 +345,7 @@ function yandexRtbMount() {
 }
 
 function yandexRtbLazyLoad() {
-  console.log('yandexRtbLazyLoad');
+  // console.log('yandexRtbLazyLoad');
   let inViewport = false;
   if (isInViewport(yandexRtb)) {
     yandexRtbMount();

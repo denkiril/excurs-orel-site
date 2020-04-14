@@ -173,9 +173,9 @@ const miniMapWidget = (() => {
         if (dataSights) {
           $miniMap.removeAttribute('data-sights');
           const getSights = new Promise((resolve2) => {
-            if (dataSights === 'sights') {
+            if (dataSights === 'sights' && myajax.url && myajax.nonce) {
               const searchStr = window.location.search ? `${window.location.search}&` : '?';
-              const requestUrl = `${myajax.url + searchStr}action=get_sights`;
+              const requestUrl = `${myajax.url + searchStr}action=get_sights&nonce_code=${myajax.nonce}`;
               // console.log(requestUrl);
               fetch(requestUrl, { headers: { 'content-type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
                 .then(response => resolve2(response.json()));

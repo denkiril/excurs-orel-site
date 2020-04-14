@@ -50,7 +50,7 @@ function get_events() {
  * @return void
  */
 function get_sights() {
-	check_ajax_referer( 'myajax-gb-nonce', 'nonce_code' );
+	check_ajax_referer( 'myajax-nonce', 'nonce_code' );
 
 	$slug = isset( $_GET['slug'] ) ? sanitize_key( $_GET['slug'] ) : null;
 	if ( ! $slug ) {
@@ -69,6 +69,7 @@ function get_sights() {
 			$title     = esc_html( get_the_title( $post_id ) );
 			$location  = get_field( 'obj_info_geolocation', $post_id );
 			$thumb_url = get_the_post_thumbnail_url( $post_id, 'thumbnail' );
+			$post_slug = in_array( $mypost, $mus_posts, true ) ? 'museums' : 'sights';
 
 			$sights[] = array(
 				'post_id'   => $post_id,
@@ -77,6 +78,7 @@ function get_sights() {
 				'lat'       => $location['lat'],
 				'lng'       => $location['lng'],
 				'thumb_url' => $thumb_url,
+				'slug'      => $post_slug,
 			);
 		}
 	}
@@ -91,7 +93,7 @@ function get_sights() {
  * @return void
  */
 function get_apikey() {
-	check_ajax_referer( 'myajax-script-nonce', 'nonce_code' );
+	check_ajax_referer( 'myajax-nonce', 'nonce_code' );
 
 	$apikey = null;
 	if ( isset( $_GET['apikeyname'] ) ) {

@@ -139,8 +139,8 @@ add_action( 'widgets_init', 'excursions_widgets_init' );
 
 $links_array = array();
 $consolelog  = '';
-define( 'SCRIPTS_VER', '20200410' );
-define( 'STYLES_VER', '20200410' );
+define( 'SCRIPTS_VER', '20200414' );
+define( 'STYLES_VER', '20200414' );
 $webp_on = ! ( home_url() === 'http://excurs-orel' );
 if ( ! $webp_on ) {
 	console_log( 'WEBP_OFF' );
@@ -178,7 +178,7 @@ function excursions_scripts() {
 	wp_enqueue_script( 'script-legacy', $scripts_dirname . 'script-legacy.js', array(), SCRIPTS_VER, 'in_footer' );
 	$script_data = array(
 		'url'   => admin_url( 'admin-ajax.php' ),
-		'nonce' => wp_create_nonce( 'myajax-script-nonce' ),
+		'nonce' => wp_create_nonce( 'myajax-nonce' ),
 	);
 	wp_localize_script( 'script-js', 'myajax', $script_data );
 	wp_localize_script( 'script-legacy', 'myajax', $script_data );
@@ -339,9 +339,8 @@ function add_carousel_scripts() {
 function events_map_scripts_func() {
 	wp_enqueue_style( 'events_map' );
 	wp_enqueue_script( 'events_map-js' );
-	wp_localize_script( 'events_map-js', 'myajax', array( 'url' => admin_url( 'admin-ajax.php' ) ) );
 	wp_enqueue_script( 'events_map-legacy' );
-	wp_localize_script( 'events_map-legacy', 'myajax', array( 'url' => admin_url( 'admin-ajax.php' ) ) );
+	// wp_localize_script( 'events_map-legacy', 'myajax', array( 'url' => admin_url( 'admin-ajax.php' ) ) );.
 }
 add_action( 'events_map_scripts', 'events_map_scripts_func', 10, 0 );
 
@@ -357,9 +356,8 @@ function guidebook_map_scripts_func() {
 	);
 	wp_enqueue_style( 'guidebook_map' );
 	wp_enqueue_script( 'guidebook_map-js' );
-	wp_localize_script( 'guidebook_map-js', 'myajax', $data );
 	wp_enqueue_script( 'guidebook_map-legacy' );
-	wp_localize_script( 'guidebook_map-legacy', 'myajax', $data );
+	// wp_localize_script( 'guidebook_map-legacy', 'myajax', $data );.
 }
 add_action( 'guidebook_map_scripts', 'guidebook_map_scripts_func', 10, 0 );
 
@@ -370,9 +368,8 @@ add_action( 'guidebook_map_scripts', 'guidebook_map_scripts_func', 10, 0 );
  */
 function event_map_scripts_func() {
 	wp_enqueue_script( 'acf_map-js' );
-	wp_localize_script( 'acf_map-js', 'myajax', array( 'url' => admin_url( 'admin-ajax.php' ) ) );
 	wp_enqueue_script( 'acf_map-legacy' );
-	wp_localize_script( 'acf_map-legacy', 'myajax', array( 'url' => admin_url( 'admin-ajax.php' ) ) );
+	// wp_localize_script( 'acf_map-legacy', 'myajax', array( 'url' => admin_url( 'admin-ajax.php' ) ) );.
 }
 add_action( 'event_map_scripts', 'event_map_scripts_func', 10, 0 );
 

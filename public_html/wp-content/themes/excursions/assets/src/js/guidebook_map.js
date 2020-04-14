@@ -205,11 +205,13 @@ function NewObjList(objectsMap, objects, storage, clusterer) {
 
   objects.forEach((object) => {
     const thumbUrl = object.thumb_url;
-    const nothumbClass = thumbUrl ? '' : 'class="no_thumb"';
     const imgUrl = thumbUrl || placeholderUrl;
+    const liClasses = [];
+    if (!thumbUrl) liClasses.push('no_thumb');
+    if (object.slug) liClasses.push(`slug-${object.slug}`);
 
     const markup = `
-            <li ${nothumbClass} data-post_id="${object.post_id}" tabindex="-1">
+            <li class="${liClasses.join(' ')}" data-post_id="${object.post_id}" tabindex="-1">
                 <span class="li_title">${object.title}</span>
                 <a class="hiddenlink" href="${object.permalink}" title="Ссылка на ${object.title}">[>>]</a>
                 <img data-src="${imgUrl}" />
@@ -403,7 +405,7 @@ function NewObjMap(objectsMap) {
       .then(response => response.json())
       .then((objects) => {
         // objects = json;
-        // console.log(objects);
+        console.log(objects);
         // Функция ymaps.ready() будет вызвана, когда загрузятся все компоненты API,
         // а также когда будет готово DOM-дерево.
         ymaps.ready(() => {

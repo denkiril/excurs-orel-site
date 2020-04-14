@@ -27,6 +27,8 @@ use Carbon_Fields\Field\Complex_Field;
  * @return void
  */
 function crb_fields_for_gb_routes() {
+	$map_page    = get_page_by_path( 'map' );
+	$map_page_id = $map_page ? $map_page->ID : null;
 	Container::make( 'post_meta', 'Поля для раздела «Маршруты, тематические подборки»' )
 		// ->show_on_post_type( 'guidebook' )
 		// ->show_on_taxonomy_term( 'routes', 'sections' )
@@ -40,7 +42,7 @@ function crb_fields_for_gb_routes() {
 				'taxonomy' => 'sections',
 			)
 		)
-		->or_where( 'post_id', '=', get_page_by_path( 'map' )->ID )
+		->or_where( 'post_id', '=', $map_page_id )
 		->add_fields(
 			array(
 				Field::make( 'textarea', 'gbr_intro', 'Введение (html и шорткоды)' )
