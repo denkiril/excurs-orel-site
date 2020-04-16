@@ -285,26 +285,10 @@ function newscards_func( $atts ) {
 
 		$html .= '<div class="row">';
 		foreach ( $myposts as $mypost ) {
-			$permalink      = get_the_permalink( $mypost );
-			$title_attr     = str_replace( '&shy;', '', the_title_attribute( array( 'echo' => false ) ) );
-			$a_format       = '<a href="' . $permalink . '" title="' . $title_attr . '" %1$s>%2$s</a>';
-			$show_attention = in_array( $mypost, $future_events_posts, true );
-			$newscard_title = esc_html( get_field( 'newscard-title', $mypost->ID ) );
-			if ( empty( $newscard_title ) ) {
-				$event_date     = 'events' === $mypost->post_type ? markup_event_date( $mypost->ID ) : '';
-				$newscard_title = $event_date . esc_html( get_the_title( $mypost ) );
-			}
+			$show_event_date = 'events' === $mypost->post_type;
+			$show_attention  = in_array( $mypost, $future_events_posts, true );
 
-			$html .= '<div class="newscard-container col-md-6 col-lg-4"><div class="newscard">';
-			$html .= sprintf( $a_format, '', get_attachment_picture( get_post_thumbnail_id( $mypost ), $size ) );
-			if ( $show_attention ) {
-				$html .= '<p class="attention">Не пропустите!</p>';
-			}
-			$html .= '<h3 class="newscard-title">' . $newscard_title . '</h3>';
-			if ( $read_more ) {
-				$html .= ' ' . sprintf( $a_format, 'tabindex="-1"', $read_more );
-			}
-			$html .= '</div></div>';
+			$html .= excurs_get_newscard_html( $mypost->ID, '', $show_event_date, $show_attention, $size, $read_more );
 		}
 
 		$html .= '</div><!-- .row -->';

@@ -1497,6 +1497,42 @@ function remove_fields_on_map_page() {
 }
 add_action( 'admin_init', 'remove_fields_on_map_page' );
 
+/**
+ * Generate newscards html
+ *
+ * @param integer $post_id         Post ID.
+ * @param string  $alt_title       Optional. Alt title for the card. Default none.
+ * @param boolean $show_event_date Optional. Shouls show event date. Default false.
+ * @param boolean $show_attention  Optional. Shouls show attention. Default false.
+ * @param string  $size            Optional. Size of card picture. Default 'medium_large'.
+ * @param string  $read_more       Optional. Read more text. Default '[Перейти&nbsp;>>]'.
+ * @return string Outer HTML.
+ */
+function excurs_get_newscard_html( $post_id, $alt_title = '', $show_event_date = false, $show_attention = false, $size = 'medium_large', $read_more = '[Перейти&nbsp;>>]' ) {
+	$html           = '';
+	$permalink      = get_the_permalink( $post_id );
+	$title_attr     = excurs_get_the_title_for_attr( $post_id );
+	$a_format       = '<a href="' . $permalink . '" title="' . $title_attr . '" %1$s>%2$s</a>';
+	$event_date     = $show_event_date ? markup_event_date( $post_id ) : '';
+	$newscard_title = $alt_title ? $alt_title : get_field( 'newscard-title', $post_id );
+	if ( empty( $newscard_title ) ) {
+		$newscard_title = get_the_title( $post_id );
+	}
+
+	$html .= '<div class="newscard-container col-md-6 col-lg-4"><div class="newscard">';
+	$html .= sprintf( $a_format, '', get_attachment_picture( get_post_thumbnail_id( $post_id ), $size ) );
+	if ( $show_attention ) {
+		$html .= '<p class="attention">Не пропустите!</p>';
+	}
+	$html .= '<h3 class="newscard-title">' . $event_date . esc_html( $newscard_title ) . '</h3>';
+	if ( $read_more ) {
+		$html .= ' ' . sprintf( $a_format, 'tabindex="-1"', esc_html( $read_more ) );
+	}
+	$html .= '</div></div>';
+
+	return $html;
+}
+
 require_once get_template_directory() . '/includes/template-carbon-fields.php';
 require_once get_template_directory() . '/includes/template-shortcodes.php';
 require_once get_template_directory() . '/includes/template-ajax-actions.php';

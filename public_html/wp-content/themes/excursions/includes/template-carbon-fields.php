@@ -29,7 +29,7 @@ use Carbon_Fields\Field\Complex_Field;
 function crb_fields_for_gb_routes() {
 	$map_page    = get_page_by_path( 'map' );
 	$map_page_id = $map_page ? $map_page->ID : null;
-	Container::make( 'post_meta', 'Поля для раздела «Маршруты, тематические подборки»' )
+	Container::make( 'post_meta', 'gbroutes', 'Поля для раздела "Маршруты, тематические подборки"' )
 		// ->show_on_post_type( 'guidebook' )
 		// ->show_on_taxonomy_term( 'routes', 'sections' )
 		->where( 'post_type', '=', 'guidebook' )
@@ -85,3 +85,55 @@ function crb_fields_for_gb_routes() {
 		);
 }
 add_action( 'carbon_fields_register_fields', 'crb_fields_for_gb_routes' );
+
+/**
+ * Add carbon fields to the front page
+ *
+ * @return void
+ */
+function crb_fields_for_front_page() {
+	Container::make( 'post_meta', 'newscards_2', 'Секция Карточки № 2 (Путеводитель по Орлу)' )
+		->where( 'post_id', '=', get_option( 'page_on_front' ) )
+		->add_fields(
+			array(
+				Field::make( 'text', 'nc2_title', 'Заголовок секции' )
+					->set_width( 50 ),
+				Field::make( 'text', 'nc2_title_link', 'Ссылка заголовка секции' )
+					->set_width( 50 ),
+				Field::make( 'complex', 'nc2_posts', 'Карточки постов (статьи Путеводителя и т.п.)' )
+					->setup_labels(
+						array(
+							'plural_name'   => 'Посты',
+							'singular_name' => 'Пост',
+						)
+					)
+					->set_collapsed( true )
+					->add_fields(
+						array(
+							Field::make( 'association', 'post', 'Пост / Страница / Статья ПВ' )
+								->set_types(
+									array(
+										array(
+											'type'      => 'post',
+											'post_type' => 'page',
+										),
+										array(
+											'type'      => 'post',
+											'post_type' => 'post',
+										),
+										array(
+											'type'      => 'post',
+											'post_type' => 'guidebook',
+										),
+									)
+								)
+								->set_max( 1 ),
+							Field::make( 'text', 'admin_title', 'Заголовок для админки' ),
+							Field::make( 'text', 'card_alt_title', 'Альтернативный заголовок карточки' ),
+						)
+					)
+					->set_header_template( '<%- admin_title %> <%- card_alt_title ? "(" + card_alt_title + ")" : "" %>' ),
+			)
+		);
+}
+add_action( 'carbon_fields_register_fields', 'crb_fields_for_front_page' );
