@@ -146,12 +146,14 @@ if ( ! $webp_on ) {
 	console_log( 'WEBP_OFF' );
 }
 
-define( 'PLACEHOLDER_URL_3X2', get_template_directory_uri() . '/assets/img/placeholder_3x2.png' );
-define( 'PLACEHOLDER_URL_4X4', get_template_directory_uri() . '/assets/img/placeholder_4x4.png' );
-define( 'PLACEHOLDER_URL_2X3', get_template_directory_uri() . '/assets/img/placeholder_2x3.png' );
-define( 'PLACEHOLDER_URL_MAP', get_template_directory_uri() . '/assets/img/map_loader.svg' );
+$template_directory_uri = get_template_directory_uri();
 
-preload_link( get_template_directory_uri() . '/assets/css/main_bottom.css', STYLES_VER );
+define( 'PLACEHOLDER_URL_3X2', $template_directory_uri . '/assets/img/placeholder_3x2.png' );
+define( 'PLACEHOLDER_URL_4X4', $template_directory_uri . '/assets/img/placeholder_4x4.png' );
+define( 'PLACEHOLDER_URL_2X3', $template_directory_uri . '/assets/img/placeholder_2x3.png' );
+define( 'PLACEHOLDER_URL_MAP', $template_directory_uri . '/assets/img/map_loader.svg' );
+
+preload_link( $template_directory_uri . '/assets/css/main_bottom.css', STYLES_VER );
 
 /**
  * Scripts loading.
@@ -159,12 +161,13 @@ preload_link( get_template_directory_uri() . '/assets/css/main_bottom.css', STYL
  * @return void
  */
 function excursions_scripts() {
-	$scripts_dirname = get_template_directory_uri() . '/assets/js/';
+	global $template_directory_uri;
+	$scripts_dirname = $template_directory_uri . '/assets/js/';
 	wp_enqueue_style( 'excursions-style', get_stylesheet_uri(), array(), STYLES_VER );
 
-	wp_enqueue_script( 'excursions-navigation', get_template_directory_uri() . '/js/navigation.js', array(), '20151215', true );
+	wp_enqueue_script( 'excursions-navigation', $template_directory_uri . '/js/navigation.js', array(), '20151215', true );
 
-	wp_enqueue_script( 'excursions-skip-link-focus-fix', get_template_directory_uri() . '/js/skip-link-focus-fix.js', array(), '20151215', true );
+	wp_enqueue_script( 'excursions-skip-link-focus-fix', $template_directory_uri . '/js/skip-link-focus-fix.js', array(), '20151215', true );
 
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );
@@ -172,7 +175,7 @@ function excursions_scripts() {
 
 	// $pf_url = 'https://polyfill.io/v3/polyfill.min.js?features=fetch%2CElement.prototype.matches%2CObject.keys%2CNodeList.prototype.forEach%2CArray.prototype.forEach';
 	// wp_enqueue_script( 'polyfills-js', $pf_url, array(), '1', 'in_footer' );
-	wp_enqueue_script( 'polyfills-js', get_template_directory_uri() . '/assets/include/polyfills-es5.js', array(), '20200410', 'in_footer' );
+	wp_enqueue_script( 'polyfills-js', $template_directory_uri . '/assets/include/polyfills-es5.js', array(), '20200410', 'in_footer' );
 
 	wp_enqueue_script( 'script-js', $scripts_dirname . 'script.js', array(), SCRIPTS_VER, 'in_footer' );
 	wp_enqueue_script( 'script-legacy', $scripts_dirname . 'script-legacy.js', array(), SCRIPTS_VER, 'in_footer' );
@@ -184,19 +187,19 @@ function excursions_scripts() {
 	wp_localize_script( 'script-legacy', 'myajax', $script_data );
 
 	if ( is_singular( 'events' ) || is_singular( 'guidebook' ) || is_page( 'map' ) ) {
-		wp_enqueue_style( 'events', get_template_directory_uri() . '/assets/css/events.css', array(), STYLES_VER );
+		wp_enqueue_style( 'events', $template_directory_uri . '/assets/css/events.css', array(), STYLES_VER );
 		wp_enqueue_script( 'events-js', $scripts_dirname . 'events.js', array( 'script-js' ), SCRIPTS_VER, 'in_footer' );
 		wp_enqueue_script( 'events-legacy', $scripts_dirname . 'events-legacy.js', array( 'script-legacy' ), SCRIPTS_VER, 'in_footer' );
 	}
 
 	wp_deregister_script( 'jquery' );
 	// wp_register_script( 'jquery', '//code.jquery.com/jquery-3.3.1.min.js', array(), '3.3.1', 'in_footer' ).
-	wp_register_script( 'jquery', get_template_directory_uri() . '/assets/include/jquery-3.3.1.min.js', array(), '1', 'in_footer' );
-	wp_register_script( 'glide-js', get_template_directory_uri() . '/assets/include/glide.min.js', array(), '1', 'in_footer' );
+	wp_register_script( 'jquery', $template_directory_uri . '/assets/include/jquery-3.3.1.min.js', array(), '1', 'in_footer' );
+	wp_register_script( 'glide-js', $template_directory_uri . '/assets/include/glide.min.js', array(), '1', 'in_footer' );
 	wp_register_script( 'widgets-js', $scripts_dirname . 'widgets.js', array( 'glide-js' ), SCRIPTS_VER, 'in_footer' );
 	wp_register_script( 'widgets-legacy', $scripts_dirname . 'widgets-legacy.js', array( 'glide-js' ), SCRIPTS_VER, 'in_footer' );
 
-	wp_enqueue_script( 'cssrelpreload-js', get_template_directory_uri() . '/assets/include/cssrelpreload.js', array(), '1', 'in_footer' );
+	wp_enqueue_script( 'cssrelpreload-js', $template_directory_uri . '/assets/include/cssrelpreload.js', array(), '1', 'in_footer' );
 	wp_register_script( 'acf_map-js', $scripts_dirname . 'acf_map.js', array( 'script-js' ), SCRIPTS_VER, 'in_footer' );
 	wp_register_script( 'acf_map-legacy', $scripts_dirname . 'acf_map-legacy.js', array( 'script-legacy' ), SCRIPTS_VER, 'in_footer' );
 	wp_register_script( 'events_map-js', $scripts_dirname . 'events_map.js', array( 'script-js' ), SCRIPTS_VER, 'in_footer' );
@@ -206,10 +209,10 @@ function excursions_scripts() {
 
 	wp_register_script( 'yashare-js', '//yastatic.net/share2/share.js', array(), '1', 'in_footer' );
 	wp_register_script( 'fancybox-js', '//cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js', array( 'jquery' ), '1', 'in_footer' );
-	wp_register_style( 'glide-core', get_template_directory_uri() . '/assets/include/glide.core.min.css', array(), '1' );
-	wp_register_style( 'glide-theme', get_template_directory_uri() . '/assets/include/glide.theme.min.css', array(), '1' );
-	wp_register_style( 'events_map', get_template_directory_uri() . '/assets/css/events_map.css', array(), STYLES_VER );
-	wp_register_style( 'guidebook_map', get_template_directory_uri() . '/assets/css/guidebook_map.css', array(), STYLES_VER );
+	wp_register_style( 'glide-core', $template_directory_uri . '/assets/include/glide.core.min.css', array(), '1' );
+	wp_register_style( 'glide-theme', $template_directory_uri . '/assets/include/glide.theme.min.css', array(), '1' );
+	wp_register_style( 'events_map', $template_directory_uri . '/assets/css/events_map.css', array(), STYLES_VER );
+	wp_register_style( 'guidebook_map', $template_directory_uri . '/assets/css/guidebook_map.css', array(), STYLES_VER );
 }
 add_action( 'wp_enqueue_scripts', 'excursions_scripts' );
 
@@ -1330,12 +1333,21 @@ function get_guidebook_posts( $term_slug = '', $numberposts = 0 ) {
  * @return void
  */
 function check_query_params() {
-	$query_params = excurs_get_query_params();
+	if ( empty( $_SERVER['REQUEST_URI'] ) ) {
+		return;
+	}
 
-	if ( count( $query_params ) ) {
-		$allowed_keys = array( 'pagenum', 'cat_f', 'numberposts_1', 'numberposts_2' );
+	$uri   = esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) );
+	$parts = wp_parse_url( $uri );
+
+	$query_params = array(); // excurs_get_query_params() .
+	$query_string = '';
+
+	if ( isset( $parts['query'] ) ) {
 		parse_str( $parts['query'], $query_params );
+
 		$start_query_params = $query_params;
+		$allowed_keys       = array( 'pagenum', 'cat_f', 'numberposts_1', 'numberposts_2' );
 
 		foreach ( $query_params as $key => $value ) {
 			if ( ! in_array( $key, $allowed_keys, true ) ) {

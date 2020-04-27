@@ -22,10 +22,13 @@
 
 	<link rel="shortcut icon" href="/favicon.ico">
 
-	<?php $theme_path = get_template_directory_uri(); ?>
-	<link rel="preload" as="font" type="font/woff2" href="<?=$theme_path?>/assets/fonts/ubuntu-v13-cyrillic_latin-300.woff2" crossorigin>
-	<link rel="preload" as="font" type="font/woff2" href="<?=$theme_path?>/assets/fonts/ubuntu-v13-cyrillic_latin-regular.woff2" crossorigin>
-	
+	<?php
+	$font_1_url = get_template_directory_uri() . '/assets/fonts/ubuntu-v13-cyrillic_latin-300.woff2';
+	$font_2_url = get_template_directory_uri() . '/assets/fonts/ubuntu-v13-cyrillic_latin-regular.woff2';
+	?>
+	<link rel="preload" as="font" type="font/woff2" href="<?php echo esc_attr( $font_1_url ); ?>" crossorigin>
+	<link rel="preload" as="font" type="font/woff2" href="<?php echo esc_attr( $font_2_url ); ?>" crossorigin>
+
 	<style>@-ms-viewport{width:device-width}html{box-sizing:border-box;-ms-overflow-style:scrollbar}*,*::before,*::after{box-sizing:inherit}.container{width:100%;padding-right:15px;padding-left:15px;margin-right:auto;margin-left:auto}@media (min-width:576px){.container{max-width:540px}}@media (min-width:768px){.container{max-width:720px}}@media (min-width:992px){.container{max-width:960px}}@media (min-width:1200px){.container{max-width:1140px}}.container-fluid{width:100%;padding-right:15px;padding-left:15px;margin-right:auto;margin-left:auto}.row{display:-ms-flexbox;display:flex;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-15px;margin-left:-15px}.no-gutters{margin-right:0;margin-left:0}.no-gutters>.col,.no-gutters>[class*="col-"]{padding-right:0;padding-left:0}.col-1,.col-2,.col-3,.col-4,.col-5,.col-6,.col-7,.col-8,.col-9,.col-10,.col-11,.col-12,.col,.col-auto,.col-sm-1,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-10,.col-sm-11,.col-sm-12,.col-sm,.col-sm-auto,.col-md-1,.col-md-2,.col-md-3,.col-md-4,.col-md-5,.col-md-6,.col-md-7,.col-md-8,.col-md-9,.col-md-10,.col-md-11,.col-md-12,.col-md,.col-md-auto,.col-lg-1,.col-lg-2,.col-lg-3,.col-lg-4,.col-lg-5,.col-lg-6,.col-lg-7,.col-lg-8,.col-lg-9,.col-lg-10,.col-lg-11,.col-lg-12,.col-lg,.col-lg-auto,.col-xl-1,.col-xl-2,.col-xl-3,.col-xl-4,.col-xl-5,.col-xl-6,.col-xl-7,.col-xl-8,.col-xl-9,.col-xl-10,.col-xl-11,.col-xl-12,.col-xl,.col-xl-auto{position:relative;width:100%;min-height:1px;padding-right:15px;padding-left:15px}.col{-ms-flex-preferred-size:0;flex-basis:0%;-ms-flex-positive:1;flex-grow:1;max-width:100%}.col-auto{-ms-flex:0 0 auto;flex:0 0 auto;width:auto;max-width:none}.col-1{-ms-flex:0 0 8.333333%;flex:0 0 8.333333%;max-width:8.333333%}.col-2{-ms-flex:0 0 16.666667%;flex:0 0 16.666667%;max-width:16.666667%}.col-3{-ms-flex:0 0 25%;flex:0 0 25%;max-width:25%}.col-4{-ms-flex:0 0 33.333333%;flex:0 0 33.333333%;max-width:33.333333%}.col-5{-ms-flex:0 0 41.666667%;flex:0 0 41.666667%;max-width:41.666667%}.col-6{-ms-flex:0 0 50%;flex:0 0 50%;max-width:50%}.col-7{-ms-flex:0 0 58.333333%;flex:0 0 58.333333%;max-width:58.333333%}.col-8{-ms-flex:0 0 66.666667%;flex:0 0 66.666667%;max-width:66.666667%}.col-9{-ms-flex:0 0 75%;flex:0 0 75%;max-width:75%}.col-10{-ms-flex:0 0 83.333333%;flex:0 0 83.333333%;max-width:83.333333%}.col-11{-ms-flex:0 0 91.666667%;flex:0 0 91.666667%;max-width:91.666667%}.col-12{-ms-flex:0 0 100%;flex:0 0 100%;max-width:100%}@media (min-width:576px){.col-sm{-ms-flex-preferred-size:0;flex-basis:0%;-ms-flex-positive:1;flex-grow:1;max-width:100%}.col-sm-auto{-ms-flex:0 0 auto;flex:0 0 auto;width:auto;max-width:none}.col-sm-1{-ms-flex:0 0 8.333333%;flex:0 0 8.333333%;max-width:8.333333%}.col-sm-2{-ms-flex:0 0 16.666667%;flex:0 0 16.666667%;max-width:16.666667%}.col-sm-3{-ms-flex:0 0 25%;flex:0 0 25%;max-width:25%}.col-sm-4{-ms-flex:0 0 33.333333%;flex:0 0 33.333333%;max-width:33.333333%}.col-sm-5{-ms-flex:0 0 41.666667%;flex:0 0 41.666667%;max-width:41.666667%}.col-sm-6{-ms-flex:0 0 50%;flex:0 0 50%;max-width:50%}.col-sm-7{-ms-flex:0 0 58.333333%;flex:0 0 58.333333%;max-width:58.333333%}.col-sm-8{-ms-flex:0 0 66.666667%;flex:0 0 66.666667%;max-width:66.666667%}.col-sm-9{-ms-flex:0 0 75%;flex:0 0 75%;max-width:75%}.col-sm-10{-ms-flex:0 0 83.333333%;flex:0 0 83.333333%;max-width:83.333333%}.col-sm-11{-ms-flex:0 0 91.666667%;flex:0 0 91.666667%;max-width:91.666667%}.col-sm-12{-ms-flex:0 0 100%;flex:0 0 100%;max-width:100%}}@media (min-width:768px){.col-md{-ms-flex-preferred-size:0;flex-basis:0%;-ms-flex-positive:1;flex-grow:1;max-width:100%}.col-md-auto{-ms-flex:0 0 auto;flex:0 0 auto;width:auto;max-width:none}.col-md-1{-ms-flex:0 0 8.333333%;flex:0 0 8.333333%;max-width:8.333333%}.col-md-2{-ms-flex:0 0 16.666667%;flex:0 0 16.666667%;max-width:16.666667%}.col-md-3{-ms-flex:0 0 25%;flex:0 0 25%;max-width:25%}.col-md-4{-ms-flex:0 0 33.333333%;flex:0 0 33.333333%;max-width:33.333333%}.col-md-5{-ms-flex:0 0 41.666667%;flex:0 0 41.666667%;max-width:41.666667%}.col-md-6{-ms-flex:0 0 50%;flex:0 0 50%;max-width:50%}.col-md-7{-ms-flex:0 0 58.333333%;flex:0 0 58.333333%;max-width:58.333333%}.col-md-8{-ms-flex:0 0 66.666667%;flex:0 0 66.666667%;max-width:66.666667%}.col-md-9{-ms-flex:0 0 75%;flex:0 0 75%;max-width:75%}.col-md-10{-ms-flex:0 0 83.333333%;flex:0 0 83.333333%;max-width:83.333333%}.col-md-11{-ms-flex:0 0 91.666667%;flex:0 0 91.666667%;max-width:91.666667%}.col-md-12{-ms-flex:0 0 100%;flex:0 0 100%;max-width:100%}}@media (min-width:992px){.col-lg{-ms-flex-preferred-size:0;flex-basis:0%;-ms-flex-positive:1;flex-grow:1;max-width:100%}.col-lg-auto{-ms-flex:0 0 auto;flex:0 0 auto;width:auto;max-width:none}.col-lg-1{-ms-flex:0 0 8.333333%;flex:0 0 8.333333%;max-width:8.333333%}.col-lg-2{-ms-flex:0 0 16.666667%;flex:0 0 16.666667%;max-width:16.666667%}.col-lg-3{-ms-flex:0 0 25%;flex:0 0 25%;max-width:25%}.col-lg-4{-ms-flex:0 0 33.333333%;flex:0 0 33.333333%;max-width:33.333333%}.col-lg-5{-ms-flex:0 0 41.666667%;flex:0 0 41.666667%;max-width:41.666667%}.col-lg-6{-ms-flex:0 0 50%;flex:0 0 50%;max-width:50%}.col-lg-7{-ms-flex:0 0 58.333333%;flex:0 0 58.333333%;max-width:58.333333%}.col-lg-8{-ms-flex:0 0 66.666667%;flex:0 0 66.666667%;max-width:66.666667%}.col-lg-9{-ms-flex:0 0 75%;flex:0 0 75%;max-width:75%}.col-lg-10{-ms-flex:0 0 83.333333%;flex:0 0 83.333333%;max-width:83.333333%}.col-lg-11{-ms-flex:0 0 91.666667%;flex:0 0 91.666667%;max-width:91.666667%}.col-lg-12{-ms-flex:0 0 100%;flex:0 0 100%;max-width:100%}}@media (min-width:1200px){.col-xl{-ms-flex-preferred-size:0;flex-basis:0%;-ms-flex-positive:1;flex-grow:1;max-width:100%}.col-xl-auto{-ms-flex:0 0 auto;flex:0 0 auto;width:auto;max-width:none}.col-xl-1{-ms-flex:0 0 8.333333%;flex:0 0 8.333333%;max-width:8.333333%}.col-xl-2{-ms-flex:0 0 16.666667%;flex:0 0 16.666667%;max-width:16.666667%}.col-xl-3{-ms-flex:0 0 25%;flex:0 0 25%;max-width:25%}.col-xl-4{-ms-flex:0 0 33.333333%;flex:0 0 33.333333%;max-width:33.333333%}.col-xl-5{-ms-flex:0 0 41.666667%;flex:0 0 41.666667%;max-width:41.666667%}.col-xl-6{-ms-flex:0 0 50%;flex:0 0 50%;max-width:50%}.col-xl-7{-ms-flex:0 0 58.333333%;flex:0 0 58.333333%;max-width:58.333333%}.col-xl-8{-ms-flex:0 0 66.666667%;flex:0 0 66.666667%;max-width:66.666667%}.col-xl-9{-ms-flex:0 0 75%;flex:0 0 75%;max-width:75%}.col-xl-10{-ms-flex:0 0 83.333333%;flex:0 0 83.333333%;max-width:83.333333%}.col-xl-11{-ms-flex:0 0 91.666667%;flex:0 0 91.666667%;max-width:91.666667%}.col-xl-12{-ms-flex:0 0 100%;flex:0 0 100%;max-width:100%}}</style>
 
 	<?php wp_head(); ?>
@@ -38,94 +41,99 @@
 	<header id="masthead" class="site-header">
 		<div class="container">
 			<div class="row">
-                <div class="col header-container flex-container" itemscope itemtype="http://schema.org/Organization">
+				<div class="col header-container flex-container" itemscope itemtype="http://schema.org/Organization">
 					<div>
 					<?php
-						$site_name 			= get_bloginfo();
-						$is_front_page 		= is_front_page();
-						$nav_title 			= null;
-						$nav_title_ref 		= null;
-						$alt_contenttitle 	= null;
-						$alt_headertitle 	= null;
-						$nav_menu_classes 	= '';
-						
-						if (is_singular('guidebook') || is_tax('sections')) {
-							// $guidebook_id = 789;
-							// if (home_url() == 'http://excurs-orel') $guidebook_id = 697;
-							$guidebook_id 		= get_page_by_path('guidebook')->ID;
-							$alt_headertitle 	= get_post_meta($guidebook_id, 'header-title', true);
-							// $term_0 			= 'sights'; // get_terms( array('taxonomy' => 'sections') )[0];
-							$terms 				= get_the_terms($post->ID, 'sections');
-							$term 				= $terms ? array_shift($terms) : null;
-							if (($term && $term->slug == 'sights') || is_tax('sections')) {
-								// $nav_title 		= $term->name;
-								// $nav_title_ref 	= get_term_link( (int)$term->term_id );
-								$nav_title 			= get_the_title($guidebook_id); // Путеводитель
-								$nav_title_ref 		= get_permalink($guidebook_id);
-								$nav_menu_classes 	= 'menu-item-guidebook_hide';
-								if (is_tax('sections')) {
-									$alt_contenttitle = $term->name;
-								}
-							} else {
-								// $term 		= get_queried_object();
-								$nav_title 		= $term->name;
-								$nav_title_ref 	= get_term_link((int)$term->term_id);
+					$site_name        = get_bloginfo();
+					$is_front_page    = is_front_page();
+					$nav_title        = null;
+					$nav_title_ref    = null;
+					$alt_contenttitle = null;
+					$alt_headertitle  = null;
+					$nav_menu_classes = '';
+					$is_map_page      = is_page( 'map' );
+
+					if ( is_singular( 'guidebook' ) || is_tax( 'sections' ) ) {
+						$guidebook_id    = get_page_by_path( 'guidebook' )->ID;
+						$alt_headertitle = get_post_meta( $guidebook_id, 'header-title', true );
+						$terms           = get_the_terms( $post->ID, 'sections' );
+						$myterm          = $terms ? array_shift( $terms ) : null;
+						if ( ( $myterm && 'sights' === $myterm->slug ) || is_tax( 'sections' ) ) {
+							$nav_title        = get_the_title( $guidebook_id );
+							$nav_title_ref    = get_permalink( $guidebook_id );
+							$nav_menu_classes = 'menu-item-guidebook_hide';
+							if ( is_tax( 'sections' ) ) {
+								$alt_contenttitle = $myterm->name;
 							}
-						} elseif (!is_404()) {
-							$alt_headertitle = get_post_meta($post->ID, 'header-title', true);
-						}
-
-						$headertitle = $alt_headertitle ? $alt_headertitle : $site_name;
-
-						if ( $is_front_page || ( $alt_headertitle && is_page() ) ) {
-							$headertitle_html = '<h1 class="header-title">'.$headertitle.'</h1>';
-							$h1_is = true;
 						} else {
-							$headertitle_html = '<h2 class="header-title">'.$headertitle.'</h2>';
-							$h1_is = false;
+							$nav_title     = $myterm->name;
+							$nav_title_ref = get_term_link( intval( $myterm->term_id ) );
 						}
+					} elseif ( ! is_404() ) {
+						$alt_headertitle = get_post_meta( $post->ID, 'header-title', true );
+					}
 
-						if ( $is_front_page ) {
-							$headertitle_html .= '<p class="header-subtitle">мы не стоим на месте</p>';
-						} 
+					$headertitle = $alt_headertitle ? $alt_headertitle : $site_name;
 
-						if ( ! $nav_title ) {
-							$nav_title = ( is_page() || is_home() ) ? single_post_title( null, false ) : '';
+					if ( ! $nav_title ) {
+						$nav_title = ( is_page() || is_home() ) ? single_post_title( null, false ) : '';
+					}
+					if ( ! $nav_title && is_archive() ) {
+						$nav_title = get_the_archive_title();
+					}
+					if ( ! $nav_title && is_single() ) {
+						// $ancestors = get_post_ancestors($post->ID);
+						if ( is_singular( 'post' ) ) {
+							$my_blog_id    = get_option( 'page_for_posts' );
+							$nav_title     = get_the_title( $my_blog_id );
+							$nav_title_ref = get_permalink( $my_blog_id );
 						}
-						if ( ! $nav_title && is_archive() ) {
-							$nav_title = get_the_archive_title();
+						if ( is_singular( 'events' ) ) {
+							$nav_title     = 'События'; // get_the_archive_title();.
+							$nav_title_ref = get_post_type_archive_link( 'events' );
 						}
-						if ( !$nav_title && is_single() ) {
-							// $ancestors = get_post_ancestors($post->ID);
-							if ( is_singular('post') ) {
-								$blog_id 		= get_option('page_for_posts');
-								$nav_title 		= get_the_title( $blog_id );
-								$nav_title_ref 	= get_permalink( $blog_id );
-							} 
-							if ( is_singular('events') ) {
-								$nav_title 		= 'События'; // get_the_archive_title();
-								$nav_title_ref 	= get_post_type_archive_link('events');
-							} 
-							// if( is_singular('guidebook') ){} 
-						}
+					}
 
-						echo $headertitle_html;
+					$h1_is           = false;
+					$header_subtitle = null;
+					if ( $is_front_page || ( $alt_headertitle && is_page() ) ) {
+						$h1_is = true;
+					}
+
+					if ( $is_front_page ) {
+						// 'мы не стоим на месте'.
+						$header_subtitle = 'на удалёнке';
+					}
 					?>
-					</div>
-						
-					<?php if ( function_exists('the_custom_logo') ) the_custom_logo(); ?>
 
-					<meta itemprop="name" content="<?=$site_name?>">
+					<?php if ( $h1_is ) : ?>
+						<h1 class="header-title"><?php echo esc_html( $headertitle ); ?></h1>
+					<?php else : ?>
+						<h2 class="header-title"><?php echo esc_html( $headertitle ); ?></h2>
+					<?php endif; ?>
+
+					<?php if ( $header_subtitle ) : ?>
+						<p class="header-subtitle"><?php echo esc_html( $header_subtitle ); ?></p>
+					<?php endif; ?>
+
+					</div>
+
+					<?php
+					if ( function_exists( 'the_custom_logo' ) ) {
+						the_custom_logo();
+					}
+					?>
+
+					<meta itemprop="name" content="<?php echo esc_attr( $site_name ); ?>">
 
 				</div> <!-- header-container itemtype="http://schema.org/Organization" --> 
-            </div>
+			</div>
 		</div>
 
 		<div class="container nav-container">
 			<nav id="nav-block" class="fixable">
 				<div class="row">
 					<div class="col">
-						<!-- <div class="nav-container"> -->
 						<div>
 							<div id="nav-adaptive" class="flex-container">
 								<button id="menu" class="hidden">
@@ -134,18 +142,31 @@
 									<span></span>
 									<span></span>
 								</button>
-								<div class="nav-title">
-									<?php echo $nav_title_ref ? '<a href="' . $nav_title_ref.'">' . $nav_title . '</a>' : $nav_title; ?>
-								</div>
+								<?php if ( $nav_title && ! $is_map_page ) : ?>
+									<div class="nav-title">
+										<?php if ( $nav_title_ref ) : ?>
+											<a href="<?php echo esc_attr( $nav_title_ref ); ?>">
+										<?php endif; ?>
+
+										<?php echo esc_html( $nav_title ); ?>
+
+										<?php if ( $nav_title_ref ) : ?>
+											</a>
+										<?php endif; ?>
+									</div>
+								<?php endif; ?>
 							</div>
 						</div>
 						<div>
-							<?php wp_nav_menu( array(
-								'theme_location'  => 'header_menu',
-								// 'menu'            => 'menu-1',
-								'container'       => false,
-								'menu_class'      => 'nav-menu '.$nav_menu_classes
-							 ) ); ?>
+							<?php
+							wp_nav_menu(
+								array(
+									'theme_location' => 'header_menu',
+									'container'      => false,
+									'menu_class'     => 'nav-menu ' . $nav_menu_classes,
+								)
+							);
+							?>
 						</div>
 					</div>
 				</div>
@@ -161,7 +182,7 @@
 		</g></svg>
 	</a>
 
-	<?php if(function_exists('bcn_display') && !$is_front_page ): ?>
+	<?php if ( function_exists( 'bcn_display' ) && ! $is_front_page ) : ?>
 		<div class="breadcrumbs container" typeof="BreadcrumbList" vocab="https://schema.org/">
 			<?php bcn_display(); ?>
 		</div>
@@ -169,12 +190,16 @@
 
 	<div id="content" class="site-content">
 		<div class="container main-container">								
-		<?php if( !$h1_is && $nav_title && !is_single() ): 
-			if(!$alt_contenttitle){
-				if( is_post_type_archive('events') ) $alt_contenttitle = 'Наши мероприятия';
-				else $alt_contenttitle = get_post_meta( get_queried_object()->ID, 'content-title', true );
+		<?php
+		if ( ! $h1_is && $nav_title && ! is_single() ) :
+			if ( ! $alt_contenttitle ) {
+				$alt_contenttitle = is_post_type_archive( 'events' ) ? 'Наши мероприятия' : get_post_meta( get_queried_object()->ID, 'content-title', true );
 			}
-			if( $alt_contenttitle ) $nav_title = $alt_contenttitle;
+			if ( $alt_contenttitle ) {
+				$nav_title = $alt_contenttitle;
+			}
 			?>
-			<h1 class="content-title"><?=$nav_title?></h1>
+
+			<h1 class="content-title"><?php echo esc_html( $nav_title ); ?></h1>
+
 		<?php endif; ?>

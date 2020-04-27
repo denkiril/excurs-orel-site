@@ -1,0 +1,24 @@
+{
+	"folders": [
+		{
+			"path": ".."
+			// "path": "../public_html/wp-content/themes/excursions"
+		}
+	],
+	"settings": {
+		// "phpcs.standard": "C:\\Users\\User\\wpcs\\phpcs.xml",
+		"phpcs.standard": "WordPress",
+		"phpcs.ignorePatterns": [
+			// "*/ignored-file.php",
+			"*/vendor/*",
+			"dev/*",
+			// "/public_html/*.php",
+			"/public_html/wp-admin/*",
+			"/public_html/wp-includes/*",
+			"/public_html/wp-content/languages/*",
+			"/public_html/wp-content/plugins/*",
+			"/public_html/wp-content/upgrade/*",
+			"/public_html/wp-content/uploads/*",
+		],
+	}
+}

@@ -791,9 +791,13 @@ function guidebook_map_func( $atts ) {
 	$data_slug   = $atts['slug'] ? sprintf( ' data-slug="%s"', $atts['slug'] ) : '';
 	$form        = $atts['form'];
 
+	$query_params = excurs_get_query_params();
+	if ( isset( $query_params['pagenum'] ) && strpos( $add_classes, 'noautoopen' ) === false ) {
+		$add_classes .= ' noautoopen';
+	}
+
 	$form_html = '';
 	if ( $form ) {
-		$query_params          = excurs_get_query_params();
 		$cat_f_checked         = isset( $query_params['cat_f'] ) ? 'checked' : '';
 		$numberposts_1_checked = isset( $query_params['numberposts_1'] ) ? 'checked' : '';
 		$numberposts_2_checked = isset( $query_params['numberposts_2'] ) ? 'checked' : '';
