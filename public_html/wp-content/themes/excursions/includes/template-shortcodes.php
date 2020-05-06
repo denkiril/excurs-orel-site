@@ -184,7 +184,7 @@ function newscards_func( $atts ) {
 	$myposts             = array();
 	$future_events_posts = array();
 
-	$events_args = array(
+	$events_args      = array(
 		'post_type'   => 'events',
 		'exclude'     => $exclude,
 		'orderby'     => 'meta_value',
@@ -192,9 +192,10 @@ function newscards_func( $atts ) {
 		'meta_key'    => 'event_info_event_date',
 		'numberposts' => -1,
 	);
+	$all_events_posts = get_posts( $events_args );
 
 	if ( $future_events || $actual_events ) {
-		$events_posts = get_posts( $events_args );
+		$events_posts = $all_events_posts;
 	}
 
 	if ( $future_events && ! empty( $events_posts ) ) {
@@ -288,7 +289,21 @@ function newscards_func( $atts ) {
 			$show_event_date = 'events' === $mypost->post_type;
 			$show_attention  = in_array( $mypost, $future_events_posts, true );
 
-			$html .= excurs_get_newscard_html( $mypost->ID, '', $show_event_date, $show_attention, $size, $read_more );
+			$html .= excurs_get_newscard_html( $mypost->ID, '', 'post', $show_event_date, $show_attention, $size, $read_more );
+		}
+
+		if ( $promo_events ) {
+			$random_events_post = null;
+			shuffle( $all_events_posts );
+			foreach ( $all_events_posts as $rand_post ) {
+				if ( ! in_array( $rand_post, $myposts, true ) ) {
+					$random_events_post = $rand_post;
+					break;
+				}
+			}
+
+			$post_id = $random_events_post ? $random_events_post->ID : null;
+			$html   .= excurs_get_newscard_html( $post_id, '', 'events', false, false, $size, $read_more );
 		}
 
 		$html .= '</div><!-- .row -->';

@@ -1514,25 +1514,37 @@ add_action( 'admin_init', 'remove_fields_on_map_page' );
  *
  * @param integer $post_id         Post ID.
  * @param string  $alt_title       Optional. Alt title for the card. Default none.
+ * @param string  $type            Optional. Type of card. Can be 'events'. Default 'post'.
  * @param boolean $show_event_date Optional. Shouls show event date. Default false.
  * @param boolean $show_attention  Optional. Shouls show attention. Default false.
  * @param string  $size            Optional. Size of card picture. Default 'medium_large'.
  * @param string  $read_more       Optional. Read more text. Default '[Перейти&nbsp;>>]'.
  * @return string Outer HTML.
  */
-function excurs_get_newscard_html( $post_id, $alt_title = '', $show_event_date = false, $show_attention = false, $size = 'medium_large', $read_more = '[Перейти&nbsp;>>]' ) {
-	$html           = '';
-	$permalink      = get_the_permalink( $post_id );
-	$title_attr     = excurs_get_the_title_for_attr( $post_id );
-	$a_format       = '<a href="' . $permalink . '" title="' . $title_attr . '" %1$s>%2$s</a>';
+function excurs_get_newscard_html( $post_id, $alt_title = '', $type = 'post', $show_event_date = false, $show_attention = false, $size = 'medium_large', $read_more = '[Перейти&nbsp;>>]' ) {
+	$permalink      = esc_url( get_the_permalink( $post_id ) );
+	$title_attr     = esc_attr( excurs_get_the_title_for_attr( $post_id ) );
+	$thumb_id       = get_post_thumbnail_id( $post_id );
 	$event_date     = $show_event_date ? markup_event_date( $post_id ) : '';
 	$newscard_title = $alt_title ? $alt_title : get_field( 'newscard-title', $post_id );
 	if ( empty( $newscard_title ) ) {
 		$newscard_title = get_the_title( $post_id );
 	}
 
-	$html .= '<div class="newscard-container col-md-6 col-lg-4"><div class="newscard">';
-	$html .= sprintf( $a_format, '', get_attachment_picture( get_post_thumbnail_id( $post_id ), $size ) );
+	$add_html = '';
+	if ( 'events' === $type ) {
+		$add_html = '<p style="font-size:0.9em;margin-top:0.5em;margin-bottom:0;">На фото: <a href="' . $permalink . '" >' . esc_html( get_the_title( $post_id ) ) . '</a></p>';
+
+		$permalink      = esc_url( get_post_type_archive_link( 'events' ) );
+		$title_attr     = esc_attr( 'Ссылка на все события' );
+		$event_date     = '';
+		$newscard_title = 'Фотоотчёты с наших событий';
+	}
+
+	$a_format = '<a href="' . $permalink . '" title="' . $title_attr . '" %1$s>%2$s</a>';
+
+	$html  = '<div class="newscard-container col-md-6 col-lg-4"><div class="newscard">';
+	$html .= sprintf( $a_format, '', get_attachment_picture( $thumb_id, $size ) );
 	if ( $show_attention ) {
 		$html .= '<p class="attention">Не пропустите!</p>';
 	}
@@ -1540,6 +1552,7 @@ function excurs_get_newscard_html( $post_id, $alt_title = '', $show_event_date =
 	if ( $read_more ) {
 		$html .= ' ' . sprintf( $a_format, 'tabindex="-1"', esc_html( $read_more ) );
 	}
+	$html .= $add_html;
 	$html .= '</div></div>';
 
 	return $html;
