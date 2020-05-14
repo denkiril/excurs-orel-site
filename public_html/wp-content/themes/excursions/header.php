@@ -51,7 +51,7 @@
 					$alt_contenttitle = null;
 					$alt_headertitle  = null;
 					$nav_menu_classes = '';
-					$is_map_page      = is_page( 'map' );
+					$print_nav_title  = ! ( is_page( 'map' ) || is_page( 'citata' ) );
 
 					if ( is_singular( 'guidebook' ) || is_tax( 'sections' ) ) {
 						$guidebook_id    = get_page_by_path( 'guidebook' )->ID;
@@ -142,7 +142,7 @@
 									<span></span>
 									<span></span>
 								</button>
-								<?php if ( $nav_title && ! $is_map_page ) : ?>
+								<?php if ( $nav_title && $print_nav_title ) : ?>
 									<div class="nav-title">
 										<?php if ( $nav_title_ref ) : ?>
 											<a href="<?php echo esc_attr( $nav_title_ref ); ?>">

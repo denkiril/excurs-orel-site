@@ -30,7 +30,6 @@ function crb_fields_for_gb_routes() {
 	$map_page    = get_page_by_path( 'map' );
 	$map_page_id = $map_page ? $map_page->ID : null;
 	Container::make( 'post_meta', 'gbroutes', 'Поля для раздела "Маршруты, тематические подборки"' )
-		// ->show_on_post_type( 'guidebook' )
 		// ->show_on_taxonomy_term( 'routes', 'sections' )
 		->where( 'post_type', '=', 'guidebook' )
 		->where(
@@ -74,8 +73,10 @@ function crb_fields_for_gb_routes() {
 									)
 								)
 								->set_max( 1 ),
-							Field::make( 'image', 'image', 'Картинка' )->set_width( 25 ),
-							Field::make( 'textarea', 'desription', 'Описание' )->set_width( 75 ),
+							Field::make( 'image', 'image', 'Картинка' )
+								->set_width( 25 ),
+							Field::make( 'textarea', 'desription', 'Описание' )
+								->set_width( 75 ),
 						)
 					)
 					->set_header_template( '<%- title %> <%- latlng_text || gba.length ? "" : "[geo?]" %>' ),
@@ -85,6 +86,46 @@ function crb_fields_for_gb_routes() {
 		);
 }
 add_action( 'carbon_fields_register_fields', 'crb_fields_for_gb_routes' );
+
+/**
+ * Add fields for 'sources' posts (show on 'citata' page)
+ *
+ * @return void
+ */
+function crb_fields_for_citata() {
+	Container::make( 'post_meta', 'citatas', 'Цитаты' )
+		->show_on_post_type( 'sources' )
+		->add_fields(
+			array(
+				Field::make( 'text', 'source_text', 'Источник (подпись к цитатам)' )
+					->set_attribute( 'placeholder', 'Иван Тургенев, «Рудин», 1856.' )
+					->set_width( 75 ),
+				Field::make( 'text', 'date', 'Год (для сортировки)' )
+					->set_width( 25 ),
+				Field::make( 'complex', 'citata_list', 'Список цитат' )
+					->setup_labels(
+						array(
+							'plural_name'   => 'Цитаты',
+							'singular_name' => 'цитату',
+						)
+					)
+					->add_fields(
+						array(
+							Field::make( 'textarea', 'text', 'Текст' )
+								->set_rows( 8 ),
+							Field::make( 'image', 'image', 'Картинка' )
+								->set_width( 20 ),
+							Field::make( 'textarea', 'comment', 'Комментарий (подпись к цитате)' )
+								->set_width( 60 ),
+							Field::make( 'text', 'slug', 'Ярлык (#slug)' )
+								->set_width( 20 ),
+						)
+					)
+					->set_header_template( '<%- text.substring(0, 60) %> / <%- slug ? "#" + slug : "" %>' ),
+			)
+		);
+}
+add_action( 'carbon_fields_register_fields', 'crb_fields_for_citata' );
 
 /**
  * Add carbon fields to the front page
