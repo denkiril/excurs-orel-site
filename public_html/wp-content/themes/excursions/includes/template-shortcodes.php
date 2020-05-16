@@ -284,8 +284,10 @@ function newscards_func( $atts ) {
 			$html .= '<h2>' . $section_title . '</h2>';
 		}
 
-		$html .= '<div class="row">';
+		$myposts_ids = array();
+		$html       .= '<div class="row">';
 		foreach ( $myposts as $mypost ) {
+			$myposts_ids[]   = $mypost->ID;
 			$show_event_date = 'events' === $mypost->post_type;
 			$show_attention  = in_array( $mypost, $future_events_posts, true );
 
@@ -293,17 +295,15 @@ function newscards_func( $atts ) {
 		}
 
 		if ( $promo_events ) {
-			$random_events_post = null;
+			$rand_post = null;
 			shuffle( $all_events_posts );
-			foreach ( $all_events_posts as $rand_post ) {
-				if ( ! in_array( $rand_post, $myposts, true ) ) {
-					$random_events_post = $rand_post;
+			foreach ( $all_events_posts as $rand_events_post ) {
+				if ( ! in_array( $rand_events_post->ID, $myposts_ids, true ) ) {
+					$rand_post = $rand_events_post;
+					$html     .= excurs_get_newscard_html( $rand_post->ID, '', 'events', false, false, $size, $read_more );
 					break;
 				}
 			}
-
-			$post_id = $random_events_post ? $random_events_post->ID : null;
-			$html   .= excurs_get_newscard_html( $post_id, '', 'events', false, false, $size, $read_more );
 		}
 
 		$html .= '</div><!-- .row -->';
