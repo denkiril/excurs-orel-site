@@ -112,7 +112,11 @@ function crb_fields_for_citata() {
 					->add_fields(
 						array(
 							Field::make( 'textarea', 'text', 'Текст' )
-								->set_rows( 8 ),
+								->set_rows( 8 )
+								->set_width( 80 ),
+							Field::make( 'set', 'tags', 'Тэги (для фильтра)' )
+								->add_options( 'citata_get_tags_array' )
+								->set_width( 20 ),
 							Field::make( 'image', 'image', 'Картинка' )
 								->set_width( 20 ),
 							Field::make( 'textarea', 'comment', 'Комментарий (подпись к цитате)' )

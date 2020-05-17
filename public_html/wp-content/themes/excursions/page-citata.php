@@ -17,7 +17,7 @@ get_header();
 
 <style>
 	.citata-source { font-size: 0.9em; color: #3f3f3f; }
-	.citata-comment { font-size: 0.9em; }
+	.citata-comment { font-size: 0.9em; color: #3f3f3f; font-style: italic; }
 </style>
 
 <main id="main" class="site-main page-citata">
@@ -27,19 +27,35 @@ get_header();
 if ( have_posts() ) :
 	the_post();
 
-	$sources_posts = get_posts( array( 'post_type' => 'sources' ) );
+	// print_r2( citata_get_tags_array() ); ?
+
 	$citata_list   = array();
+	$sources_posts = get_posts(
+		array(
+			'post_type'   => 'sources',
+			'numberposts' => -1,
+		)
+	);
 	foreach ( $sources_posts as $sources_post ) {
 		$source_id       = $sources_post->ID;
 		$add_citata_list = carbon_get_post_meta( $source_id, 'citata_list' );
 
 		if ( $add_citata_list ) {
-			$source = carbon_get_post_meta( $source_id, 'source_text' );
-			$date   = carbon_get_post_meta( $source_id, 'date' );
+			$source  = carbon_get_post_meta( $source_id, 'source_text' );
+			$date    = carbon_get_post_meta( $source_id, 'date' );
+			$w_terms = get_the_terms( $source_id, 'writers' );
+
 			foreach ( $add_citata_list as $citata ) {
 				$citata['source'] = $source;
 				$citata['date']   = $date;
-				$citata_list[]    = $citata;
+
+				if ( $w_terms && ! is_wp_error( $w_terms ) ) {
+					foreach ( $w_terms as $w_term ) {
+						$citata['tags'][] = $w_term->slug;
+					}
+				}
+
+				$citata_list[] = $citata;
 			}
 		}
 	}
@@ -54,14 +70,17 @@ if ( have_posts() ) :
 	$gallery = false;
 	?>
 
-	<div style="margin-bottom: 2em;">
+	<div style="margin-bottom: 3em;">
 		<?php the_content(); ?>
-		<hr />
 	</div>
 
-	<?php foreach ( $citata_list as $key => $citata ) : ?>
+	<?php
+	foreach ( $citata_list as $key => $citata ) :
+		$citata_comment = trim( $citata['comment'] );
+		$citata_tags    = implode( ' ', $citata['tags'] );
+		?>
 
-		<div class="row anno-card">
+		<div class="row anno-card" data-citata_tags="<?php echo esc_attr( $citata_tags ); ?>">
 			<div class="col-12 col-md-4">
 				<?php
 				$img_id = $citata['image'];
@@ -81,7 +100,9 @@ if ( have_posts() ) :
 				<p class="citata-source"><?php echo esc_html( trim( $citata['source'] ) ); ?></p>
 			</div>
 
-			<p class="col-12 citata-comment"><?php echo trim( $citata['comment'] ); ?></p>
+			<?php if ( $citata_comment ) : ?>
+				<p class="col-12 citata-comment"><?php echo wiki_parse_text( $citata_comment ); ?></p>
+			<?php endif; ?>
 		</div>
 
 		<?php

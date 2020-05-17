@@ -504,8 +504,8 @@ function register_post_types() {
 	register_post_type(
 		'guidebook',
 		array(
-			'label'  => null,
-			'labels' => array(
+			'label'               => null,
+			'labels'              => array(
 				'name'               => 'Путеводитель', // основное название для типа записи.
 				'singular_name'      => 'Статья ПВ', // название для одной записи этого типа.
 				'add_new'            => 'Добавить статью', // для добавления новой записи.
@@ -581,12 +581,12 @@ function register_post_types() {
 		)
 	);
 
-	// post_type => guidebook.
+	// post_type => sources.
 	register_post_type(
 		'sources',
 		array(
-			'label'             => null,
-			'labels'            => array(
+			'label'              => null,
+			'labels'             => array(
 				'name'               => 'Источники / цитаты', // основное название для типа записи.
 				'singular_name'      => 'Источник', // название для одной записи этого типа.
 				'add_new'            => 'Добавить источник', // для добавления новой записи.
@@ -601,22 +601,62 @@ function register_post_types() {
 				'all_items'          => 'Все источники', // Все записи. По умолчанию равен menu_name.
 				'menu_name'          => 'Источники', // название меню.
 			),
-			'description'       => 'Источники информации по Орлу.',
-			'public'            => false,
-			'show_ui'           => true, // зависит от public.
-			'show_in_nav_menus' => true, // зависит от public.
-			'show_in_menu'      => true, // показывать ли в меню адмнки.
-			'show_in_admin_bar' => true, // по умолчанию значение show_in_menu.
-			'show_in_rest'      => true, // добавить в REST API. C WP 4.7.
-			'rest_base'         => null, // $post_type. C WP 4.7.
-			'menu_position'     => 6,
-			'menu_icon'         => 'dashicons-editor-quote',
-			'hierarchical'      => false,
-			'supports'          => array( 'title', 'editor', 'author', 'thumbnail' ),
-			'taxonomies'        => array( 'category' ),
-			'has_archive'       => false,
-			'rewrite'           => true,
-			'query_var'         => true,
+			'description'        => 'Источники информации по Орлу.',
+			'public'             => true,
+			'publicly_queryable' => false, // равен аргументу public.
+			'show_ui'            => true, // зависит от public.
+			'show_in_nav_menus'  => true, // зависит от public.
+			'show_in_menu'       => true, // показывать ли в меню адмнки.
+			'show_in_admin_bar'  => true, // по умолчанию значение show_in_menu.
+			'show_in_rest'       => true, // добавить в REST API. C WP 4.7.
+			'rest_base'          => null, // $post_type. C WP 4.7.
+			'menu_position'      => 6,
+			'menu_icon'          => 'dashicons-editor-quote',
+			'hierarchical'       => false,
+			'supports'           => array( 'title', 'author', 'thumbnail' ),
+			'taxonomies'         => array( 'writers' ),
+			'has_archive'        => false,
+			'rewrite'            => true,
+			'query_var'          => true,
+		)
+	);
+
+	// taxonomies => author.
+	register_taxonomy(
+		'writers',
+		array( 'sources' ),
+		array(
+			'label'              => '', // определяется параметром $labels->name.
+			'labels'             => array(
+				'name'              => 'Писатели',
+				'singular_name'     => 'Писатель',
+				'search_items'      => 'Поиск писателей',
+				'all_items'         => 'Все писатели',
+				'view_item '        => 'Смотреть писателя',
+				'parent_item'       => 'Родительский писатель',
+				'parent_item_colon' => 'Родительский писатель:',
+				'edit_item'         => 'Редактировать писателя',
+				'update_item'       => 'Обновить писателя',
+				'add_new_item'      => 'Добавить писателя',
+				'new_item_name'     => 'Новое название писателя',
+				'menu_name'         => 'Писатели',
+			),
+			'description'        => 'Авторы источников', // описание таксономии.
+			'public'             => true,
+			'publicly_queryable' => false, // равен аргументу public.
+			'show_in_nav_menus'  => true, // равен аргументу public.
+			'show_ui'            => true, // равен аргументу public.
+			'show_in_menu'       => true, // равен аргументу show_ui.
+			'show_tagcloud'      => true, // равен аргументу show_ui.
+			'show_in_rest'       => null, // добавить в REST API.
+			'rest_base'          => null, // $taxonomy.
+			'hierarchical'       => true, // true - таксономия будет древовидная (как категории). false - будет не древовидная (как метки).
+			'rewrite'            => true,
+			'capabilities'       => array(),
+			'meta_box_cb'        => null, // callback функция. Отвечает за html код метабокса (с версии 3.8): post_categories_meta_box или post_tags_meta_box. Если указать false, то метабокс будет отключен вообще.
+			'show_admin_column'  => true, // Позволить или нет авто-создание колонки таксономии в таблице ассоциированного типа записи. (с версии 3.5).
+			'_builtin'           => false,
+			'show_in_quick_edit' => null, // по умолчанию значение show_ui.
 		)
 	);
 }
@@ -1369,7 +1409,7 @@ function get_guidebook_posts( $term_slug = '', $numberposts = 0 ) {
 }
 
 /**
- * Remove unregistered query params from address bar in browser
+ * Remove unnecessary query params from address bar in browser
  *
  * @return void
  */
@@ -1388,10 +1428,11 @@ function check_query_params() {
 		parse_str( $parts['query'], $query_params );
 
 		$start_query_params = $query_params;
-		$allowed_keys       = array( 'pagenum', 'cat_f', 'numberposts_1', 'numberposts_2' );
+		$keys_to_delete     = array( 'fbclid' );
+		// allowed keys: 'pagenum', 'cat_f', 'numberposts_1', 'numberposts_2', 'searchid', 'text', 'web'.
 
 		foreach ( $query_params as $key => $value ) {
-			if ( ! in_array( $key, $allowed_keys, true ) ) {
+			if ( in_array( $key, $keys_to_delete, true ) ) {
 				unset( $query_params[ $key ] );
 			}
 		}
@@ -1597,6 +1638,24 @@ function excurs_get_newscard_html( $post_id, $alt_title = '', $type = 'post', $s
 	$html .= '</div></div>';
 
 	return $html;
+}
+
+/**
+ * Return array of citata tags
+ *
+ * @return array Citata tags.
+ */
+function citata_get_tags_array() {
+	return array(
+		'abt_orel'       => 'об Орле',
+		'abt_russia'     => 'о России',
+		'abt_life'       => 'про жизнь',
+		'abt_love'       => 'о любви',
+		'abt_separation' => 'о разлуке',
+		'abt_work'       => 'о труде',
+		'abt_politics'   => 'о политике',
+		'abt_literature' => 'о литературе',
+	);
 }
 
 require_once get_template_directory() . '/includes/template-carbon-fields.php';
