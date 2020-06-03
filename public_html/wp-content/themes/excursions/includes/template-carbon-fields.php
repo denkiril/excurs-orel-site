@@ -88,6 +88,38 @@ function crb_fields_for_gb_routes() {
 add_action( 'carbon_fields_register_fields', 'crb_fields_for_gb_routes' );
 
 /**
+ * Add 'see also' fields for some posts ('guidebook')
+ *
+ * @return void
+ */
+function crb_seealso_fields() {
+	Container::make( 'post_meta', 'seealso', 'См. также' )
+		->where( 'post_type', '=', 'guidebook' )
+		->add_fields(
+			array(
+				Field::make( 'association', 'seealso_posts', 'Пост / Страница / Статья ПВ' )
+					->set_types(
+						array(
+							array(
+								'type'      => 'post',
+								'post_type' => 'page',
+							),
+							array(
+								'type'      => 'post',
+								'post_type' => 'post',
+							),
+							array(
+								'type'      => 'post',
+								'post_type' => 'guidebook',
+							),
+						)
+					),
+			)
+		);
+}
+add_action( 'carbon_fields_register_fields', 'crb_seealso_fields' );
+
+/**
  * Add fields for 'sources' posts (show on 'citata' page)
  *
  * @return void
@@ -109,6 +141,7 @@ function crb_fields_for_citata() {
 							'singular_name' => 'цитату',
 						)
 					)
+					->set_collapsed( true )
 					->add_fields(
 						array(
 							Field::make( 'textarea', 'text', 'Текст' )

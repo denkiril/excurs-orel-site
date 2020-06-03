@@ -87,4 +87,36 @@ if ( count( $sights ) ) :
 	</div>
 </div><!-- .entry-content -->
 
+<?php
+$seealso_posts = carbon_get_the_post_meta( 'seealso_posts' );
+if ( $seealso_posts ) :
+	?>
+
+	<div class="info-block">
+		<h2>См. также</h2>
+		<div class="row">
+		<?php
+		$html = '';
+		foreach ( $seealso_posts as $post_item ) {
+			$postid    = $post_item['id'];
+			$permalink = get_permalink();
+			if ( $permalink ) {
+				$permalink  = get_the_permalink( $postid );
+				$thumb_id   = get_post_thumbnail_id( $postid );
+				$title_attr = esc_attr( excurs_get_the_title_for_attr( $postid ) );
+
+				$html .= '<div class="anno-card col-6 col-sm-6 col-md-4 col-lg-3">';
+				$html .= '<a href="' . $permalink . '" title="' . $title_attr . '" tabindex="-1">';
+				$html .= get_attachment_picture( $thumb_id, 'medium', false, null, true, true ); // medium_large.
+				$html .= '</a><h3 class="annocard-caption"><a href="' . $permalink . '" title="' . $title_attr . '">';
+				$html .= esc_html( get_the_title( $postid ) ) . '</a></h3></div>';
+			}
+		}
+		echo $html;
+		?>
+		</div>
+	</div> <!-- .info-block -->
+
+<?php endif; ?>
+
 </article><!-- #post-<?php the_ID(); ?> -->
