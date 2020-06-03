@@ -28,16 +28,35 @@ if ( have_posts() ) :
 	the_post();
 
 	// print_r2( citata_get_tags_array() ); ?
+	// $is_admin = user_can( wp_get_current_user(), 'administrator' ); ?
 
-	$citata_list   = array();
 	$sources_posts = get_posts(
 		array(
 			'post_type'   => 'sources',
 			'numberposts' => -1,
 		)
 	);
+
+	$sources_list = array();
 	foreach ( $sources_posts as $sources_post ) {
-		$source_id       = $sources_post->ID;
+		$source_id      = $sources_post->ID;
+		$sources_list[] = array(
+			'id'   => $source_id,
+			'date' => carbon_get_post_meta( $source_id, 'date' ),
+		);
+	}
+
+	$field = 'date';
+	usort(
+		$sources_list,
+		function( $a, $b ) use ( $field ) {
+			return strcmp( $a[ $field ], $b[ $field ] );
+		}
+	);
+
+	$citata_list = array();
+	foreach ( $sources_list as $sources_item ) {
+		$source_id       = $sources_item['id'];
 		$add_citata_list = carbon_get_post_meta( $source_id, 'citata_list' );
 
 		if ( $add_citata_list ) {
@@ -60,13 +79,6 @@ if ( have_posts() ) :
 		}
 	}
 
-	$field = 'date';
-	usort(
-		$citata_list,
-		function( $a, $b ) use ( $field ) {
-			return strcmp( $a[ $field ], $b[ $field ] );
-		}
-	);
 	$gallery = false;
 	?>
 
