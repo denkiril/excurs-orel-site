@@ -111,29 +111,37 @@ footer{
     text-align: right;
     /* margin-bottom: 20px; */
 }
-.soc-container a{
+.soc-container a {
     text-decoration: none;
     padding: 0 5px;
 }
-.soc-container a:focus{
+.soc-container a:focus {
     outline: none;
 }
 .soc-container a:hover .vk-logo,
-.soc-container a:focus .vk-logo{
+.soc-container a:focus .vk-logo {
     fill: #4d76a1;
     fill-opacity: 1;
 }
 .soc-container a:hover .fb-logo,
-.soc-container a:focus .fb-logo{
+.soc-container a:focus .fb-logo {
     fill: #3b5998;
     fill-opacity: 1;
 }
 .soc-container a:hover .ig-logo,
-.soc-container a:focus .ig-logo{
+.soc-container a:focus .ig-logo {
     fill: #d93175;
     fill-opacity: 1;
 }
+.yt-logo {
+    fill: #ff0000;
+    fill-opacity: 0;
+}
+.soc-container a:hover .yt-logo,
+.soc-container a:focus .yt-logo {
+    fill-opacity: 0.9;
+}
 
-a img{
+a img {
     border: none; /*for IE*/
 }

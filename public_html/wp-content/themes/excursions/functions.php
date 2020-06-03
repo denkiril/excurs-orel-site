@@ -140,7 +140,7 @@ add_action( 'widgets_init', 'excursions_widgets_init' );
 $links_array = array();
 $consolelog  = '';
 define( 'SCRIPTS_VER', '20200414' );
-define( 'STYLES_VER', '20200414' );
+define( 'STYLES_VER', '20200528' );
 $webp_on = ! ( home_url() === 'http://excurs-orel' );
 if ( ! $webp_on ) {
 	console_log( 'WEBP_OFF' );
@@ -1073,7 +1073,7 @@ function markup_post_permalink( $postid, $text, $permalink = null, $title = null
 	$title     = $title ? $title : esc_html( get_the_title( $post_id ) );
 	$title     = $title ? ' title="' . $title . '"' : '';
 	if ( $permalink ) {
-		$text = '<a href="' . $permalink . '"' . $title . '">' . $text . '</a>';
+		$text = '<a href="' . $permalink . '"' . $title . '>' . $text . '</a>';
 	}
 
 	return $text;
@@ -1112,10 +1112,11 @@ function wiki_parse( $text, $add_link = true ) {
 	for ( $i = 0; $i < $dbl_count; $i++ ) {
 		$post_id = get_post_id( $matches[1][ $i ] );
 		if ( $post_id ) {
-			$title     = esc_html( get_the_title( $post_id ) );
-			$permalink = get_permalink( $post_id );
-			$link_text = markup_post_permalink( $post_id, $matches[2][ $i ], $permalink, $title );
-			$text      = str_replace( $matches[0][ $i ], $link_text, $text );
+			$title      = esc_html( get_the_title( $post_id ) );
+			$title_attr = esc_attr( excurs_get_the_title_for_attr( $post_id ) );
+			$permalink  = get_permalink( $post_id );
+			$link_text  = markup_post_permalink( $post_id, $matches[2][ $i ], $permalink, $title_attr );
+			$text       = str_replace( $matches[0][ $i ], $link_text, $text );
 
 			$location = get_field( 'obj_info', $post_id )['geolocation'];
 			if ( $location ) {
