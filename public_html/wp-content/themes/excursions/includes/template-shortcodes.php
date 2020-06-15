@@ -372,7 +372,7 @@ function socwidgets_func( $atts ) {
 	$html .= '</div>';
 	$html .= '</div></div></section>';
 
-	add_social_scripts();
+	add_widgets_scripts();
 
 	return $html;
 }
@@ -1049,3 +1049,51 @@ function gbr_sights_func( $atts ) {
 	return $html;
 }
 add_shortcode( 'gbr_sights', 'gbr_sights_func' );
+
+/**
+ * Shortcode for output guidebook route sights
+ * [video_card yt='https://youtu.be/NdY1x0kSeYY' title='Заголовок видео' desription='Описание']
+ *
+ * @param array $atts Shortcode attributes.
+ * @return string Output HTML.
+ */
+function video_card_func( $atts ) {
+	// Белый список параметров и значения по умолчанию.
+	$atts = shortcode_atts(
+		array(
+			'yt'         => null,
+			'title'      => null,
+			'desription' => null,
+		),
+		$atts
+	);
+
+	$yt_link    = $atts['yt'];
+	$title      = $atts['title'];
+	$desription = $atts['desription'];
+
+	$title      = $title ? '<h2 class="annocard-title">' . $title . '</h2>' : '';
+	$desription = $desription ? '<p>' . $desription . '</p>' : '';
+	$html       = '';
+
+	if ( $yt_link ) {
+		$ytarray     = explode( '/', $yt_link );
+		$ytendstring = end( $ytarray );
+		$ytendarray  = explode( '?v=', $ytendstring );
+		$ytendstring = end( $ytendarray );
+		$ytendarray  = explode( '&', $ytendstring );
+		$ytcode      = $ytendarray[0];
+
+		$html .= '<div class="row anno-card">';
+		$html .= '<div class="col-12 col-md-6 video-container">';
+		$html .= '<iframe data-iframe_src="https://www.youtube.com/embed/' . $ytcode . '" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+		$html .= '</div>';
+		$html .= '<div class="col-12 col-md-6">' . $title . $desription . '</div>';
+		$html .= '</div>';
+	}
+
+	add_widgets_scripts();
+
+	return $html;
+}
+add_shortcode( 'video_card', 'video_card_func' );

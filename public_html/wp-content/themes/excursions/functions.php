@@ -139,8 +139,8 @@ add_action( 'widgets_init', 'excursions_widgets_init' );
 
 $links_array = array();
 $consolelog  = '';
-define( 'SCRIPTS_VER', '20200414' );
-define( 'STYLES_VER', '20200528' );
+define( 'SCRIPTS_VER', '20200614' );
+define( 'STYLES_VER', '20200614' );
 $webp_on = ! ( home_url() === 'http://excurs-orel' );
 if ( ! $webp_on ) {
 	console_log( 'WEBP_OFF' );
@@ -377,11 +377,11 @@ function event_map_scripts_func() {
 add_action( 'event_map_scripts', 'event_map_scripts_func', 10, 0 );
 
 /**
- * Add scripts for social widgets.
+ * Add scripts for widgets and video.
  *
  * @return void
  */
-function add_social_scripts() {
+function add_widgets_scripts() {
 	wp_enqueue_script( 'widgets-js' );
 	wp_enqueue_script( 'widgets-legacy' );
 }

@@ -850,3 +850,27 @@ figure {
 .hidden {
     visibility: hidden;
 }
+
+.video-container {
+    text-align: center;
+    margin-bottom: 1em;
+}
+
+.video-container iframe {
+    width: 420px;
+    height: 280px;
+    /* width: 560px; */
+    /* height: 315px; */
+    border: none;
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .video-container iframe {
+        width: 100%;
+    }
+}
+
+.text-block {
+    margin-bottom: 2rem;
+}

@@ -221,45 +221,48 @@
 		</div> <!-- post-gallery -->
 		<?php endif;
 
-		$smi = get_field('smi');
-		if ( $smi ) : ?>
+		$smi = get_field( 'smi' );
+		if ( $smi ) :
+			?>
 			<div class="row">
 			<div class="col">
 				<h2>О нас пишут</h2>
 				<ul>
 				<?php
-				$lines = explode( PHP_EOL, trim($smi) );
+				$lines = explode( PHP_EOL, trim( $smi ) );
 				foreach ( $lines as $line ) {
 					$sublines = explode( '=', $line, 2 );
-					$text = esc_html( trim($sublines[0]) );
-					$url = esc_html( trim($sublines[1]) );
+					$text     = esc_html( trim( $sublines[0] ) );
+					$url      = esc_html( trim( $sublines[1] ) );
 					if ( $url ) {
-						$ret = parse_url( $url );
-						if( ! isset( $ret['scheme'] ) ) {
+						$ret = wp_parse_url( $url );
+						if ( ! isset( $ret['scheme'] ) ) {
 							$url = "http://{$url}";
 						}
-						$text = '<a href="'.$url.'" target="_blank" rel="noopener noreferrer">'.$text.'</a>';
+						$text = '<a href="' . $url . '" target="_blank" rel="noopener noreferrer">' . $text . '</a>';
 					}
-					echo '<li>'.$text.'</li>';
+					echo '<li>' . $text . '</li>';
 				}
 				?>
 				</ul>
 			</div>
-		</div> <!-- row -->
-		<?php endif;
+			</div> <!-- row -->
+			<?php
+		endif;
 
-		/* video */
-		// $video = get_field('video'); 
-		if ($yt_links = trim(get_field('video_youtube'))) {
-			$yt_links = explode(PHP_EOL, $yt_links);
+		$yt_links = trim( get_field( 'video_youtube' ) );
+		$vk_links = trim( get_field( 'video_vk' ) );
+		if ( $yt_links ) {
+			$yt_links = explode( PHP_EOL, $yt_links );
 		}
-		if ($vk_links = trim(get_field('video_vk'))) {
-			$vk_links = explode(PHP_EOL, $vk_links);
+		if ( $vk_links ) {
+			$vk_links = explode( PHP_EOL, $vk_links );
 		}
 		$links_count = 0;
-		$links_count = is_array($yt_links) ? $links_count + count($yt_links) : $links_count;
-		$links_count = is_array($vk_links) ? $links_count + count($vk_links) : $links_count;
-		if ($links_count) :
+		$links_count = is_array( $yt_links ) ? $links_count + count( $yt_links ) : $links_count;
+		$links_count = is_array( $vk_links ) ? $links_count + count( $vk_links ) : $links_count;
+		if ( $links_count ) :
+			add_widgets_scripts();
 			$col_sfx = $links_count > 1 ? '-lg-6' : '';
 			?>
 			<div class="video-gallery">
@@ -271,83 +274,85 @@
 				</div> <!-- row -->
 
 				<div class="row">
-				<?php 
-				// https://youtu.be/MOOqSGOXua0 
-				// https://www.youtube.com/watch?v=MOOqSGOXua0&feature=youtu.be&ab_channel=AlekseyBorisov 
-				// src="https://www.youtube.com/embed/MOOqSGOXua0?rel=0"
-				if (is_array($yt_links)) :
-					foreach ($yt_links as $yt_link) :
-						$ytarray 	 = explode("/", $yt_link);
-						$ytendstring = end($ytarray);
-						$ytendarray  = explode("?v=", $ytendstring);
-						$ytendstring = end($ytendarray);
-						$ytendarray  = explode("&", $ytendstring);
-						$ytcode 	 = $ytendarray[0]; 
+				<?php
+				// https://youtu.be/MOOqSGOXua0 .
+				// https://www.youtube.com/watch?v=MOOqSGOXua0&feature=youtu.be&ab_channel=AlekseyBorisov .
+				// src="https://www.youtube.com/embed/MOOqSGOXua0?rel=0" .
+				if ( is_array( $yt_links ) ) :
+					foreach ( $yt_links as $yt_link ) :
+						$ytarray     = explode( '/', $yt_link );
+						$ytendstring = end( $ytarray );
+						$ytendarray  = explode( '?v=', $ytendstring );
+						$ytendstring = end( $ytendarray );
+						$ytendarray  = explode( '&', $ytendstring );
+						$ytcode      = $ytendarray[0];
 						?>
 
-						<div class="col<?=$col_sfx?> video-container">
-							<iframe data-iframe_src="https://www.youtube.com/embed/<?=$ytcode?>" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+						<div class="col<?php echo esc_html( $col_sfx ); ?> video-container">
+							<iframe data-iframe_src="https://www.youtube.com/embed/<?php echo esc_attr( $ytcode ); ?>" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 						</div>
 
-					<?php endforeach;
+						<?php
+					endforeach;
 				endif;
 
-				if (is_array($vk_links)) :
-					foreach ($vk_links as $vk_link) :?>
-				
-					<div class="col<?=$col_sfx?> video-container">
-						<iframe data-iframe_src="<?=$vk_link?>" allowfullscreen></iframe>
-					</div>
+				if ( is_array( $vk_links ) ) :
+					foreach ( $vk_links as $vk_link ) :
+						?>
 
-					<?php endforeach;
-				endif; ?>
+						<div class="col<?php echo esc_html( $col_sfx ); ?> video-container">
+							<iframe data-iframe_src="<?php echo esc_attr( $vk_link ); ?>" allowfullscreen></iframe>
+						</div>
+
+					<?php endforeach; ?>
+				<?php endif; ?>
 				</div> <!-- row -->
 
 			</div><!-- .video-gallery -->
 		<?php endif; ?>
-		
+
 	</div><!-- .entry-content -->
 
 	<?php
 	/* Prev & Next Events */
-	$prev_event = null;
-	$next_event = null;
-	$events_args = array(
-		'post_type' 	=> 'events',
-		'orderby' 		=> 'meta_value',
-		'order'     	=> 'ASC',
-		'meta_key' 		=> 'event_info_event_date',
-		'numberposts' 	=> -1,
+	$prev_event   = null;
+	$next_event   = null;
+	$events_args  = array(
+		'post_type'   => 'events',
+		'orderby'     => 'meta_value',
+		'order'       => 'ASC',
+		'meta_key'    => 'event_info_event_date',
+		'numberposts' => -1,
 	);
 	$events_posts = get_posts( $events_args );
-	$event_id = get_queried_object()->ID;
-	foreach ( $events_posts as $key => $post ) {
-		if ( $event_id == $post->ID ) {
+	$event_id     = get_queried_object()->ID;
+	foreach ( $events_posts as $key => $ev_post ) {
+		if ( $event_id === $ev_post->ID ) {
 			$this_event_key = $key;
 			break;
 		}
 	}
 	if ( $this_event_key ) {
-		$prev_event = ( isset( $events_posts[$this_event_key-1] ) ) ? $events_posts[$this_event_key-1] : null;
-		$next_event = ( isset( $events_posts[$this_event_key+1] ) ) ? $events_posts[$this_event_key+1] : null;
+		$prev_event = ( isset( $events_posts[ $this_event_key - 1 ] ) ) ? $events_posts[ $this_event_key - 1 ] : null;
+		$next_event = ( isset( $events_posts[ $this_event_key + 1 ] ) ) ? $events_posts[ $this_event_key + 1 ] : null;
 	}
-	
+
 	if ( $prev_event || $next_event ) :
 		if ( $show_offer || $report['show'] || $smi || $links_count ) {
 			echo '<hr />';
 		}
 		?>
 		<div class="flex-container">
-		<?php if ($prev_event) : ?>
+		<?php if ( $prev_event ) : ?>
 			<div class="prevnext-card">
 				<p style="text-align: left">&lt;&nbsp;Предыдущее<span class="sm-hide"> событие</span></p>
 				<div class="anno-card">
 					<?php
-						
-						$thumb_id = get_post_thumbnail_id($prev_event);
-						$permalink = get_the_permalink($prev_event);
-						$title = esc_html( get_the_title($prev_event) ); 
-						echo '<a href="'.$permalink.'" title="Ссылка на: '.$title.'">';
+
+						$thumb_id  = get_post_thumbnail_id( $prev_event );
+						$permalink = get_the_permalink( $prev_event );
+						$title     = esc_html( get_the_title( $prev_event ) );
+						echo '<a href="' . $permalink . '" title="Ссылка на: ' . $title . '">';
 						echo get_attachment_picture( $thumb_id, 'medium', false, null, true, true );
 						echo '</a>';
 					?>
@@ -356,15 +361,15 @@
 			</div>
 		<?php endif; ?>
 
-		<?php if ($next_event) : ?>
+		<?php if ( $next_event ) : ?>
 			<div class="prevnext-card">
 				<p style="text-align: right">Следующее<span class="sm-hide"> событие</span>&nbsp;&gt;</p>
 				<div class="anno-card">
 					<?php
-						$thumb_id = get_post_thumbnail_id($next_event);
-						$permalink = get_the_permalink($next_event);
-						$title = esc_html( get_the_title($next_event) ); 
-						echo '<a href="'.$permalink.'" title="Ссылка на:'.$title.'">';
+						$thumb_id  = get_post_thumbnail_id( $next_event );
+						$permalink = get_the_permalink( $next_event );
+						$title     = esc_html( get_the_title( $next_event ) );
+						echo '<a href="' . $permalink . '" title="Ссылка на: ' . $title . '">';
 						echo get_attachment_picture( $thumb_id, 'medium', false, null, true, true );
 						echo '</a>';
 					?>
@@ -373,8 +378,12 @@
 			</div>
 		<?php endif; ?>
 		</div>
-	
+
 	<?php endif; ?>
 </article><!-- #post-<?php the_ID(); ?> -->
 
-<?php if( $gallery ) do_action( 'add_gallery_scripts' ); ?>
+<?php
+if ( $gallery ) {
+	do_action( 'add_gallery_scripts' );
+}
+?>

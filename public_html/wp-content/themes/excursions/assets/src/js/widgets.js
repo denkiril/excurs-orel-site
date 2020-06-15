@@ -7,6 +7,7 @@ const SocialSection = document.getElementById('soc-section');
 const vkGroups = document.getElementById('vk_groups');
 const fbRoot = document.getElementById('fb-root');
 const $glide = document.querySelector('.glide');
+const ShowVideoBtn = document.querySelector('#ShowVideo_btn');
 
 function socialMount() {
   if (vkGroups) {
@@ -58,20 +59,6 @@ if (SocialSection && window.screen.width > 768) {
   }
 }
 
-// $(document).ready(() => {
-//   // Слайдер-карусель
-//   if ($('.carousel').length) { // anti "$(...).slick is not a function"
-//     $('.carousel').slick({
-//       arrows: false,
-//       dots: true,
-//       autoplay: (window.screen.width > 768),
-//       autoplaySpeed: 5000,
-//       lazyLoad: 'ondemand',
-//       // lazyLoad: 'progressive'
-//     });
-//   }
-// });
-
 if ($glide) {
   const $glideArrows = $glide.querySelector('.glide__arrows');
   if ($glideArrows) $glideArrows.style.display = 'block';
@@ -85,3 +72,64 @@ if ($glide) {
 
   glide.mount();
 }
+
+// ShowVideo
+let lazy = [];
+
+function iframeLazyLoad() {
+  // console.log('iframeLoad ' + lazy.length);
+  if (lazy.length) {
+    // for(var i=0; i<lazy.length; i++){
+    lazy.forEach((iframe) => {
+      if (isInViewport(iframe)) {
+        if (iframe.getAttribute('data-iframe_src')) {
+          // iframe.src = iframe.getAttribute('data-iframe_src');
+          iframe.setAttribute('src', iframe.getAttribute('data-iframe_src'));
+          iframe.removeAttribute('data-iframe_src');
+        }
+      }
+    });
+
+    // iframeCleanLazy();
+    lazy = Array.prototype.filter.call(lazy, l => l.getAttribute('data-iframe_src'));
+
+    if (lazy.length === 0) {
+      window.removeEventListener('scroll', iframeLazyLoad);
+      window.removeEventListener('resize', iframeLazyLoad);
+    }
+  }
+}
+
+function ShowVideo() {
+  // console.log('ShowVideo');
+  window.addEventListener('scroll', iframeLazyLoad);
+  window.addEventListener('resize', iframeLazyLoad);
+
+  // bShowVideo = true;
+  lazy.forEach((iframe) => {
+    // iframe.style.display = 'inline';
+    iframe.setAttribute('style', 'display: inline;');
+  });
+
+  if (ShowVideoBtn) {
+    ShowVideoBtn.style.display = 'none';
+  }
+
+  iframeLazyLoad();
+}
+
+function initShowVideo() {
+  lazy = document.querySelectorAll('iframe[data-iframe_src]');
+  // console.log('Found ' + lazy.length + ' lazy iframes');
+
+  if (lazy.length) {
+    if (window.screen.width > 768 || !ShowVideoBtn) {
+      ShowVideo();
+    } else if (ShowVideoBtn) {
+      ShowVideoBtn.style.display = 'block';
+      ShowVideoBtn.addEventListener('click', ShowVideo);
+    }
+  }
+}
+
+window.addEventListener('load', initShowVideo);
