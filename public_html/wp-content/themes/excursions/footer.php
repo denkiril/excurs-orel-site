@@ -13,7 +13,7 @@
 
 	<?php
 	$mypost_type = get_post_type();
-	$no_ads_page = is_page( 'kvesty' ) || is_page( 'gid-v-orle' );
+	$no_ads_page = is_page( 'kvesty' ) || is_page( 'gid-v-orle' ) || is_page( 'map' );
 	if ( 'events' !== $mypost_type && 'post' !== $mypost_type && ! $no_ads_page ) :
 		?>
 		<!-- Yandex.RTB R-A-414612-1 -->
@@ -25,7 +25,7 @@
 
 		<div id="soc-buttons">
 			<span>Поделиться: </span>
-			<div class="ya-share2" data-services="vkontakte,facebook,odnoklassniki,moimir,twitter,viber,whatsapp,skype,telegram"></div>
+			<div class="ya-share2" data-services="vkontakte,facebook,odnoklassniki,moimir,twitter,viber,whatsapp,skype,telegram,collections"></div>
 		</div>
 
 		<?php

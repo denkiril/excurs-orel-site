@@ -58,7 +58,8 @@ function annocards_func( $atts ) {
 		}
 	} else {
 		$args = array(
-			'post_type'     => $my_post_type,
+      'post_type'     => $my_post_type,
+      'numberposts'   => 10,
 			'category_name' => $cat_name,
 			'tag'           => $tag_name,
 			'exclude'       => $exclude,
@@ -677,6 +678,7 @@ function gallery_func( $atts ) {
 			'permalink'    => true,
 			'pics_in_row'  => 1,
 			'return_array' => false,
+			'wrap'         => true,
 		),
 		$atts
 	);
@@ -693,6 +695,7 @@ function gallery_func( $atts ) {
 	$add_link     = $atts['permalink'];
 	$pics_in_row  = intval( $atts['pics_in_row'] );
 	$return_array = $atts['return_array'];
+	$wrap         = boolval( $atts['wrap'] );
 
 	$html   = '';
 	$sights = array();
@@ -722,7 +725,7 @@ function gallery_func( $atts ) {
 				$bootstrap = 'col-12 col-sm-6';
 		}
 
-		$html    .= '<div class="row ' . $class . '">';
+		$html    .= $wrap ? '<div class="row ' . $class . '">' : '';
 		$nums_arr = excurs_get_nums_arr( $nums );
 		foreach ( $images as $counter => $image ) :
 			if ( $nums && ! in_array( $counter + 1, $nums_arr, true ) ) {
@@ -751,9 +754,9 @@ function gallery_func( $atts ) {
 
 			$item_anchor = $class . '-' . $img_id;
 
-			$html .= '<div id="' . $item_anchor . '" class="' . $item . ' ' . $bootstrap . '"><a name="' . $item_anchor . '"></a>';
+			$html .= $wrap ? '<div id="' . $item_anchor . '" class="' . $item . ' ' . $bootstrap . '"><a name="' . $item_anchor . '"></a>' : '';
 			$html .= markup_fancy_figure( $img_id, $fancybox, $full_image_url, $img_title, $size, $lazy, $img_title, null, $figcaption_html );
-			$html .= '</div>';
+			$html .= $wrap ? '</div>' : '';
 
 			if ( $return_array ) {
 				$location = null;
@@ -770,7 +773,7 @@ function gallery_func( $atts ) {
 			}
 		endforeach;
 
-		$html .= '</div> <!-- row ' . $class . ' -->';
+		$html .= $wrap ? '</div> <!-- row ' . $class . ' -->' : '';
 
 		do_action( 'add_gallery_scripts' );
 	endif;
