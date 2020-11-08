@@ -1,0 +1,9 @@
+wsl
+cd ../../../e/OSPanel/domains/excurs-orel/docker/proxy
+cd ../../../e/OSPanel/domains/excurs-orel/docker
+
+docker-compose up -d
+
+docker-compose down
+
+WARNING: Image for service php was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
