@@ -1104,9 +1104,10 @@ function get_post_id( $post_name ) {
  *
  * @param string  $text     Text for parsing.
  * @param boolean $add_link Optional. Should markup links in urls? Default true.
+ * @param boolean $parse_sights Optional. Should parse sights? Default true.
  * @return array Text and array of sights.
  */
-function wiki_parse( $text, $add_link = true ) {
+function wiki_parse( $text, $add_link = true, $parse_sights = true ) {
 	$sights    = array();
 	$dbl_count = preg_match_all( '/\\[{2}([^\\|]*)\\|([^\\]]*)\\]{2}/u', $text, $matches );
 	for ( $i = 0; $i < $dbl_count; $i++ ) {
@@ -1118,17 +1119,18 @@ function wiki_parse( $text, $add_link = true ) {
 			$link_text  = markup_post_permalink( $post_id, $matches[2][ $i ], $permalink, $title_attr );
 			$text       = str_replace( $matches[0][ $i ], $link_text, $text );
 
-			$location = get_field( 'obj_info', $post_id )['geolocation'];
-			if ( $location ) {
-				$thumb_url = get_the_post_thumbnail_url( $post_id, 'thumbnail' );
-				$sights[]  = array(
-					'lat'       => $location['lat'],
-					'lng'       => $location['lng'],
-					'post_id'   => $post_id,
-					'permalink' => $permalink,
-					'title'     => $title,
-					'thumb_url' => $thumb_url,
-				);
+			if ( $parse_sights ) {
+				$location = get_field( 'obj_info', $post_id )['geolocation'];
+				if ( $location ) {
+					$sights[] = array(
+						'lat'       => $location['lat'],
+						'lng'       => $location['lng'],
+						'post_id'   => $post_id,
+						'permalink' => $permalink,
+						'title'     => $title,
+						'thumb_url' => get_the_post_thumbnail_url( $post_id, 'thumbnail' ),
+					);
+				}
 			}
 		}
 	}
@@ -1156,7 +1158,7 @@ function wiki_parse( $text, $add_link = true ) {
  * @return string Output HTML.
  */
 function wiki_parse_text( $text, $add_link = true ) {
-	return wiki_parse( $text, $add_link )['text'];
+	return wiki_parse( $text, $add_link, false )['text'];
 }
 
 /**
@@ -1662,3 +1664,4 @@ function citata_get_tags_array() {
 require_once get_template_directory() . '/includes/template-carbon-fields.php';
 require_once get_template_directory() . '/includes/template-shortcodes.php';
 require_once get_template_directory() . '/includes/template-ajax-actions.php';
+require_once get_template_directory() . '/includes/template-rest-actions.php';

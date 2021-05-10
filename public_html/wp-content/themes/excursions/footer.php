@@ -25,7 +25,7 @@
 
 		<div id="soc-buttons">
 			<span>Поделиться: </span>
-			<div class="ya-share2" data-services="vkontakte,facebook,odnoklassniki,moimir,twitter,viber,whatsapp,skype,telegram,collections"></div>
+			<div class="ya-share2" data-services="vkontakte,facebook,odnoklassniki,moimir,twitter,viber,whatsapp,skype,telegram"></div>
 		</div>
 
 		<?php
@@ -97,7 +97,7 @@
 
 			<div class="row">
 				<div class="col copyr-container footer-links">
-					<p>© 2015-2020 <a href="<?php echo esc_attr( home_url() ); ?>">«Экскурсии по Орлу»</a></p>
+					<p>© 2015–2021 <a href="<?php echo esc_attr( home_url() ); ?>">«Экскурсии по Орлу»</a></p>
 					<p>© Разработка <span class="adaptive-hide">и поддержка </span>сайта: <a href="https://github.com/denkiril" target="_blank" rel="noopener noreferrer">Денис Кирилюк</a></p>
 					<p><a href="https://yasobe.ru/na/excursorelru" target="_blank" rel="noopener noreferrer">$ Поддержать проект</a></p>
 					<p class="sub_copyr">При использовании наших материалов, не забывайте, пожалуйста, ссылаться на наш сайт.</p>
