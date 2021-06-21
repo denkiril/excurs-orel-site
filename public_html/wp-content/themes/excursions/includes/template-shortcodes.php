@@ -58,8 +58,8 @@ function annocards_func( $atts ) {
 		}
 	} else {
 		$args = array(
-      'post_type'     => $my_post_type,
-      'numberposts'   => 10,
+			'post_type'     => $my_post_type,
+			'numberposts'   => 10,
 			'category_name' => $cat_name,
 			'tag'           => $tag_name,
 			'exclude'       => $exclude,
@@ -72,13 +72,15 @@ function annocards_func( $atts ) {
 			);
 
 			if ( $date ) {
-				$today = date( 'Ymd' );
+				$timezone = new DateTimeZone( 'Europe/Moscow' );
+				$today    = wp_date( 'Ymd', null, $timezone );
 				if ( 'past' === $date ) {
 					$past_events = true;
 				} else {
 					$future_events = true;
 				}
 				$compare = $past_events ? '<' : '>=';
+
 				$args += array(
 					'meta_query' => array(
 						array(
@@ -179,9 +181,9 @@ function newscards_func( $atts ) {
 	$section_link  = $atts['section_link'];
 	$events_num    = $atts['events_num'];
 
-	date_default_timezone_set( 'Europe/Moscow' );
-	$today               = date( 'Ymd' );
-	$current_time        = date( 'H:i' );
+	$timezone            = new DateTimeZone( 'Europe/Moscow' );
+	$today               = wp_date( 'Ymd', null, $timezone );
+	$current_time        = wp_date( 'H:i', null, $timezone );
 	$myposts             = array();
 	$future_events_posts = array();
 

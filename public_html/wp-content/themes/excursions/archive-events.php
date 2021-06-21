@@ -28,9 +28,9 @@ get_header();
 		</div>
 
 		<?php
-		date_default_timezone_set( 'Europe/Moscow' );
-		$today        = date( 'Ymd' );
-		$current_time = date( 'H:i' );
+		$timezone     = new DateTimeZone( 'Europe/Moscow' );
+		$today        = wp_date( 'Ymd', null, $timezone );
+		$current_time = wp_date( 'H:i', null, $timezone );
 
 		while ( have_posts() ) :
 			the_post();
@@ -69,12 +69,12 @@ get_header();
 
 		the_posts_pagination();
 
-	else :
+		else :
 
-		get_template_part( 'template-parts/content', 'none' );
+			get_template_part( 'template-parts/content', 'none' );
 
 	endif;
-	?>
+		?>
 
 </main><!-- #main -->
 

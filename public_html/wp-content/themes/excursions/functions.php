@@ -741,17 +741,15 @@ add_action( 'pre_get_posts', 'get_posts_search_filter' );
  * @return string html
  */
 function markup_event_date( $post_id = null ) {
-	$html = '';
-
-	$event_date = get_field( 'event_info_event_date', $post_id );
-	if ( $event_date ) {
-		$raw_date = get_field( 'event_info_event_date', $post_id, false );
-		$date_obj = new DateTime( $raw_date );
-		$datetime = $date_obj->format( 'Y-m-d' );
-		$html     = '<time datetime="' . $datetime . '">' . $event_date . '</time> ';
+	$raw_date = get_field( 'event_info_event_date', $post_id, false );
+	if ( $raw_date ) {
+		$date = date_create( $raw_date );
+		if ( $date ) {
+			return '<time datetime="' . date_format( $date, 'Y-m-d' ) . '">' . date_format( $date, 'd.m.Y' ) . '</time> ';
+		}
 	}
 
-	return $html;
+	return '';
 }
 
 /**
