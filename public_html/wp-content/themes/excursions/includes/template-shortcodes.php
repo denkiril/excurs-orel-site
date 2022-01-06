@@ -129,8 +129,7 @@ function annocards_func( $atts ) {
 		$html .= '</div></div></section>';
 
 	} elseif ( $future_events ) {
-		$html = '<p>На ближайшее время у нас ничего не запланировано.</p>
-			<p>Вы можете проверить наши группы в соцсетях (ссылки внизу сайта) – возможно там есть анонсы, которые ещё не добрались до этого сайта.</p>';
+		$html = '<p>Самая актуальная информация – в группе <a href="https://vk.com/excurs_orel" target="_blank" rel="noopener noreferrer" title="Экскурсии по Орлу в ВКонтакте">«Экскурсии по Орлу» в ВК</a>.</p>';
 	}
 
 	return $html;

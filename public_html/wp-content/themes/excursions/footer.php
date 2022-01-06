@@ -50,6 +50,10 @@
 					);
 					?>
 
+					<a href="https://daria-orel.mave.digital" target="_blank" rel="noopener noreferrer" title="Подкаст «Истории с Дарьей Фурманской»">
+						Подкаст про Орёл
+					</a>
+
 					<div class="search-form">
 						<div class="ya-site-form ya-site-form_inited_no" data-bem="{&quot;action&quot;:&quot;https://excurs-orel.ru/search/&quot;,&quot;arrow&quot;:false,&quot;bg&quot;:&quot;transparent&quot;,&quot;fontsize&quot;:14,&quot;fg&quot;:&quot;#000000&quot;,&quot;language&quot;:&quot;ru&quot;,&quot;logo&quot;:&quot;rb&quot;,&quot;publicname&quot;:&quot;Поиск по excurs-orel.ru&quot;,&quot;suggest&quot;:true,&quot;target&quot;:&quot;_blank&quot;,&quot;tld&quot;:&quot;ru&quot;,&quot;type&quot;:2,&quot;usebigdictionary&quot;:true,&quot;searchid&quot;:2340921,&quot;input_fg&quot;:&quot;#000000&quot;,&quot;input_bg&quot;:&quot;#ffffff&quot;,&quot;input_fontStyle&quot;:&quot;normal&quot;,&quot;input_fontWeight&quot;:&quot;normal&quot;,&quot;input_placeholder&quot;:&quot;Поиск по сайту&quot;,&quot;input_placeholderColor&quot;:&quot;#000000&quot;,&quot;input_borderColor&quot;:&quot;#7f9db9&quot;}">
 							<form action="https://yandex.ru/search/site/" method="get" target="_blank" accept-charset="utf-8">
@@ -97,7 +101,7 @@
 
 			<div class="row">
 				<div class="col copyr-container footer-links">
-					<p>© 2015–2021 <a href="<?php echo esc_attr( home_url() ); ?>">«Экскурсии по Орлу»</a></p>
+					<p>© 2015–2022 <a href="<?php echo esc_attr( home_url() ); ?>">«Экскурсии по Орлу»</a></p>
 					<p>© Разработка <span class="adaptive-hide">и поддержка </span>сайта: <a href="https://github.com/denkiril" target="_blank" rel="noopener noreferrer">Денис Кирилюк</a></p>
 					<p><a href="https://yasobe.ru/na/excursorelru" target="_blank" rel="noopener noreferrer">$ Поддержать проект</a></p>
 					<p class="sub_copyr">При использовании наших материалов, не забывайте, пожалуйста, ссылаться на наш сайт.</p>
