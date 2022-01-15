@@ -141,6 +141,11 @@ footer{
 .soc-container a:focus .yt-logo {
     fill-opacity: 0.9;
 }
+.soc-container a:hover .podcast-logo,
+.soc-container a:focus .podcast-logo {
+    fill: #d41421;
+    fill-opacity: 0.9;
+}
 
 a img {
     border: none; /*for IE*/
