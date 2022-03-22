@@ -103,7 +103,7 @@ function get_sight_by_id_wprest( WP_REST_Request $request ) {
 		'title'       => get_the_title( $post_id ),
 		'geolocation' => $obj_info['geolocation'],
 		'location'    => $obj_info['location'],
-		'thumb_url'   => get_the_post_thumbnail_url( $post_id, 'thumbnail' ),
+		// 'thumb_url'   => get_the_post_thumbnail_url( $post_id, 'thumbnail' ),
 	);
 
 	$sets = in_array( $mypost, $mus_posts, true ) ? 'mus' : 'main';
@@ -146,6 +146,42 @@ function get_sight_by_id_wprest( WP_REST_Request $request ) {
 	if ( $obj_info['site'] ) {
 		$sight['site'] = $obj_info['site'];
 	}
+
+	$sight['intro'] = get_field( 'gba_intro', $post_id );
+
+	$images   = array();
+	$thumb_id = get_post_thumbnail_id( $post_id );
+	if ( $thumb_id ) {
+		$metadata = wp_get_attachment_metadata( $thumb_id );
+		unset( $metadata['image_meta'] );
+
+		$images[] = array(
+			'title'   => get_the_title( $thumb_id ),
+			'full'    => wp_get_attachment_image_url( $thumb_id, 'full' ),
+			'meta'    => $metadata,
+			'alt'     => get_post_meta( $thumb_id, '_wp_attachment_image_alt', true ),
+			'caption' => wp_get_attachment_caption( $thumb_id ),
+		);
+	}
+
+	$gal_images = acf_photo_gallery( 'gallery_gal', $post_id );
+	foreach ( $gal_images as $img ) {
+		$img_id = $img['id'];
+		if ( $img_id ) {
+			$metadata = wp_get_attachment_metadata( $img_id );
+			unset( $metadata['image_meta'] );
+
+			$images[] = array(
+				'title'   => $img['title'],
+				'full'    => $img['full_image_url'],
+				'meta'    => $metadata,
+				'alt'     => get_post_meta( $img_id, '_wp_attachment_image_alt', true ),
+				'caption' => $img['caption'],
+			);
+		}
+	}
+
+	$sight['images'] = $images;
 
 	return $sight;
 }
