@@ -774,6 +774,7 @@ figure {
 
 .socwidget {
     display: block !important;
+    min-height: 190px;
     text-align: center;
     margin: 0 auto;
     margin-bottom: 1em;
@@ -873,4 +874,8 @@ figure {
 
 .text-block {
     margin-bottom: 2rem;
+}
+
+.hide {
+  display: none;
 }

@@ -70,10 +70,10 @@ if ( have_posts() ) :
 					<!-- VK Widget -->
 					<div class="socwidget" id="vk_groups" data-id="94410363" data-mode="3" data-width="300" data-height="400"></div>
 				</div>
-				<div class="col-md-6">
+				<!-- <div class="col-md-6">
 					<div id="fb-root"></div>
 					<div class="socwidget fb-group" data-href="https://www.facebook.com/groups/excursorel" data-width="300" data-show-social-context="true" data-show-metadata="false"></div>
-				</div>
+				</div> -->
 			</div>
 		</div>
 	</section>
