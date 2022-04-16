@@ -79,7 +79,7 @@
 						$nav_title = ( is_page() || is_home() ) ? single_post_title( null, false ) : '';
 					}
 					if ( ! $nav_title && is_archive() ) {
-						$nav_title = get_the_archive_title();
+						$nav_title = wp_strip_all_tags( get_the_archive_title() );
 					}
 					if ( ! $nav_title && is_single() ) {
 						// $ancestors = get_post_ancestors($post->ID);
