@@ -148,6 +148,7 @@ function get_sight_by_id_wprest( WP_REST_Request $request ) {
 	}
 
 	$sight['intro'] = get_field( 'gba_intro', $post_id );
+	// $sight['intro'] = carbon_get_post_meta( $post_id, 'gba_intro_2' );
 
 	$images   = array();
 	$thumb_id = get_post_thumbnail_id( $post_id );
@@ -187,13 +188,38 @@ function get_sight_by_id_wprest( WP_REST_Request $request ) {
 }
 
 /**
+ * REST GET guidebook posts data by slugs
+ *
+ * @param WP_REST_Request $request Optional. WP_REST_Request args.
+ * @return array Posts data array.
+ */
+function get_sights_by_links_wprest( WP_REST_Request $request ) {
+	$parameters = $request->get_query_params();
+	$slugs_arr  = explode( ',', $parameters['slugs'] );
+
+	$posts = array();
+	foreach ( $slugs_arr as $slug ) {
+		$post_obj = get_page_by_path( $slug, OBJECT, 'guidebook' );
+		if ( $post_obj ) {
+			$posts[] = array(
+				'slug'    => $slug,
+				'post_id' => (int) $post_obj->ID,
+				'title'   => $post_obj->post_title,
+			);
+		}
+	}
+
+	return $posts;
+}
+
+/**
  * REST routes registrator.
  *
  * @return void
  */
 function excurs_wprest_registrator() {
 	register_rest_route(
-		'api/v1',
+		'api',
 		'/gb-posts',
 		array(
 			'methods'  => 'GET',
@@ -202,7 +228,7 @@ function excurs_wprest_registrator() {
 	);
 
 	register_rest_route(
-		'api/v1',
+		'api',
 		'/sights',
 		array(
 			'methods'  => 'GET',
@@ -211,11 +237,20 @@ function excurs_wprest_registrator() {
 	);
 
 	register_rest_route(
-		'api/v1',
+		'api',
 		'/sights/(?P<id>\d+)',
 		array(
 			'methods'  => 'GET',
 			'callback' => 'get_sight_by_id_wprest',
+		)
+	);
+
+	register_rest_route(
+		'api',
+		'/sight-links',
+		array(
+			'methods'  => 'GET',
+			'callback' => 'get_sights_by_links_wprest',
 		)
 	);
 }
