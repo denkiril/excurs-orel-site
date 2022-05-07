@@ -63,11 +63,11 @@ function get_sights_wprest( WP_REST_Request $request ) {
 			}
 
 			if ( $type ) {
-				$sight['type'] = array( $type );
+				$sight['okn_type'] = array( $type );
 			}
 
 			if ( $category ) {
-				$sight['category'] = array( $category );
+				$sight['okn_category'] = array( $category );
 			}
 
 			if ( $okn_id ) {
@@ -98,25 +98,31 @@ function get_sight_by_id_wprest( WP_REST_Request $request ) {
 	$obj_info = get_field( 'obj_info', $post_id );
 
 	$sight = array(
-		'post_id'     => $post_id,
-		'permalink'   => get_the_permalink( $post_id ),
-		'title'       => get_the_title( $post_id ),
-		'geolocation' => $obj_info['geolocation'],
-		'location'    => $obj_info['location'],
-		// 'thumb_url'   => get_the_post_thumbnail_url( $post_id, 'thumbnail' ),
+		'post_id'   => $post_id,
+		'permalink' => get_the_permalink( $post_id ),
+		'title'     => get_the_title( $post_id ),
 	);
 
-	$sets = in_array( $mypost, $mus_posts, true ) ? 'mus' : 'main';
-	if ( $sets ) {
-		$sight['sets'] = array( $sets );
+	// $sets = in_array( $mypost, $mus_posts, true ) ? 'mus' : 'main';
+	// if ( $sets ) {
+	// 	$sight['sets'] = array( $sets );
+	// }
+	// $sight['post'] = $mypost;
+
+	if ( $obj_info['geolocation'] ) {
+		$sight['geolocation'] = $obj_info['geolocation'];
+	}
+
+	if ( $obj_info['location'] ) {
+		$sight['location'] = $obj_info['location'];
 	}
 
 	if ( $obj_info['okn_type'] ) {
-		$sight['type'] = array( $obj_info['okn_type'] );
+		$sight['okn_type'] = array( $obj_info['okn_type'] );
 	}
 
 	if ( $obj_info['protection_category'] ) {
-		$sight['category'] = array( $obj_info['protection_category'] );
+		$sight['okn_category'] = array( $obj_info['protection_category'] );
 	}
 
 	if ( $obj_info['okn_id'] ) {
@@ -147,7 +153,8 @@ function get_sight_by_id_wprest( WP_REST_Request $request ) {
 		$sight['site'] = $obj_info['site'];
 	}
 
-	$sight['intro'] = get_field( 'gba_intro', $post_id );
+	$sight['gba_intro']   = get_field( 'gba_intro', $post_id );
+	$sight['gba_content'] = get_field( 'gba_content', $post_id );
 	// $sight['intro'] = carbon_get_post_meta( $post_id, 'gba_intro_2' );
 
 	$images   = array();
@@ -200,12 +207,18 @@ function get_sights_by_links_wprest( WP_REST_Request $request ) {
 	$posts = array();
 	foreach ( $slugs_arr as $slug ) {
 		$post_obj = get_page_by_path( $slug, OBJECT, 'guidebook' );
+
 		if ( $post_obj ) {
-			$posts[] = array(
-				'slug'    => $slug,
-				'post_id' => (int) $post_obj->ID,
-				'title'   => $post_obj->post_title,
-			);
+			$post_id  = (int) $post_obj->ID;
+			$obj_info = get_field( 'obj_info', $post_id );
+
+			if ( $obj_info['geolocation'] ) { // TODO Docs?
+				$posts[] = array(
+					'slug'    => $slug,
+					'post_id' => $post_id,
+					'title'   => get_the_title( $post_id ),
+				);
+			}
 		}
 	}
 
