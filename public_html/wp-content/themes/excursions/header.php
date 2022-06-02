@@ -54,13 +54,13 @@
 					$print_nav_title  = ! ( is_page( 'map' ) || is_page( 'citata' ) );
 
 					if ( is_singular( 'guidebook' ) || is_tax( 'sections' ) ) {
-						$guidebook_id    = get_page_by_path( 'guidebook' )->ID;
-						$alt_headertitle = get_post_meta( $guidebook_id, 'header-title', true );
-						$terms           = get_the_terms( $post->ID, 'sections' );
-						$myterm          = $terms ? array_shift( $terms ) : null;
+						// $guidebook_id    = get_page_by_path( 'guidebook' )->ID;
+						// $alt_headertitle = get_post_meta( $guidebook_id, 'header-title', true );
+						$terms  = get_the_terms( $post->ID, 'sections' );
+						$myterm = $terms ? array_shift( $terms ) : null;
 						if ( ( $myterm && 'sights' === $myterm->slug ) || is_tax( 'sections' ) ) {
-							$nav_title        = get_the_title( $guidebook_id );
-							$nav_title_ref    = get_permalink( $guidebook_id );
+							$nav_title        = 'Путеводитель'; // get_the_title( $guidebook_id );
+							$nav_title_ref    = '/guidebook/'; // get_permalink( $guidebook_id );
 							$nav_menu_classes = 'menu-item-guidebook_hide';
 							if ( is_tax( 'sections' ) ) {
 								$alt_contenttitle = $myterm->name;
