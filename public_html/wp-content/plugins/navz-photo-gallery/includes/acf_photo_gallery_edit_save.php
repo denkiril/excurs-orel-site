@@ -1,5 +1,8 @@
 <?php
 
+// exit if accessed directly
+if( ! defined( 'ABSPATH' ) ) exit;
+
 //Fires off when ediitn the details of the photo
 function acf_photo_gallery_edit_save(){
 	if( wp_verify_nonce( $_POST['acf-pg-hidden-nonce'], 'acf_photo_gallery_edit_save') and !empty($_POST['acf-pg-hidden-field']) and !empty($_POST['acf-pg-hidden-post'])  and !empty($_POST['acf-pg-hidden-attachment']) ){
@@ -9,7 +12,7 @@ function acf_photo_gallery_edit_save(){
 		$post = sanitize_text_field($request['acf-pg-hidden-post']);
 		$attachment = sanitize_text_field($request['acf-pg-hidden-attachment']);
 		$title = sanitize_text_field($request['title']);
-		$caption = sanitize_text_field($request['caption']);
+		$caption = sanitize_textarea_field($request['caption']);
 
 		unset( $request['acf-pg-hidden-field'] );
 		unset( $request['acf-pg-hidden-post'] );

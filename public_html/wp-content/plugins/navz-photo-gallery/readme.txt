@@ -1,9 +1,9 @@
 ﻿=== ACF Photo Gallery Field ===
 Contributors: navzme
 Tags: acf, advanced, custom, fields, photo, gallery, album, fancybox, litebox, lightbox
-Requires at least: 3.8
-Tested up to: 5.4
-Stable tag: 1.6.7
+Requires at least: 4.7.0
+Tested up to: 5.8.1
+Stable tag: 1.7.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,6 +19,8 @@ A lightweight extension of Advanced Custom Field (ACF) that adds **Photo Gallery
 * Easily load data through a simple and friendly API
 * Uses the native WordPress custom post type for ease of use and fast processing
 * Uses the native WordPress metadata for ease of use and fast processing
+* Supports Elementor
+* RESTFul API
 
 = Note =
 This plugin is alternative of ACF Gallery Pro. You need to have knowledge of coding because you’ll be required to edit your WordPress theme source code. If you are looking for shortcodes and prebuilt gallery then this plugin is **NOT** for you. This plugin will give you PHP array of images and you’ll need to make the gallery layout as you wish.
@@ -126,6 +128,42 @@ Just like any other WordPress plugin, this plugin can also cause issues with oth
 4. Please refer to the description for more info regarding the field type settings
 
 == Changelog ==
+=1.7.9=
+* [Bugfix] Elementor Pro gallery images preview
+* [Added] Support for user profile
+
+=1.7.8=
+* [Bugfix] Sanitizing and escaping inputs
+
+=1.7.7=
+* [Bugfix] Sanitizing and escaping inputs
+
+=1.7.6=
+* [Bugfix] Sanitizing and escaping inputs
+
+=1.7.5=
+* [Bugfix] Security issue and reset body overflow
+
+=1.7.4=
+* [Bugfix] Security issue
+
+=1.7.3=
+* [Bugfix] Remove edit and delete image button conditions
+
+=1.7.2=
+* [Bugfix] Illegal string offset error
+
+=1.7.1=
+* [Bugfix] ElementorPro class not found
+* [Bugfix] Warning: Undefined array key "acf-photo-gallery-field"
+
+=1.7.0=
+* [Add] Option for to show/hide edit and remove button
+* [Add] Support for Elementor
+
+=1.6.8=
+* [Bugfix] Make gallery images limit optional
+
 =1.6.7=
 * [Removed] Support to ACF get_field() function due to bug
 

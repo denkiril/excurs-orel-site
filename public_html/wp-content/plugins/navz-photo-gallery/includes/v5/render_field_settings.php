@@ -1,4 +1,8 @@
 <?php
+
+// exit if accessed directly
+if( ! defined( 'ABSPATH' ) ) exit;
+
     /*
     *  acf_render_field_setting
     *
@@ -25,4 +29,20 @@
         'type'          => 'number',
         'name'          => 'fields['.$name.'][images_limit]',
         'value'         => $value['images_limit']
+    ));
+
+    acf_render_field_setting( $field, array(
+        'label'			=> __('Remove edit button','TEXTDOMAIN'),
+        'type'          => 'select',
+        'name'          => 'fields['.$name.'][remove_edit_button]',
+        'value'         => $value['remove_edit_button'],
+        'choices'       => array('No' => 'No', 'Yes' => 'Yes')
+    ));
+
+    acf_render_field_setting( $field, array(
+        'label'			=> __('Remove delete button','TEXTDOMAIN'),
+        'type'          => 'select',
+        'name'          => 'fields['.$name.'][remove_delete_button]',
+        'value'         => $value['remove_delete_button'],
+        'choices'       => array('No' => 'No', 'Yes' => 'Yes')
     ));
