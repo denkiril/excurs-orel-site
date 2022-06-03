@@ -12,12 +12,14 @@
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 	<header class="entry-header">
 		<?php
-		$gallery = false;
+		$gallery     = false;
 		$event_title = get_the_title();
-		$event_info = get_field('event_info');
-		$date_in_title = $event_info['event_date_in_htitle'];
-		$event_date = $event_info['event_date'];
-		if( $date_in_title && $event_date ) $event_title .= ' / ' . $event_date;
+		$event_info  = get_field( 'event_info' );
+		$event_date  = $event_info['event_date'];
+		$seasons     = carbon_get_the_post_meta( 'evnt_seasons' );
+		if ( $event_date && ! $seasons && $event_info['event_date_in_htitle'] ) {
+			$event_title .= ' / ' . $event_date;
+		}
 		?>
 		<h1 class="entry-title"><?php echo esc_html( $event_title ); ?></h1>
 	</header><!-- .entry-header -->
@@ -39,80 +41,85 @@
 			</div>
 		</div> <!-- row -->
 		<hr /> 
-		<?php 
-		$post_gallery_array = gallery_func(['acf_field' => 'post-gallery', 'return_array' => true]);
-		$location = $event_info['event_place_map'];
-		$show_map = $event_info['show_map'] && !empty($location);
-		$col_sfx = $show_map ? '-lg-6' : '';
-		// get raw date
-		$ev_date = get_field('event_info_event_date', false, false);
-		$today = date('Ymd');
+		<?php
+		$post_gallery_array = gallery_func(
+			array(
+				'acf_field'    => 'post-gallery',
+				'return_array' => true,
+			)
+		);
+
+		$post_gallery = $post_gallery_array['html'];
+		$location     = $event_info['event_place_map'];
+		$show_map     = $event_info['show_map'] && ( ! empty( $location ) || $post_gallery );
+		$col_sfx      = $show_map ? '-lg-6' : '';
+
+		$ev_date = get_field( 'event_info_event_date', false, false );
+		$today   = gmdate( 'Ymd' );
 		// get_field('dev_show_offer'); -- Показывать оффер, даже если событие уже прошло
 		$show_offer = get_field('dev_show_offer') ? true : ($ev_date >= $today);
 		?>
 		<div class="event-info row">
 			<div class="col<?=$col_sfx?>">
-				<?php 
+				<?php
 				$event_info_is = false;
-				$echo = '';
-				if( $event_info['show_event_date']  && $event_date )
-				{
-					$label = $event_info['event_date_label'] ? '<span class="ei_label">' . esc_html( $event_info['event_date_label'] ) . '</span> ' : '';
-					$event_date_html = markup_event_date();
-					if( $show_offer ){
-						$event_date_html = '<span class="attention">'.$event_date_html.'</span>';
+				$echo          = '';
+				if ( $event_info['show_event_date'] && $event_date ) {
+					$event_date_label = $seasons ? 'Дата премьеры:' : 'Дата:';
+					$event_date_html  = markup_event_date();
+					if ( $show_offer ) {
+						$event_date_html = '<span class="attention">' . $event_date_html . '</span>';
 					}
-					$echo .= $label . $event_date_html . '<br />';
+					$echo .= '<span class="ei_label">' . $event_date_label . '</span> ' . $event_date_html . '<br />';
 				}
-				if( $event_info['show_event_time'] && $event_info['event_time'] )
-				{
+				if ( $seasons ) {
+					$years = array_map( 'trim', explode( ',', $seasons ) );
+					$echo .= '<span class="ei_label">Сезоны:</span> ' . implode( ', ', $years ) . '<br />';
+				}
+				if ( $event_info['show_event_time'] && $event_info['event_time'] ) {
 					$label = $event_info['event_time_label'] ? '<span class="ei_label">' . esc_html( $event_info['event_time_label'] ) . '</span> ' : '';
 					$echo .= $label . esc_html( $event_info['event_time'] ) . '<br />';
 				}
-					// $echo .= esc_html( $event_info['event_time_label'] ) . ' ' . esc_html( $event_info['event_time'] ) . '<br />';
-				if( $event_info['show_event_place'] && $event_info['event_place_text'] )
-				{
+				if ( $event_info['show_event_place'] && $event_info['event_place_text'] ) {
 					$label = $event_info['event_place_label'] ? '<span class="ei_label">' . esc_html( $event_info['event_place_label'] ) . '</span> ' : '';
 					$echo .= $label . esc_html( $event_info['event_place_text'] ) . '<br />';
 				}
-					// $echo .= esc_html( $event_info['event_place_label'] ) . ' ' . esc_html( $event_info['event_place_text'] ) . '<br />';
-				$show_guide = $event_info['show_guide'] && ($event_info['guide_text'] || $event_info['guide_names']);
-				if( $echo && $show_guide )
-					$echo .= '<br />';
-				if( $show_guide )
-				{
+
+				$show_guide = $event_info['show_guide'] && ( $event_info['guide_text'] || $event_info['guide_names'] );
+				if ( $show_guide ) {
 					$guide_text = $event_info['guide_text'];
-					if( !$guide_text ){
-						$names = $event_info['guide_names'];
-						$guide_text = implode(', ', $names);
+					if ( ! $guide_text ) {
+						$guide_names = $event_info['guide_names'];
+						$guide_text  = implode( ', ', $guide_names );
 					}
 					$label = $event_info['guide_label'] ? '<span class="ei_label">' . esc_html( $event_info['guide_label'] ) . '</span> ' : '';
 					$echo .= $label . esc_html( $guide_text ) . '<br />';
 				}
-
-				if( $echo ) {
-					$echo = '<p>' . $echo . '</p>';
+				if ( $echo ) {
+					$echo          = '<p>' . $echo . '</p>';
 					$event_info_is = true;
 				}
-				echo $echo; ?>
-			</div>
-			<?php // $show_map id="map" 
-			if( $show_map ):
-				do_action( 'event_map_scripts' );
-				$sights = $post_gallery_array['sights'];
-				$sights = empty($sights) ? '' : 'data-sights="'.esc_html(json_encode($sights)).'"';
+				echo $echo;
 				?>
-				<div class="col<?php echo $col_sfx ?>">
-					<div class="mini-map event-map" <?php echo $sights ?>>
+			</div>
+			<?php
+			if ( $show_map ) :
+				do_action( 'event_map_scripts' );
+				$sights    = $post_gallery_array['sights'];
+				$sights    = empty( $sights ) ? '' : 'data-sights="' . esc_html( wp_json_encode( $sights ) ) . '"';
+				$data_attr = $location ? 'data-lat="' . $location['lat'] . '" data-lng="' . $location['lng'] . '"' : '';
+				?>
+				<div class="col<?php echo $col_sfx; ?>">
+					<div class="mini-map event-map" <?php echo $sights; ?>>
 						<noscript>Если включите JavaScript, здесь отобразится карта.</noscript>
 						<button id="OpenMap_btn" class="ref_btn autoopen">[ Показать на карте ]</button>
-						<div class="marker" data-lat="<?php echo $location['lat']; ?>" data-lng="<?php echo $location['lng']; ?>" data-post_id="<?php the_ID(); ?>"></div>
+						<div class="marker" <?php echo $data_attr; ?> data-post_id="<?php the_ID(); ?>"></div>
 					</div>
 				</div>
 			<?php endif; ?>
 		</div> <!-- event_info row -->
 
-		<?php if( $event_info_is || $show_map ) echo '<hr />'; ?>
+		<?php if ( $event_info_is || $show_map ) echo '<hr />'; ?>
 
 		<?php /* show_offer start */
 		if( $show_offer ): ?>
@@ -179,7 +186,7 @@
 		<?php endif; ?>
 
 		<!-- Yandex.RTB R-A-414612-1 -->
-		<div id="yandex_rtb_R-A-414612-1" style="padding: 20px 0 20px 0;"></div>
+		<!-- <div id="yandex_rtb_R-A-414612-1" style="padding: 20px 0 20px 0;"></div> -->
 
 		<?php 
 		/* report_photos */
@@ -202,9 +209,7 @@
 			</div> <!-- report-text row -->
 			<?php endif; ?>
 
-			<?php 
-			// $post_gallery = do_shortcode('[gallery acf_field=post-gallery]');
-			$post_gallery = $post_gallery_array['html'];
+			<?php
 			if ( $post_gallery ) {
 				$gallery = true;
 				echo $post_gallery;
