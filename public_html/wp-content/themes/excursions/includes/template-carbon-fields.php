@@ -22,6 +22,43 @@ use Carbon_Fields\Field;
 use Carbon_Fields\Field\Complex_Field;
 
 /**
+ * Add fields for guidebook posts (wip)
+ *
+ * @return void
+ */
+function crb_guidebook_fields() {
+	Container::make( 'post_meta', 'gba_fields', 'Путеводитель (статья) v.2' )
+		->where( 'post_type', '=', 'guidebook' )
+		->where(
+			'post_term',
+			'!=',
+			array(
+				'field'    => 'slug',
+				'value'    => 'routes',
+				'taxonomy' => 'sections',
+			)
+		)
+		->add_fields(
+			array(
+				Field::make( 'text', 'gba_rating', 'Рейтинг (1...10)' )
+					->set_width( 33 ),
+				Field::make( 'text', 'gba_created', 'Датировка' )
+					->set_width( 33 ),
+				Field::make( 'multiselect', 'gba_recorded', 'Год постановки на охрану' )
+					->set_width( 33 )
+					->add_options(
+						array(
+							'1960' => '1960',
+							'1974' => '1974',
+							'1995' => '1995',
+						)
+					),
+			)
+		);
+}
+add_action( 'carbon_fields_register_fields', 'crb_guidebook_fields' );
+
+/**
  * Add guidebook route fields for special pages ('routes', 'map')
  *
  * @return void
@@ -215,3 +252,19 @@ function crb_fields_for_front_page() {
 		);
 }
 add_action( 'carbon_fields_register_fields', 'crb_fields_for_front_page' );
+
+/**
+ * Add fields for events posts
+ *
+ * @return void
+ */
+function crb_events_fields() {
+	Container::make( 'post_meta', 'evnt_fields', 'Данные события (v.2)' )
+		->where( 'post_type', '=', 'events' )
+		->add_fields(
+			array(
+				Field::make( 'text', 'evnt_seasons', 'Сезоны (2018,2019):' ),
+			)
+		);
+}
+// add_action( 'carbon_fields_register_fields', 'crb_events_fields' );

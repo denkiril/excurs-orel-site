@@ -1381,25 +1381,61 @@ function get_guidebook_posts( $term_slug = '', $numberposts = 0 ) {
 			'post_type'   => 'guidebook',
 			$tax_name     => $term_slug,
 			'orderby'     => array(
-				'meta_value_num' => 'DESC',
+				// 'meta_value_num' => 'DESC',
 				'title'          => 'ASC',
 			),
-			'meta_key'    => 'gba_rating',
+			// 'meta_key'    => 'gba_rating',
 			'numberposts' => -1,
-			'meta_query'  => $meta_query,
+			// 'meta_query'  => $meta_query,
 		);
 
 		$posts = get_posts( $args );
 		// посты с category_name = promo поднимаем вверх.
-		$promo_posts = array();
-		foreach ( $posts as $counter => $post ) {
-			if ( in_category( 'promo', $post->ID ) ) {
-				$promo_posts[] = $post;
-				unset( $posts[ $counter ] );
-			}
-		}
+		// $promo_posts = array();
+		// foreach ( $posts as $counter => $post ) {
+		// 	if ( in_category( 'promo', $post->ID ) ) {
+		// 		$promo_posts[] = $post;
+		// 		unset( $posts[ $counter ] );
+		// 	}
+		// }
 
-		$posts = array_merge( $promo_posts, $posts );
+		// $posts = array_merge( $promo_posts, $posts );
+
+		// sort...
+		usort(
+			$posts,
+			function( $a, $b ) {
+				$a_id       = $a->ID;
+				$b_id       = $b->ID;
+				$a_rating   = carbon_get_post_meta( $a_id, 'gba_rating' );
+				$b_rating   = carbon_get_post_meta( $b_id, 'gba_rating' );
+				$a_recorded = carbon_get_post_meta( $a_id, 'gba_recorded' )[0];
+				$b_recorded = carbon_get_post_meta( $b_id, 'gba_recorded' )[0];
+				$a_created  = carbon_get_post_meta( $a_id, 'gba_created' );
+				$b_created  = carbon_get_post_meta( $b_id, 'gba_created' );
+
+				if ( ! $a_rating && ! $b_rating ) {
+					return 0;
+				}
+
+				if ( $a_rating === $b_rating ) {
+					if ( ! $a_recorded && ! $b_recorded ) {
+						return 0;
+					}
+
+					if ( $a_recorded === $b_recorded ) {
+						if ( ( ! $a_created && ! $b_created ) || ( $a_created === $b_created ) ) {
+							return 0;
+						}
+						return ( $a_created && ( ! $b_created || (int) $a_created < (int) $b_created ) ) ? -1 : 1;
+					}
+
+					return ( $a_recorded && ( ! $b_recorded || (int) $a_recorded < (int) $b_recorded ) ) ? -1 : 1;
+				}
+
+				return ( $a_rating && ( ! $b_rating || (int) $a_rating < (int) $b_rating ) ) ? -1 : 1;
+			}
+		);
 
 		if ( $numberposts > 0 ) {
 			$posts = array_slice( $posts, $numberposts * ( $paged - 1 ), $numberposts );
@@ -1657,6 +1693,16 @@ function citata_get_tags_array() {
 		'abt_politics'   => 'о политике',
 		'abt_literature' => 'о литературе',
 	);
+}
+
+/**
+ * Print wiki parsed content from Carbon field
+ *
+ * @param string $field_name Carbon field name.
+ * @return void
+ */
+function print_parsed_crb_field( $field_name ) {
+	echo wiki_parse_text( carbon_get_the_post_meta( $field_name ) );
 }
 
 require_once get_template_directory() . '/includes/template-carbon-fields.php';

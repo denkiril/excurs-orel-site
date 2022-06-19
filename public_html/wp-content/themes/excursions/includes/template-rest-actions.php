@@ -74,6 +74,10 @@ function get_sights_wprest( WP_REST_Request $request ) {
 				$sight['okn_id'] = $okn_id;
 			}
 
+			$sight['gba_rating']   = carbon_get_post_meta( $post_id, 'gba_rating' );
+			$sight['gba_recorded'] = carbon_get_post_meta( $post_id, 'gba_recorded' );
+			$sight['gba_created']  = carbon_get_post_meta( $post_id, 'gba_created' );
+
 			$sights[] = $sight;
 		}
 	}
