@@ -264,7 +264,9 @@ function crb_events_fields() {
 		->add_fields(
 			array(
 				Field::make( 'text', 'evnt_seasons', 'Сезоны (2018,2019):' ),
+				Field::make( 'textarea', 'evnt_alt_texts', 'Альтернативные текста к фоткам (index=alt_title=alt_description)' )
+					->set_rows( 4 ),
 			)
 		);
 }
-// add_action( 'carbon_fields_register_fields', 'crb_events_fields' );
+add_action( 'carbon_fields_register_fields', 'crb_events_fields' );

@@ -104,8 +104,9 @@ function annocards_func( $atts ) {
 			$permalink = get_the_permalink( $mypost );
 			$mytitle   = esc_html( get_the_title( $mypost ) );
 			if ( 'events' === $mypost->post_type ) {
-				$event_date = markup_event_date( $mypost->ID );
-				if ( $future_events ) {
+				$seasons    = carbon_get_post_meta( $mypost->ID, 'evnt_seasons' );
+				$event_date = $seasons ? '' : markup_event_date( $mypost->ID );
+				if ( $event_date && $future_events ) {
 					$event_date = '<span class="attention">' . $event_date . '</span>';
 				}
 			}
@@ -680,6 +681,7 @@ function gallery_func( $atts ) {
 			'pics_in_row'  => 1,
 			'return_array' => false,
 			'wrap'         => true,
+			'alt_texts'    => null,
 		),
 		$atts
 	);
@@ -697,9 +699,24 @@ function gallery_func( $atts ) {
 	$pics_in_row  = intval( $atts['pics_in_row'] );
 	$return_array = $atts['return_array'];
 	$wrap         = boolval( $atts['wrap'] );
+	$alt_texts    = $atts['alt_texts'];
 
-	$html   = '';
-	$sights = array();
+	$html          = '';
+	$sights        = array();
+	$alt_texts_arr = array();
+
+	if ( $alt_texts ) {
+		$lines = explode( PHP_EOL, trim( $alt_texts ) );
+		foreach ( $lines as $line ) {
+			$sublines = explode( '=', $line );
+			if ( count( $sublines ) > 2 ) {
+				$alt_texts_arr[ intval( $sublines[0] ) ] = array(
+					'title' => $sublines[1],
+					'desc'  => $sublines[2],
+				);
+			}
+		}
+	}
 
 	global $post;
 	// Get the images ids from the post_metadata.
@@ -750,7 +767,13 @@ function gallery_func( $atts ) {
 			}
 			// Иначе берем подпись из БД и парсим ее.
 			if ( ! $figcaption_html && ( 'image_description' === $figcaption || 'parent_href' === $figcaption ) ) {
-				$figcaption_html = wiki_parse_text( $image['caption'], $add_link ); // The caption (Description!).
+				$img_description = $image['caption'];
+				if ( ! empty( $alt_texts_arr ) && isset( $alt_texts_arr[ $counter ] ) ) {
+					$img_title       = $alt_texts_arr[ $counter ]['title'];
+					$img_description = $alt_texts_arr[ $counter ]['desc'];
+				}
+
+				$figcaption_html = wiki_parse_text( $img_description, $add_link );
 			}
 
 			$item_anchor = $class . '-' . $img_id;

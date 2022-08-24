@@ -46,6 +46,7 @@
 			array(
 				'acf_field'    => 'post-gallery',
 				'return_array' => true,
+				'alt_texts'    => carbon_get_the_post_meta( 'evnt_alt_texts' ),
 			)
 		);
 
