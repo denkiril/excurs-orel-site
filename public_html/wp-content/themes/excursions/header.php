@@ -20,7 +20,9 @@
 
 	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
 
-	<link rel="shortcut icon" href="/favicon.ico">
+	<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+	<link rel="manifest" href="/manifest.webmanifest" />
+	<link rel="apple-touch-icon" href="/assets/favicons/apple-touch-icon.png" />
 
 	<?php
 	$font_1_url = get_template_directory_uri() . '/assets/fonts/ubuntu-v13-cyrillic_latin-300.woff2';
