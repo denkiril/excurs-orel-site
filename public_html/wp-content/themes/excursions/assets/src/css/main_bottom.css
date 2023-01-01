@@ -106,14 +106,15 @@ footer{
     }
 }
 
-.soc-container{
-    /* display: inline-block; */
-    text-align: right;
-    /* margin-bottom: 20px; */
+.soc-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
 .soc-container a {
+    position: relative;
     text-decoration: none;
-    padding: 0 5px;
+    margin: 0 5px;
 }
 .soc-container a:focus {
     outline: none;
@@ -133,9 +134,14 @@ footer{
     fill: #d93175;
     fill-opacity: 1;
 }
-.yt-logo {
-    fill: #ff0000;
-    fill-opacity: 0;
+.yt-logo-hovered {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+}
+.yt-logo:hover .yt-logo-hovered {
+    display: block;
 }
 .soc-container a:hover .yt-logo,
 .soc-container a:focus .yt-logo {
