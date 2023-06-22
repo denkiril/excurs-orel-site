@@ -15,6 +15,8 @@ function addMarker(event, map) {
   const url = event.permalink;
   const { title } = event;
 
+  if (!lat || !lng) return;
+
   // Макеты балуна и хинта
   const EventBalloonLayoutClass = ymaps.templateLayoutFactory.createClass(
     '<h3><a href="{{ properties.url }}">{{ properties.title }}</a></h3>',
