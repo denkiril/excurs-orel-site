@@ -4,6 +4,7 @@ Disallow: /events/k-150-letiyu-orlovskoj-zheleznoj-dorogi-2019/
 Disallow: /search/
 Disallow: /policy/
 Disallow: /events-rules/
+Disallow: /guidebook_old/
 Disallow: /cgi-bin
 Disallow: /?
 Disallow: /wp-
@@ -19,9 +20,13 @@ Disallow: */wlwmanifest.xml
 Disallow: /xmlrpc.php
 Disallow: *utm*=
 Disallow: *openstat=
+
 Allow: */uploads
 Allow: /wp-admin/admin-ajax.php
 Allow: /wp-content/themes/excursions/
+
+# Clean-param: filter&sight&search /guidebook
+Clean-param: search /guidebook
 
 Sitemap: https://excurs-orel.ru/sitemap.xml
 
