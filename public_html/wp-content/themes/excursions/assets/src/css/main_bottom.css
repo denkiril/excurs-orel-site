@@ -119,21 +119,32 @@ footer{
 .soc-container a:focus {
     outline: none;
 }
-.soc-container a:hover .vk-logo,
-.soc-container a:focus .vk-logo {
-    fill: #4d76a1;
+.soc-container a:hover .opaque-on-hover,
+.soc-container a:focus .opaque-on-hover {
     fill-opacity: 1;
 }
-.soc-container a:hover .fb-logo,
+.soc-container a:hover .vk-front-color,
+.soc-container a:focus .vk-front-color {
+    fill: #ffffff;
+}
+.soc-container a:hover .vk-back-color,
+.soc-container a:focus .vk-back-color {
+    fill: #0077ff;
+}
+.soc-container a:hover .vk-video-color,
+.soc-container a:focus .vk-video-color {
+    fill: #ff2b42;
+}
+/* .soc-container a:hover .fb-logo,
 .soc-container a:focus .fb-logo {
     fill: #3b5998;
     fill-opacity: 1;
-}
-.soc-container a:hover .ig-logo,
+} */
+/* .soc-container a:hover .ig-logo,
 .soc-container a:focus .ig-logo {
     fill: #d93175;
     fill-opacity: 1;
-}
+} */
 .yt-logo-hovered {
     position: absolute;
     top: 0;
